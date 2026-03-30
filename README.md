@@ -1,4 +1,4 @@
-# context_log
+# ContextLog
 
 A new Flutter project.
 
