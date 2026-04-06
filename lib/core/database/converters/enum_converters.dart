@@ -83,6 +83,31 @@ class StorageTypeConverter extends TypeConverter<StorageType, String> {
   String toSql(StorageType value) => value.name;
 }
 
+class DrawingTypeConverter extends TypeConverter<DrawingType, String> {
+  const DrawingTypeConverter();
+
+  @override
+  DrawingType fromSql(String fromDb) =>
+      DrawingType.values.firstWhere((e) => e.name == fromDb);
+
+  @override
+  String toSql(DrawingType value) => value.name;
+}
+
+class NullableDrawingTypeConverter
+    extends TypeConverter<DrawingType?, String?> {
+  const NullableDrawingTypeConverter();
+
+  @override
+  DrawingType? fromSql(String? fromDb) {
+    if (fromDb == null) return null;
+    return DrawingType.values.firstWhere((e) => e.name == fromDb);
+  }
+
+  @override
+  String? toSql(DrawingType? value) => value?.name;
+}
+
 class HarrisRelationTypeConverter
     extends TypeConverter<HarrisRelationType, String> {
   const HarrisRelationTypeConverter();

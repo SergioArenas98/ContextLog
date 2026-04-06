@@ -1,84 +1,16 @@
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/validation_result.dart';
-import '../../data/repositories/feature_repository.dart';
 
+/// Validator for feature creation and update.
+/// Feature numbers are auto-generated, so no uniqueness check is needed.
+/// All user-facing fields are optional, so there is nothing to validate.
 class FeatureValidator {
-  const FeatureValidator(this._repository);
+  const FeatureValidator();
 
-  final FeatureRepository _repository;
-
-  Future<ValidationResult> validateForCreate({
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    required String excavator,
-  }) async {
-    final required = _validateRequiredFields(
-      site: site,
-      trench: trench,
-      area: area,
-      featureNumber: featureNumber,
-      excavator: excavator,
-    );
-    if (required != null) return ValidationInvalid(required);
-
-    final exists = await _repository.existsBySitetrenchAreaNumber(
-      site: site,
-      trench: trench,
-      area: area,
-      featureNumber: featureNumber,
-    );
-    if (exists) {
-      return const ValidationInvalid(ValidationMessages.featureExists);
-    }
-
+  Future<ValidationResult> validateForCreate() async {
     return const ValidationValid();
   }
 
-  Future<ValidationResult> validateForUpdate({
-    required String id,
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    required String excavator,
-  }) async {
-    final required = _validateRequiredFields(
-      site: site,
-      trench: trench,
-      area: area,
-      featureNumber: featureNumber,
-      excavator: excavator,
-    );
-    if (required != null) return ValidationInvalid(required);
-
-    final exists = await _repository.existsBySitetrenchAreaNumber(
-      site: site,
-      trench: trench,
-      area: area,
-      featureNumber: featureNumber,
-      excludeId: id,
-    );
-    if (exists) {
-      return const ValidationInvalid(ValidationMessages.featureExists);
-    }
-
+  Future<ValidationResult> validateForUpdate() async {
     return const ValidationValid();
-  }
-
-  String? _validateRequiredFields({
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    required String excavator,
-  }) {
-    if (site.trim().isEmpty) return 'Site is required';
-    if (trench.trim().isEmpty) return 'Trench is required';
-    if (area.trim().isEmpty) return 'Area is required';
-    if (featureNumber.trim().isEmpty) return 'Feature number is required';
-    if (excavator.trim().isEmpty) return 'Excavator is required';
-    return null;
   }
 }

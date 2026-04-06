@@ -9,12 +9,20 @@ Future<bool> showDuplicateWarningDialog(
   final result = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      icon: const Icon(Icons.warning_amber_outlined),
-      iconColor: Theme.of(ctx).colorScheme.tertiary,
+      icon: Icon(
+        Icons.warning_rounded,
+        color: Theme.of(ctx).colorScheme.secondary,
+        size: 32,
+      ),
       title: const Text('Duplicate Number'),
-      content: Text(message),
+      content: Text(
+        message,
+        style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+            ),
+      ),
       actions: [
-        TextButton(
+        OutlinedButton(
           onPressed: () => Navigator.of(ctx).pop(false),
           child: const Text('Cancel'),
         ),

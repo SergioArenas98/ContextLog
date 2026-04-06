@@ -12,7 +12,7 @@ class ContextLogApp extends StatelessWidget {
       title: 'ContextLog',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
     );

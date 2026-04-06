@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/utils/validation_result.dart';
+import '../../../../core/widgets/app_sheet_header.dart';
 import '../../../../core/widgets/duplicate_warning_dialog.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../domain/models/context_model.dart';
 import '../providers/context_providers.dart';
 
@@ -59,8 +62,13 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
       _notesCtrl.text = existing.notes ?? '';
 
       switch (existing) {
-        case CutModel(:final cutType, :final customCutTypeText, :final height,
-              :final width, :final depth):
+        case CutModel(
+              :final cutType,
+              :final customCutTypeText,
+              :final height,
+              :final width,
+              :final depth
+            ):
           _cutType = cutType ?? CutType.pit;
           _customCutTypeCtrl.text = customCutTypeText ?? '';
           _heightCtrl.text = height?.toString() ?? '';
@@ -102,28 +110,24 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
+      ),
       child: Form(
         key: _formKey,
         child: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space24,
+            AppSpacing.space16,
+            AppSpacing.space24,
+            AppSpacing.space24,
+          ),
           children: [
-            Row(
-              children: [
-                Text(
-                  _isEditing ? 'Edit Context' : 'Add Context',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+            AppSheetHeader(
+              title: _isEditing ? 'Edit Context' : 'Add Context',
+              onClose: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 16),
             if (!_isEditing)
               SegmentedButton<ContextType>(
                 segments: ContextType.values
@@ -138,7 +142,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
                 onSelectionChanged: (s) =>
                     setState(() => _type = s.first),
               ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.space16),
             TextFormField(
               controller: _contextNumberCtrl,
               decoration: const InputDecoration(
@@ -154,10 +158,10 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.space16),
             if (_type == ContextType.cut) ..._buildCutFields(),
             if (_type == ContextType.fill) ..._buildFillFields(),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _notesCtrl,
               decoration: const InputDecoration(
@@ -167,16 +171,29 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(_isEditing ? 'Update' : 'Save Context'),
+            const SizedBox(height: AppSpacing.space24),
+            SafeArea(
+              top: false,
+              child: FilledButton(
+                onPressed: _saving ? null : _save,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _saving
+                      ? const SizedBox(
+                          key: ValueKey('loading'),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          key: const ValueKey('label'),
+                          _isEditing ? 'Update' : 'Save Context',
+                        ),
+                ),
+              ),
             ),
           ],
         ),
@@ -185,12 +202,15 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
   }
 
   List<Widget> _buildCutFields() => [
+        SectionHeader(label: 'Cut Properties'),
+        const SizedBox(height: AppSpacing.space8),
         DropdownButtonFormField<CutType>(
           value: _cutType,
           decoration: const InputDecoration(labelText: 'Cut type'),
           items: CutType.values
               .map(
-                (t) => DropdownMenuItem(value: t, child: Text(t.displayName)),
+                (t) =>
+                    DropdownMenuItem(value: t, child: Text(t.displayName)),
               )
               .toList(),
           onChanged: (v) {
@@ -198,7 +218,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
           },
         ),
         if (_cutType == CutType.other) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.space12),
           TextFormField(
             controller: _customCutTypeCtrl,
             decoration:
@@ -210,47 +230,44 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
                     : null,
           ),
         ],
-        const SizedBox(height: 16),
-        Text(
-          'Dimensions (m)',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-        ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.space16),
+        SectionHeader(label: 'Dimensions (m)'),
+        const SizedBox(height: AppSpacing.space8),
         Row(
           children: [
             Expanded(child: _dimensionField(_heightCtrl, 'Height')),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space8),
             Expanded(child: _dimensionField(_widthCtrl, 'Width')),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space8),
             Expanded(child: _dimensionField(_depthCtrl, 'Depth')),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space12),
       ];
 
   List<Widget> _buildFillFields() {
     final cutsAsync = ref.watch(cutsByFeatureProvider(widget.featureId));
     return [
+      SectionHeader(label: 'Fill Properties'),
+      const SizedBox(height: AppSpacing.space8),
       cutsAsync.when(
         loading: () => const CircularProgressIndicator(),
         error: (e, _) => Text('Error loading cuts: $e'),
         data: (cuts) {
           if (cuts.isEmpty) {
             return Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.space12),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.smBorderRadius,
               ),
               child: Row(
                 children: [
                   Icon(
-                    Icons.warning_amber,
+                    Icons.warning_rounded,
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space8),
                   const Expanded(
                     child: Text(
                       'No cuts in this feature. Create a cut first, then add fills.',
@@ -277,13 +294,13 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
           );
         },
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: AppSpacing.space12),
       TextFormField(
         controller: _compositionCtrl,
         decoration: const InputDecoration(labelText: 'Composition'),
         textCapitalization: TextCapitalization.sentences,
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: AppSpacing.space12),
       TextFormField(
         controller: _colorCtrl,
         decoration: const InputDecoration(
@@ -292,19 +309,19 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
         ),
         textCapitalization: TextCapitalization.sentences,
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: AppSpacing.space12),
       TextFormField(
         controller: _compactionCtrl,
         decoration: const InputDecoration(labelText: 'Compaction'),
         textCapitalization: TextCapitalization.sentences,
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: AppSpacing.space12),
       TextFormField(
         controller: _inclusionsCtrl,
         decoration: const InputDecoration(labelText: 'Inclusions'),
         textCapitalization: TextCapitalization.sentences,
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: AppSpacing.space12),
     ];
   }
 
@@ -329,7 +346,6 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
       final repo = ref.read(contextRepositoryProvider);
       final validator = ref.read(contextValidatorProvider);
 
-      // Validate context number (warns on duplicate)
       final ValidationResult numResult;
       if (_type == ContextType.fill && _parentCutId != null) {
         numResult = await validator.validateFill(
@@ -366,24 +382,30 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
             id: widget.existingContext!.id,
             contextNumber: contextNumber,
             cutType: _cutType,
-            customCutTypeText:
-                _cutType == CutType.other ? _customCutTypeCtrl.text.trim() : null,
+            customCutTypeText: _cutType == CutType.other
+                ? _customCutTypeCtrl.text.trim()
+                : null,
             height: _parseDouble(_heightCtrl.text),
             width: _parseDouble(_widthCtrl.text),
             depth: _parseDouble(_depthCtrl.text),
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           );
         } else {
           await repo.createCut(
             featureId: widget.featureId,
             contextNumber: contextNumber,
             cutType: _cutType,
-            customCutTypeText:
-                _cutType == CutType.other ? _customCutTypeCtrl.text.trim() : null,
+            customCutTypeText: _cutType == CutType.other
+                ? _customCutTypeCtrl.text.trim()
+                : null,
             height: _parseDouble(_heightCtrl.text),
             width: _parseDouble(_widthCtrl.text),
             depth: _parseDouble(_depthCtrl.text),
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           );
         }
       } else {
@@ -404,7 +426,9 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
             inclusions: _inclusionsCtrl.text.trim().isEmpty
                 ? null
                 : _inclusionsCtrl.text.trim(),
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           );
         } else {
           await repo.createFill(
@@ -423,7 +447,9 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
             inclusions: _inclusionsCtrl.text.trim().isEmpty
                 ? null
                 : _inclusionsCtrl.text.trim(),
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           );
         }
       }

@@ -124,6 +124,16 @@ enum StorageType {
       };
 }
 
+enum DrawingType {
+  section,
+  profile;
+
+  String get displayName => switch (this) {
+        DrawingType.section => 'Section',
+        DrawingType.profile => 'Profile',
+      };
+}
+
 enum HarrisRelationType {
   above,
   below,

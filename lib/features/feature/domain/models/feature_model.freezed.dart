@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeatureModel {
 
- String get id; String get site; String get trench; String get area; String get featureNumber; String get excavator; DateTime get date; String? get notes; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get featureNumber; String? get rubiconCode; String? get license; String? get area; DateTime get date; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FeatureModelCopyWith<FeatureModel> get copyWith => _$FeatureModelCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.site, site) || other.site == site)&&(identical(other.trench, trench) || other.trench == trench)&&(identical(other.area, area) || other.area == area)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.excavator, excavator) || other.excavator == excavator)&&(identical(other.date, date) || other.date == date)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.rubiconCode, rubiconCode) || other.rubiconCode == rubiconCode)&&(identical(other.license, license) || other.license == license)&&(identical(other.area, area) || other.area == area)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,site,trench,area,featureNumber,excavator,date,notes,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureNumber,rubiconCode,license,area,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FeatureModel(id: $id, site: $site, trench: $trench, area: $area, featureNumber: $featureNumber, excavator: $excavator, date: $date, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FeatureModel(id: $id, featureNumber: $featureNumber, rubiconCode: $rubiconCode, license: $license, area: $area, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FeatureModelCopyWith<$Res>  {
   factory $FeatureModelCopyWith(FeatureModel value, $Res Function(FeatureModel) _then) = _$FeatureModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String site, String trench, String area, String featureNumber, String excavator, DateTime date, String? notes, DateTime createdAt, DateTime updatedAt
+ String id, String featureNumber, String? rubiconCode, String? license, String? area, DateTime date, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -62,17 +62,15 @@ class _$FeatureModelCopyWithImpl<$Res>
 
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? site = null,Object? trench = null,Object? area = null,Object? featureNumber = null,Object? excavator = null,Object? date = null,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureNumber = null,Object? rubiconCode = freezed,Object? license = freezed,Object? area = freezed,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,site: null == site ? _self.site : site // ignore: cast_nullable_to_non_nullable
-as String,trench: null == trench ? _self.trench : trench // ignore: cast_nullable_to_non_nullable
-as String,area: null == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
 as String,featureNumber: null == featureNumber ? _self.featureNumber : featureNumber // ignore: cast_nullable_to_non_nullable
-as String,excavator: null == excavator ? _self.excavator : excavator // ignore: cast_nullable_to_non_nullable
-as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as DateTime,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,rubiconCode: freezed == rubiconCode ? _self.rubiconCode : rubiconCode // ignore: cast_nullable_to_non_nullable
+as String?,license: freezed == license ? _self.license : license // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -159,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String site,  String trench,  String area,  String featureNumber,  String excavator,  DateTime date,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? rubiconCode,  String? license,  String? area,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeatureModel() when $default != null:
-return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,_that.excavator,_that.date,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.rubiconCode,_that.license,_that.area,_that.date,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -180,10 +178,10 @@ return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String site,  String trench,  String area,  String featureNumber,  String excavator,  DateTime date,  String? notes,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? rubiconCode,  String? license,  String? area,  DateTime date,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FeatureModel():
-return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,_that.excavator,_that.date,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.rubiconCode,_that.license,_that.area,_that.date,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +198,10 @@ return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String site,  String trench,  String area,  String featureNumber,  String excavator,  DateTime date,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureNumber,  String? rubiconCode,  String? license,  String? area,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FeatureModel() when $default != null:
-return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,_that.excavator,_that.date,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.rubiconCode,_that.license,_that.area,_that.date,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -215,17 +213,15 @@ return $default(_that.id,_that.site,_that.trench,_that.area,_that.featureNumber,
 
 
 class _FeatureModel implements FeatureModel {
-  const _FeatureModel({required this.id, required this.site, required this.trench, required this.area, required this.featureNumber, required this.excavator, required this.date, this.notes, required this.createdAt, required this.updatedAt});
+  const _FeatureModel({required this.id, required this.featureNumber, this.rubiconCode, this.license, this.area, required this.date, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
-@override final  String site;
-@override final  String trench;
-@override final  String area;
 @override final  String featureNumber;
-@override final  String excavator;
+@override final  String? rubiconCode;
+@override final  String? license;
+@override final  String? area;
 @override final  DateTime date;
-@override final  String? notes;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
 
@@ -239,16 +235,16 @@ _$FeatureModelCopyWith<_FeatureModel> get copyWith => __$FeatureModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.site, site) || other.site == site)&&(identical(other.trench, trench) || other.trench == trench)&&(identical(other.area, area) || other.area == area)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.excavator, excavator) || other.excavator == excavator)&&(identical(other.date, date) || other.date == date)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.rubiconCode, rubiconCode) || other.rubiconCode == rubiconCode)&&(identical(other.license, license) || other.license == license)&&(identical(other.area, area) || other.area == area)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,site,trench,area,featureNumber,excavator,date,notes,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureNumber,rubiconCode,license,area,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FeatureModel(id: $id, site: $site, trench: $trench, area: $area, featureNumber: $featureNumber, excavator: $excavator, date: $date, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FeatureModel(id: $id, featureNumber: $featureNumber, rubiconCode: $rubiconCode, license: $license, area: $area, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -259,7 +255,7 @@ abstract mixin class _$FeatureModelCopyWith<$Res> implements $FeatureModelCopyWi
   factory _$FeatureModelCopyWith(_FeatureModel value, $Res Function(_FeatureModel) _then) = __$FeatureModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String site, String trench, String area, String featureNumber, String excavator, DateTime date, String? notes, DateTime createdAt, DateTime updatedAt
+ String id, String featureNumber, String? rubiconCode, String? license, String? area, DateTime date, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -276,17 +272,15 @@ class __$FeatureModelCopyWithImpl<$Res>
 
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? site = null,Object? trench = null,Object? area = null,Object? featureNumber = null,Object? excavator = null,Object? date = null,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureNumber = null,Object? rubiconCode = freezed,Object? license = freezed,Object? area = freezed,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_FeatureModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,site: null == site ? _self.site : site // ignore: cast_nullable_to_non_nullable
-as String,trench: null == trench ? _self.trench : trench // ignore: cast_nullable_to_non_nullable
-as String,area: null == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
 as String,featureNumber: null == featureNumber ? _self.featureNumber : featureNumber // ignore: cast_nullable_to_non_nullable
-as String,excavator: null == excavator ? _self.excavator : excavator // ignore: cast_nullable_to_non_nullable
-as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
-as DateTime,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,rubiconCode: freezed == rubiconCode ? _self.rubiconCode : rubiconCode // ignore: cast_nullable_to_non_nullable
+as String?,license: freezed == license ? _self.license : license // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

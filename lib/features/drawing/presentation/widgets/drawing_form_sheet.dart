@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
+import '../../../../core/widgets/app_sheet_header.dart';
 import '../../domain/models/drawing_model.dart';
 import '../providers/drawing_providers.dart';
 
@@ -25,6 +28,8 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
   final _drawingNumberCtrl = TextEditingController();
   final _boardNumberCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  DrawingType? _drawingType;
+  CardinalOrientation _facing = CardinalOrientation.unknown;
   bool _saving = false;
 
   @override
@@ -34,6 +39,8 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
       _drawingNumberCtrl.text = widget.drawing!.drawingNumber;
       _boardNumberCtrl.text = widget.drawing!.boardNumber ?? '';
       _notesCtrl.text = widget.drawing!.notes ?? '';
+      _drawingType = widget.drawing!.drawingType;
+      _facing = widget.drawing!.facing;
     }
   }
 
@@ -54,22 +61,17 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
         key: _formKey,
         child: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space24,
+            AppSpacing.space16,
+            AppSpacing.space24,
+            AppSpacing.space24,
+          ),
           children: [
-            Row(
-              children: [
-                Text(
-                  widget.drawing == null ? 'Add Drawing' : 'Edit Drawing',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+            AppSheetHeader(
+              title: widget.drawing == null ? 'Add Drawing' : 'Edit Drawing',
+              onClose: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 16),
             TextFormField(
               controller: _drawingNumberCtrl,
               decoration: const InputDecoration(
@@ -80,7 +82,7 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
               validator: (v) =>
                   v == null || v.trim().isEmpty ? 'Required' : null,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _boardNumberCtrl,
               decoration: const InputDecoration(
@@ -88,7 +90,40 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
                 hintText: 'e.g. B3',
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
+            // Drawing type dropdown
+            DropdownButtonFormField<DrawingType?>(
+              value: _drawingType,
+              decoration: const InputDecoration(labelText: 'Type'),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('—')),
+                ...DrawingType.values.map(
+                  (t) => DropdownMenuItem(
+                    value: t,
+                    child: Text(t.displayName),
+                  ),
+                ),
+              ],
+              onChanged: (v) => setState(() => _drawingType = v),
+            ),
+            const SizedBox(height: AppSpacing.space12),
+            // Facing dropdown
+            DropdownButtonFormField<CardinalOrientation>(
+              value: _facing,
+              decoration: const InputDecoration(labelText: 'Facing'),
+              items: CardinalOrientation.values
+                  .map(
+                    (o) => DropdownMenuItem(
+                      value: o,
+                      child: Text(o.displayName),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) setState(() => _facing = v);
+              },
+            ),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _notesCtrl,
               decoration: const InputDecoration(
@@ -98,16 +133,29 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.drawing == null ? 'Save Drawing' : 'Update'),
+            const SizedBox(height: AppSpacing.space24),
+            SafeArea(
+              top: false,
+              child: FilledButton(
+                onPressed: _saving ? null : _save,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _saving
+                      ? const SizedBox(
+                          key: ValueKey('loading'),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          key: const ValueKey('label'),
+                          widget.drawing == null ? 'Save Drawing' : 'Update',
+                        ),
+                ),
+              ),
             ),
           ],
         ),
@@ -127,6 +175,8 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
           boardNumber: _boardNumberCtrl.text.trim().isEmpty
               ? null
               : _boardNumberCtrl.text.trim(),
+          drawingType: _drawingType,
+          facing: _facing,
           notes:
               _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
@@ -137,6 +187,8 @@ class _DrawingFormSheetState extends ConsumerState<DrawingFormSheet> {
           boardNumber: _boardNumberCtrl.text.trim().isEmpty
               ? null
               : _boardNumberCtrl.text.trim(),
+          drawingType: _drawingType,
+          facing: _facing,
           notes:
               _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );

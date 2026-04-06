@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/status_badge.dart';
+import '../../../../core/widgets/surface_card.dart';
 import '../../domain/models/photo_model.dart';
 import '../providers/photo_providers.dart';
 import 'photo_form_sheet.dart';
@@ -43,27 +47,36 @@ class PhotoListTab extends ConsumerWidget {
           }
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space16,
+              AppSpacing.space8,
+              AppSpacing.space16,
+              AppSpacing.space64 + 32,
+            ),
             children: [
               for (final entry in grouped.entries) ...[
-                _StageSectionHeader(stage: entry.key),
+                SectionHeader(label: entry.key.displayName),
                 ...entry.value.map(
-                  (photo) => _PhotoTile(
-                    photo: photo,
-                    featureId: featureId,
-                    onDelete: () => _deletePhoto(context, ref, photo),
+                  (photo) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: AppSpacing.space8),
+                    child: _PhotoTile(
+                      photo: photo,
+                      featureId: featureId,
+                      onDelete: () => _deletePhoto(context, ref, photo),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.space4),
               ],
             ],
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddPhoto(context, ref),
-        tooltip: 'Add Photo',
-        child: const Icon(Icons.add_a_photo_outlined),
+        icon: const Icon(Icons.add_a_photo_rounded),
+        label: const Text('Add Photo'),
       ),
     );
   }
@@ -73,9 +86,12 @@ class PhotoListTab extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => PhotoFormSheet(featureId: featureId, onSaved: () {
-        ref.invalidate(photosByFeatureProvider(featureId));
-      }),
+      builder: (_) => PhotoFormSheet(
+        featureId: featureId,
+        onSaved: () {
+          ref.invalidate(photosByFeatureProvider(featureId));
+        },
+      ),
     );
   }
 
@@ -96,25 +112,6 @@ class PhotoListTab extends ConsumerWidget {
   }
 }
 
-class _StageSectionHeader extends StatelessWidget {
-  const _StageSectionHeader({required this.stage});
-
-  final PhotoStage stage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        stage.displayName,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-      ),
-    );
-  }
-}
-
 class _PhotoTile extends ConsumerWidget {
   const _PhotoTile({
     required this.photo,
@@ -128,74 +125,138 @@ class _PhotoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: photo.localImagePath != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  File(photo.localImagePath!),
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+    final theme = Theme.of(context);
+    return SurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.space12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Image thumbnail
+          _Thumbnail(path: photo.localImagePath),
+          const SizedBox(width: AppSpacing.space12),
+          // Metadata
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        photo.manualCameraPhotoNumber != null
+                            ? 'Photo #${photo.manualCameraPhotoNumber}'
+                            : 'No photo number',
+                        style: theme.textTheme.titleSmall,
+                      ),
+                    ),
+                    StatusBadge(
+                      label: photo.cardinalOrientation.displayName,
+                      backgroundColor:
+                          theme.colorScheme.secondaryContainer,
+                      foregroundColor:
+                          theme.colorScheme.onSecondaryContainer,
+                    ),
+                  ],
                 ),
-              )
-            : Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: AppSpacing.space2),
+                StatusBadge(
+                  label: photo.stage.displayName,
+                  backgroundColor: theme.colorScheme.tertiaryContainer,
+                  foregroundColor: theme.colorScheme.onTertiaryContainer,
                 ),
-                child: Icon(
-                  Icons.photo_outlined,
-                  color: Theme.of(context).colorScheme.outline,
+                if (photo.notes != null && photo.notes!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.space4),
+                  Text(
+                    photo.notes!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          // Actions
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.edit_rounded,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
+                padding: const EdgeInsets.all(AppSpacing.space8),
+                constraints:
+                    const BoxConstraints(minWidth: 40, minHeight: 40),
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (_) => PhotoFormSheet(
+                    featureId: featureId,
+                    photo: photo,
+                    onSaved: () =>
+                        ref.invalidate(photosByFeatureProvider(featureId)),
+                  ),
                 ),
               ),
-        title: Text(
-          photo.manualCameraPhotoNumber != null
-              ? 'Photo #${photo.manualCameraPhotoNumber}'
-              : 'No photo number',
-          style: const TextStyle(fontWeight: FontWeight.w500),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Facing: ${photo.cardinalOrientation.displayName}'),
-            if (photo.notes != null && photo.notes!.isNotEmpty)
-              Text(
-                photo.notes!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-        trailing: PopupMenuButton<String>(
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'edit', child: Text('Edit')),
-            const PopupMenuItem(value: 'delete', child: Text('Delete')),
-          ],
-          onSelected: (v) {
-            if (v == 'edit') {
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => PhotoFormSheet(
-                  featureId: featureId,
-                  photo: photo,
-                  onSaved: () =>
-                      ref.invalidate(photosByFeatureProvider(featureId)),
+              IconButton(
+                icon: Icon(
+                  Icons.delete_rounded,
+                  size: 18,
+                  color: theme.colorScheme.error,
                 ),
-              );
-            } else if (v == 'delete') {
-              onDelete();
-            }
-          },
+                padding: const EdgeInsets.all(AppSpacing.space8),
+                constraints:
+                    const BoxConstraints(minWidth: 40, minHeight: 40),
+                onPressed: onDelete,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Thumbnail extends StatelessWidget {
+  const _Thumbnail({required this.path});
+
+  final String? path;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    if (path != null) {
+      return ClipRRect(
+        borderRadius: AppRadius.smBorderRadius,
+        child: Image.file(
+          File(path!),
+          width: 64,
+          height: 64,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _placeholder(theme),
         ),
+      );
+    }
+    return _placeholder(theme);
+  }
+
+  Widget _placeholder(ThemeData theme) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: AppRadius.smBorderRadius,
+      ),
+      child: Icon(
+        Icons.photo_outlined,
+        color: theme.colorScheme.outline,
+        size: 28,
       ),
     );
   }

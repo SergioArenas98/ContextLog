@@ -18,33 +18,6 @@ class $FeaturesTableTable extends FeaturesTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _siteMeta = const VerificationMeta('site');
-  @override
-  late final GeneratedColumn<String> site = GeneratedColumn<String>(
-    'site',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _trenchMeta = const VerificationMeta('trench');
-  @override
-  late final GeneratedColumn<String> trench = GeneratedColumn<String>(
-    'trench',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _areaMeta = const VerificationMeta('area');
-  @override
-  late final GeneratedColumn<String> area = GeneratedColumn<String>(
-    'area',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _featureNumberMeta = const VerificationMeta(
     'featureNumber',
   );
@@ -56,16 +29,36 @@ class $FeaturesTableTable extends FeaturesTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _excavatorMeta = const VerificationMeta(
-    'excavator',
+  static const VerificationMeta _rubiconCodeMeta = const VerificationMeta(
+    'rubiconCode',
   );
   @override
-  late final GeneratedColumn<String> excavator = GeneratedColumn<String>(
-    'excavator',
+  late final GeneratedColumn<String> rubiconCode = GeneratedColumn<String>(
+    'rubicon_code',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _licenseMeta = const VerificationMeta(
+    'license',
+  );
+  @override
+  late final GeneratedColumn<String> license = GeneratedColumn<String>(
+    'license',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _areaMeta = const VerificationMeta('area');
+  @override
+  late final GeneratedColumn<String> area = GeneratedColumn<String>(
+    'area',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
@@ -75,15 +68,6 @@ class $FeaturesTableTable extends FeaturesTable
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
-  );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -110,13 +94,11 @@ class $FeaturesTableTable extends FeaturesTable
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    site,
-    trench,
-    area,
     featureNumber,
-    excavator,
+    rubiconCode,
+    license,
+    area,
     date,
-    notes,
     createdAt,
     updatedAt,
   ];
@@ -137,30 +119,6 @@ class $FeaturesTableTable extends FeaturesTable
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('site')) {
-      context.handle(
-        _siteMeta,
-        site.isAcceptableOrUnknown(data['site']!, _siteMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_siteMeta);
-    }
-    if (data.containsKey('trench')) {
-      context.handle(
-        _trenchMeta,
-        trench.isAcceptableOrUnknown(data['trench']!, _trenchMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_trenchMeta);
-    }
-    if (data.containsKey('area')) {
-      context.handle(
-        _areaMeta,
-        area.isAcceptableOrUnknown(data['area']!, _areaMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_areaMeta);
-    }
     if (data.containsKey('feature_number')) {
       context.handle(
         _featureNumberMeta,
@@ -172,13 +130,26 @@ class $FeaturesTableTable extends FeaturesTable
     } else if (isInserting) {
       context.missing(_featureNumberMeta);
     }
-    if (data.containsKey('excavator')) {
+    if (data.containsKey('rubicon_code')) {
       context.handle(
-        _excavatorMeta,
-        excavator.isAcceptableOrUnknown(data['excavator']!, _excavatorMeta),
+        _rubiconCodeMeta,
+        rubiconCode.isAcceptableOrUnknown(
+          data['rubicon_code']!,
+          _rubiconCodeMeta,
+        ),
       );
-    } else if (isInserting) {
-      context.missing(_excavatorMeta);
+    }
+    if (data.containsKey('license')) {
+      context.handle(
+        _licenseMeta,
+        license.isAcceptableOrUnknown(data['license']!, _licenseMeta),
+      );
+    }
+    if (data.containsKey('area')) {
+      context.handle(
+        _areaMeta,
+        area.isAcceptableOrUnknown(data['area']!, _areaMeta),
+      );
     }
     if (data.containsKey('date')) {
       context.handle(
@@ -187,12 +158,6 @@ class $FeaturesTableTable extends FeaturesTable
       );
     } else if (isInserting) {
       context.missing(_dateMeta);
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
-      );
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -223,34 +188,26 @@ class $FeaturesTableTable extends FeaturesTable
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
-      site: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}site'],
-      )!,
-      trench: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}trench'],
-      )!,
-      area: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}area'],
-      )!,
       featureNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}feature_number'],
       )!,
-      excavator: attachedDatabase.typeMapping.read(
+      rubiconCode: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}excavator'],
-      )!,
+        data['${effectivePrefix}rubicon_code'],
+      ),
+      license: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}license'],
+      ),
+      area: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area'],
+      ),
       date: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}date'],
       )!,
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -271,24 +228,20 @@ class $FeaturesTableTable extends FeaturesTable
 class FeaturesTableData extends DataClass
     implements Insertable<FeaturesTableData> {
   final String id;
-  final String site;
-  final String trench;
-  final String area;
   final String featureNumber;
-  final String excavator;
+  final String? rubiconCode;
+  final String? license;
+  final String? area;
   final DateTime date;
-  final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
   const FeaturesTableData({
     required this.id,
-    required this.site,
-    required this.trench,
-    required this.area,
     required this.featureNumber,
-    required this.excavator,
+    this.rubiconCode,
+    this.license,
+    this.area,
     required this.date,
-    this.notes,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -296,15 +249,17 @@ class FeaturesTableData extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['site'] = Variable<String>(site);
-    map['trench'] = Variable<String>(trench);
-    map['area'] = Variable<String>(area);
     map['feature_number'] = Variable<String>(featureNumber);
-    map['excavator'] = Variable<String>(excavator);
-    map['date'] = Variable<DateTime>(date);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
+    if (!nullToAbsent || rubiconCode != null) {
+      map['rubicon_code'] = Variable<String>(rubiconCode);
     }
+    if (!nullToAbsent || license != null) {
+      map['license'] = Variable<String>(license);
+    }
+    if (!nullToAbsent || area != null) {
+      map['area'] = Variable<String>(area);
+    }
+    map['date'] = Variable<DateTime>(date);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -313,15 +268,15 @@ class FeaturesTableData extends DataClass
   FeaturesTableCompanion toCompanion(bool nullToAbsent) {
     return FeaturesTableCompanion(
       id: Value(id),
-      site: Value(site),
-      trench: Value(trench),
-      area: Value(area),
       featureNumber: Value(featureNumber),
-      excavator: Value(excavator),
-      date: Value(date),
-      notes: notes == null && nullToAbsent
+      rubiconCode: rubiconCode == null && nullToAbsent
           ? const Value.absent()
-          : Value(notes),
+          : Value(rubiconCode),
+      license: license == null && nullToAbsent
+          ? const Value.absent()
+          : Value(license),
+      area: area == null && nullToAbsent ? const Value.absent() : Value(area),
+      date: Value(date),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -334,13 +289,11 @@ class FeaturesTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return FeaturesTableData(
       id: serializer.fromJson<String>(json['id']),
-      site: serializer.fromJson<String>(json['site']),
-      trench: serializer.fromJson<String>(json['trench']),
-      area: serializer.fromJson<String>(json['area']),
       featureNumber: serializer.fromJson<String>(json['featureNumber']),
-      excavator: serializer.fromJson<String>(json['excavator']),
+      rubiconCode: serializer.fromJson<String?>(json['rubiconCode']),
+      license: serializer.fromJson<String?>(json['license']),
+      area: serializer.fromJson<String?>(json['area']),
       date: serializer.fromJson<DateTime>(json['date']),
-      notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -350,13 +303,11 @@ class FeaturesTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'site': serializer.toJson<String>(site),
-      'trench': serializer.toJson<String>(trench),
-      'area': serializer.toJson<String>(area),
       'featureNumber': serializer.toJson<String>(featureNumber),
-      'excavator': serializer.toJson<String>(excavator),
+      'rubiconCode': serializer.toJson<String?>(rubiconCode),
+      'license': serializer.toJson<String?>(license),
+      'area': serializer.toJson<String?>(area),
       'date': serializer.toJson<DateTime>(date),
-      'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -364,39 +315,35 @@ class FeaturesTableData extends DataClass
 
   FeaturesTableData copyWith({
     String? id,
-    String? site,
-    String? trench,
-    String? area,
     String? featureNumber,
-    String? excavator,
+    Value<String?> rubiconCode = const Value.absent(),
+    Value<String?> license = const Value.absent(),
+    Value<String?> area = const Value.absent(),
     DateTime? date,
-    Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => FeaturesTableData(
     id: id ?? this.id,
-    site: site ?? this.site,
-    trench: trench ?? this.trench,
-    area: area ?? this.area,
     featureNumber: featureNumber ?? this.featureNumber,
-    excavator: excavator ?? this.excavator,
+    rubiconCode: rubiconCode.present ? rubiconCode.value : this.rubiconCode,
+    license: license.present ? license.value : this.license,
+    area: area.present ? area.value : this.area,
     date: date ?? this.date,
-    notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   FeaturesTableData copyWithCompanion(FeaturesTableCompanion data) {
     return FeaturesTableData(
       id: data.id.present ? data.id.value : this.id,
-      site: data.site.present ? data.site.value : this.site,
-      trench: data.trench.present ? data.trench.value : this.trench,
-      area: data.area.present ? data.area.value : this.area,
       featureNumber: data.featureNumber.present
           ? data.featureNumber.value
           : this.featureNumber,
-      excavator: data.excavator.present ? data.excavator.value : this.excavator,
+      rubiconCode: data.rubiconCode.present
+          ? data.rubiconCode.value
+          : this.rubiconCode,
+      license: data.license.present ? data.license.value : this.license,
+      area: data.area.present ? data.area.value : this.area,
       date: data.date.present ? data.date.value : this.date,
-      notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -406,13 +353,11 @@ class FeaturesTableData extends DataClass
   String toString() {
     return (StringBuffer('FeaturesTableData(')
           ..write('id: $id, ')
-          ..write('site: $site, ')
-          ..write('trench: $trench, ')
-          ..write('area: $area, ')
           ..write('featureNumber: $featureNumber, ')
-          ..write('excavator: $excavator, ')
+          ..write('rubiconCode: $rubiconCode, ')
+          ..write('license: $license, ')
+          ..write('area: $area, ')
           ..write('date: $date, ')
-          ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -422,13 +367,11 @@ class FeaturesTableData extends DataClass
   @override
   int get hashCode => Object.hash(
     id,
-    site,
-    trench,
-    area,
     featureNumber,
-    excavator,
+    rubiconCode,
+    license,
+    area,
     date,
-    notes,
     createdAt,
     updatedAt,
   );
@@ -437,85 +380,69 @@ class FeaturesTableData extends DataClass
       identical(this, other) ||
       (other is FeaturesTableData &&
           other.id == this.id &&
-          other.site == this.site &&
-          other.trench == this.trench &&
-          other.area == this.area &&
           other.featureNumber == this.featureNumber &&
-          other.excavator == this.excavator &&
+          other.rubiconCode == this.rubiconCode &&
+          other.license == this.license &&
+          other.area == this.area &&
           other.date == this.date &&
-          other.notes == this.notes &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
 
 class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   final Value<String> id;
-  final Value<String> site;
-  final Value<String> trench;
-  final Value<String> area;
   final Value<String> featureNumber;
-  final Value<String> excavator;
+  final Value<String?> rubiconCode;
+  final Value<String?> license;
+  final Value<String?> area;
   final Value<DateTime> date;
-  final Value<String?> notes;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const FeaturesTableCompanion({
     this.id = const Value.absent(),
-    this.site = const Value.absent(),
-    this.trench = const Value.absent(),
-    this.area = const Value.absent(),
     this.featureNumber = const Value.absent(),
-    this.excavator = const Value.absent(),
+    this.rubiconCode = const Value.absent(),
+    this.license = const Value.absent(),
+    this.area = const Value.absent(),
     this.date = const Value.absent(),
-    this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FeaturesTableCompanion.insert({
     required String id,
-    required String site,
-    required String trench,
-    required String area,
     required String featureNumber,
-    required String excavator,
+    this.rubiconCode = const Value.absent(),
+    this.license = const Value.absent(),
+    this.area = const Value.absent(),
     required DateTime date,
-    this.notes = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       site = Value(site),
-       trench = Value(trench),
-       area = Value(area),
        featureNumber = Value(featureNumber),
-       excavator = Value(excavator),
        date = Value(date),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<FeaturesTableData> custom({
     Expression<String>? id,
-    Expression<String>? site,
-    Expression<String>? trench,
-    Expression<String>? area,
     Expression<String>? featureNumber,
-    Expression<String>? excavator,
+    Expression<String>? rubiconCode,
+    Expression<String>? license,
+    Expression<String>? area,
     Expression<DateTime>? date,
-    Expression<String>? notes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (site != null) 'site': site,
-      if (trench != null) 'trench': trench,
-      if (area != null) 'area': area,
       if (featureNumber != null) 'feature_number': featureNumber,
-      if (excavator != null) 'excavator': excavator,
+      if (rubiconCode != null) 'rubicon_code': rubiconCode,
+      if (license != null) 'license': license,
+      if (area != null) 'area': area,
       if (date != null) 'date': date,
-      if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -524,26 +451,22 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
 
   FeaturesTableCompanion copyWith({
     Value<String>? id,
-    Value<String>? site,
-    Value<String>? trench,
-    Value<String>? area,
     Value<String>? featureNumber,
-    Value<String>? excavator,
+    Value<String?>? rubiconCode,
+    Value<String?>? license,
+    Value<String?>? area,
     Value<DateTime>? date,
-    Value<String?>? notes,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return FeaturesTableCompanion(
       id: id ?? this.id,
-      site: site ?? this.site,
-      trench: trench ?? this.trench,
-      area: area ?? this.area,
       featureNumber: featureNumber ?? this.featureNumber,
-      excavator: excavator ?? this.excavator,
+      rubiconCode: rubiconCode ?? this.rubiconCode,
+      license: license ?? this.license,
+      area: area ?? this.area,
       date: date ?? this.date,
-      notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -556,26 +479,20 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (site.present) {
-      map['site'] = Variable<String>(site.value);
+    if (featureNumber.present) {
+      map['feature_number'] = Variable<String>(featureNumber.value);
     }
-    if (trench.present) {
-      map['trench'] = Variable<String>(trench.value);
+    if (rubiconCode.present) {
+      map['rubicon_code'] = Variable<String>(rubiconCode.value);
+    }
+    if (license.present) {
+      map['license'] = Variable<String>(license.value);
     }
     if (area.present) {
       map['area'] = Variable<String>(area.value);
     }
-    if (featureNumber.present) {
-      map['feature_number'] = Variable<String>(featureNumber.value);
-    }
-    if (excavator.present) {
-      map['excavator'] = Variable<String>(excavator.value);
-    }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
-    }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -593,13 +510,11 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   String toString() {
     return (StringBuffer('FeaturesTableCompanion(')
           ..write('id: $id, ')
-          ..write('site: $site, ')
-          ..write('trench: $trench, ')
-          ..write('area: $area, ')
           ..write('featureNumber: $featureNumber, ')
-          ..write('excavator: $excavator, ')
+          ..write('rubiconCode: $rubiconCode, ')
+          ..write('license: $license, ')
+          ..write('area: $area, ')
           ..write('date: $date, ')
-          ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -1263,6 +1178,25 @@ class $DrawingsTableTable extends DrawingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<DrawingType?, String>
+  drawingType = GeneratedColumn<String>(
+    'drawing_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<DrawingType?>($DrawingsTableTable.$converterdrawingType);
+  @override
+  late final GeneratedColumnWithTypeConverter<CardinalOrientation, String>
+  facing = GeneratedColumn<String>(
+    'facing',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('unknown'),
+  ).withConverter<CardinalOrientation>($DrawingsTableTable.$converterfacing);
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -1300,6 +1234,8 @@ class $DrawingsTableTable extends DrawingsTable
     featureId,
     drawingNumber,
     boardNumber,
+    drawingType,
+    facing,
     notes,
     createdAt,
     updatedAt,
@@ -1396,6 +1332,18 @@ class $DrawingsTableTable extends DrawingsTable
         DriftSqlType.string,
         data['${effectivePrefix}board_number'],
       ),
+      drawingType: $DrawingsTableTable.$converterdrawingType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}drawing_type'],
+        ),
+      ),
+      facing: $DrawingsTableTable.$converterfacing.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}facing'],
+        )!,
+      ),
       notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
@@ -1415,6 +1363,11 @@ class $DrawingsTableTable extends DrawingsTable
   $DrawingsTableTable createAlias(String alias) {
     return $DrawingsTableTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<DrawingType?, String?> $converterdrawingType =
+      const NullableDrawingTypeConverter();
+  static TypeConverter<CardinalOrientation, String> $converterfacing =
+      const CardinalOrientationConverter();
 }
 
 class DrawingsTableData extends DataClass
@@ -1423,6 +1376,8 @@ class DrawingsTableData extends DataClass
   final String featureId;
   final String drawingNumber;
   final String? boardNumber;
+  final DrawingType? drawingType;
+  final CardinalOrientation facing;
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -1431,6 +1386,8 @@ class DrawingsTableData extends DataClass
     required this.featureId,
     required this.drawingNumber,
     this.boardNumber,
+    this.drawingType,
+    required this.facing,
     this.notes,
     required this.createdAt,
     required this.updatedAt,
@@ -1443,6 +1400,16 @@ class DrawingsTableData extends DataClass
     map['drawing_number'] = Variable<String>(drawingNumber);
     if (!nullToAbsent || boardNumber != null) {
       map['board_number'] = Variable<String>(boardNumber);
+    }
+    if (!nullToAbsent || drawingType != null) {
+      map['drawing_type'] = Variable<String>(
+        $DrawingsTableTable.$converterdrawingType.toSql(drawingType),
+      );
+    }
+    {
+      map['facing'] = Variable<String>(
+        $DrawingsTableTable.$converterfacing.toSql(facing),
+      );
     }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
@@ -1460,6 +1427,10 @@ class DrawingsTableData extends DataClass
       boardNumber: boardNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(boardNumber),
+      drawingType: drawingType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(drawingType),
+      facing: Value(facing),
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
@@ -1478,6 +1449,8 @@ class DrawingsTableData extends DataClass
       featureId: serializer.fromJson<String>(json['featureId']),
       drawingNumber: serializer.fromJson<String>(json['drawingNumber']),
       boardNumber: serializer.fromJson<String?>(json['boardNumber']),
+      drawingType: serializer.fromJson<DrawingType?>(json['drawingType']),
+      facing: serializer.fromJson<CardinalOrientation>(json['facing']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -1491,6 +1464,8 @@ class DrawingsTableData extends DataClass
       'featureId': serializer.toJson<String>(featureId),
       'drawingNumber': serializer.toJson<String>(drawingNumber),
       'boardNumber': serializer.toJson<String?>(boardNumber),
+      'drawingType': serializer.toJson<DrawingType?>(drawingType),
+      'facing': serializer.toJson<CardinalOrientation>(facing),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -1502,6 +1477,8 @@ class DrawingsTableData extends DataClass
     String? featureId,
     String? drawingNumber,
     Value<String?> boardNumber = const Value.absent(),
+    Value<DrawingType?> drawingType = const Value.absent(),
+    CardinalOrientation? facing,
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -1510,6 +1487,8 @@ class DrawingsTableData extends DataClass
     featureId: featureId ?? this.featureId,
     drawingNumber: drawingNumber ?? this.drawingNumber,
     boardNumber: boardNumber.present ? boardNumber.value : this.boardNumber,
+    drawingType: drawingType.present ? drawingType.value : this.drawingType,
+    facing: facing ?? this.facing,
     notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -1524,6 +1503,10 @@ class DrawingsTableData extends DataClass
       boardNumber: data.boardNumber.present
           ? data.boardNumber.value
           : this.boardNumber,
+      drawingType: data.drawingType.present
+          ? data.drawingType.value
+          : this.drawingType,
+      facing: data.facing.present ? data.facing.value : this.facing,
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -1537,6 +1520,8 @@ class DrawingsTableData extends DataClass
           ..write('featureId: $featureId, ')
           ..write('drawingNumber: $drawingNumber, ')
           ..write('boardNumber: $boardNumber, ')
+          ..write('drawingType: $drawingType, ')
+          ..write('facing: $facing, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -1550,6 +1535,8 @@ class DrawingsTableData extends DataClass
     featureId,
     drawingNumber,
     boardNumber,
+    drawingType,
+    facing,
     notes,
     createdAt,
     updatedAt,
@@ -1562,6 +1549,8 @@ class DrawingsTableData extends DataClass
           other.featureId == this.featureId &&
           other.drawingNumber == this.drawingNumber &&
           other.boardNumber == this.boardNumber &&
+          other.drawingType == this.drawingType &&
+          other.facing == this.facing &&
           other.notes == this.notes &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -1572,6 +1561,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
   final Value<String> featureId;
   final Value<String> drawingNumber;
   final Value<String?> boardNumber;
+  final Value<DrawingType?> drawingType;
+  final Value<CardinalOrientation> facing;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -1581,6 +1572,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     this.featureId = const Value.absent(),
     this.drawingNumber = const Value.absent(),
     this.boardNumber = const Value.absent(),
+    this.drawingType = const Value.absent(),
+    this.facing = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1591,6 +1584,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     required String featureId,
     required String drawingNumber,
     this.boardNumber = const Value.absent(),
+    this.drawingType = const Value.absent(),
+    this.facing = const Value.absent(),
     this.notes = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -1605,6 +1600,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     Expression<String>? featureId,
     Expression<String>? drawingNumber,
     Expression<String>? boardNumber,
+    Expression<String>? drawingType,
+    Expression<String>? facing,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -1615,6 +1612,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
       if (featureId != null) 'feature_id': featureId,
       if (drawingNumber != null) 'drawing_number': drawingNumber,
       if (boardNumber != null) 'board_number': boardNumber,
+      if (drawingType != null) 'drawing_type': drawingType,
+      if (facing != null) 'facing': facing,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -1627,6 +1626,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     Value<String>? featureId,
     Value<String>? drawingNumber,
     Value<String?>? boardNumber,
+    Value<DrawingType?>? drawingType,
+    Value<CardinalOrientation>? facing,
     Value<String?>? notes,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -1637,6 +1638,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
       featureId: featureId ?? this.featureId,
       drawingNumber: drawingNumber ?? this.drawingNumber,
       boardNumber: boardNumber ?? this.boardNumber,
+      drawingType: drawingType ?? this.drawingType,
+      facing: facing ?? this.facing,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1658,6 +1661,16 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     }
     if (boardNumber.present) {
       map['board_number'] = Variable<String>(boardNumber.value);
+    }
+    if (drawingType.present) {
+      map['drawing_type'] = Variable<String>(
+        $DrawingsTableTable.$converterdrawingType.toSql(drawingType.value),
+      );
+    }
+    if (facing.present) {
+      map['facing'] = Variable<String>(
+        $DrawingsTableTable.$converterfacing.toSql(facing.value),
+      );
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -1681,6 +1694,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
           ..write('featureId: $featureId, ')
           ..write('drawingNumber: $drawingNumber, ')
           ..write('boardNumber: $boardNumber, ')
+          ..write('drawingType: $drawingType, ')
+          ..write('facing: $facing, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -4540,13 +4555,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$FeaturesTableTableCreateCompanionBuilder =
     FeaturesTableCompanion Function({
       required String id,
-      required String site,
-      required String trench,
-      required String area,
       required String featureNumber,
-      required String excavator,
+      Value<String?> rubiconCode,
+      Value<String?> license,
+      Value<String?> area,
       required DateTime date,
-      Value<String?> notes,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -4554,13 +4567,11 @@ typedef $$FeaturesTableTableCreateCompanionBuilder =
 typedef $$FeaturesTableTableUpdateCompanionBuilder =
     FeaturesTableCompanion Function({
       Value<String> id,
-      Value<String> site,
-      Value<String> trench,
-      Value<String> area,
       Value<String> featureNumber,
-      Value<String> excavator,
+      Value<String?> rubiconCode,
+      Value<String?> license,
+      Value<String?> area,
       Value<DateTime> date,
-      Value<String?> notes,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -4723,13 +4734,18 @@ class $$FeaturesTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get site => $composableBuilder(
-    column: $table.site,
+  ColumnFilters<String> get featureNumber => $composableBuilder(
+    column: $table.featureNumber,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get trench => $composableBuilder(
-    column: $table.trench,
+  ColumnFilters<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get license => $composableBuilder(
+    column: $table.license,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4738,23 +4754,8 @@ class $$FeaturesTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get featureNumber => $composableBuilder(
-    column: $table.featureNumber,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get excavator => $composableBuilder(
-    column: $table.excavator,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<DateTime> get date => $composableBuilder(
     column: $table.date,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4933,13 +4934,18 @@ class $$FeaturesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get site => $composableBuilder(
-    column: $table.site,
+  ColumnOrderings<String> get featureNumber => $composableBuilder(
+    column: $table.featureNumber,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get trench => $composableBuilder(
-    column: $table.trench,
+  ColumnOrderings<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get license => $composableBuilder(
+    column: $table.license,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4948,23 +4954,8 @@ class $$FeaturesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get featureNumber => $composableBuilder(
-    column: $table.featureNumber,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get excavator => $composableBuilder(
-    column: $table.excavator,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get date => $composableBuilder(
     column: $table.date,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4991,28 +4982,24 @@ class $$FeaturesTableTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get site =>
-      $composableBuilder(column: $table.site, builder: (column) => column);
-
-  GeneratedColumn<String> get trench =>
-      $composableBuilder(column: $table.trench, builder: (column) => column);
-
-  GeneratedColumn<String> get area =>
-      $composableBuilder(column: $table.area, builder: (column) => column);
-
   GeneratedColumn<String> get featureNumber => $composableBuilder(
     column: $table.featureNumber,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get excavator =>
-      $composableBuilder(column: $table.excavator, builder: (column) => column);
+  GeneratedColumn<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get license =>
+      $composableBuilder(column: $table.license, builder: (column) => column);
+
+  GeneratedColumn<String> get area =>
+      $composableBuilder(column: $table.area, builder: (column) => column);
 
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -5208,25 +5195,21 @@ class $$FeaturesTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
-                Value<String> site = const Value.absent(),
-                Value<String> trench = const Value.absent(),
-                Value<String> area = const Value.absent(),
                 Value<String> featureNumber = const Value.absent(),
-                Value<String> excavator = const Value.absent(),
+                Value<String?> rubiconCode = const Value.absent(),
+                Value<String?> license = const Value.absent(),
+                Value<String?> area = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FeaturesTableCompanion(
                 id: id,
-                site: site,
-                trench: trench,
-                area: area,
                 featureNumber: featureNumber,
-                excavator: excavator,
+                rubiconCode: rubiconCode,
+                license: license,
+                area: area,
                 date: date,
-                notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -5234,25 +5217,21 @@ class $$FeaturesTableTableTableManager
           createCompanionCallback:
               ({
                 required String id,
-                required String site,
-                required String trench,
-                required String area,
                 required String featureNumber,
-                required String excavator,
+                Value<String?> rubiconCode = const Value.absent(),
+                Value<String?> license = const Value.absent(),
+                Value<String?> area = const Value.absent(),
                 required DateTime date,
-                Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => FeaturesTableCompanion.insert(
                 id: id,
-                site: site,
-                trench: trench,
-                area: area,
                 featureNumber: featureNumber,
-                excavator: excavator,
+                rubiconCode: rubiconCode,
+                license: license,
+                area: area,
                 date: date,
-                notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -5858,6 +5837,8 @@ typedef $$DrawingsTableTableCreateCompanionBuilder =
       required String featureId,
       required String drawingNumber,
       Value<String?> boardNumber,
+      Value<DrawingType?> drawingType,
+      Value<CardinalOrientation> facing,
       Value<String?> notes,
       required DateTime createdAt,
       required DateTime updatedAt,
@@ -5869,6 +5850,8 @@ typedef $$DrawingsTableTableUpdateCompanionBuilder =
       Value<String> featureId,
       Value<String> drawingNumber,
       Value<String?> boardNumber,
+      Value<DrawingType?> drawingType,
+      Value<CardinalOrientation> facing,
       Value<String?> notes,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -5926,6 +5909,22 @@ class $$DrawingsTableTableFilterComposer
   ColumnFilters<String> get boardNumber => $composableBuilder(
     column: $table.boardNumber,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DrawingType?, DrawingType, String>
+  get drawingType => $composableBuilder(
+    column: $table.drawingType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    CardinalOrientation,
+    CardinalOrientation,
+    String
+  >
+  get facing => $composableBuilder(
+    column: $table.facing,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get notes => $composableBuilder(
@@ -5991,6 +5990,16 @@ class $$DrawingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get drawingType => $composableBuilder(
+    column: $table.drawingType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get facing => $composableBuilder(
+    column: $table.facing,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get notes => $composableBuilder(
     column: $table.notes,
     builder: (column) => ColumnOrderings(column),
@@ -6051,6 +6060,15 @@ class $$DrawingsTableTableAnnotationComposer
     column: $table.boardNumber,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<DrawingType?, String> get drawingType =>
+      $composableBuilder(
+        column: $table.drawingType,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<CardinalOrientation, String> get facing =>
+      $composableBuilder(column: $table.facing, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
@@ -6117,6 +6135,8 @@ class $$DrawingsTableTableTableManager
                 Value<String> featureId = const Value.absent(),
                 Value<String> drawingNumber = const Value.absent(),
                 Value<String?> boardNumber = const Value.absent(),
+                Value<DrawingType?> drawingType = const Value.absent(),
+                Value<CardinalOrientation> facing = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -6126,6 +6146,8 @@ class $$DrawingsTableTableTableManager
                 featureId: featureId,
                 drawingNumber: drawingNumber,
                 boardNumber: boardNumber,
+                drawingType: drawingType,
+                facing: facing,
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -6137,6 +6159,8 @@ class $$DrawingsTableTableTableManager
                 required String featureId,
                 required String drawingNumber,
                 Value<String?> boardNumber = const Value.absent(),
+                Value<DrawingType?> drawingType = const Value.absent(),
+                Value<CardinalOrientation> facing = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
@@ -6146,6 +6170,8 @@ class $$DrawingsTableTableTableManager
                 featureId: featureId,
                 drawingNumber: drawingNumber,
                 boardNumber: boardNumber,
+                drawingType: drawingType,
+                facing: facing,
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

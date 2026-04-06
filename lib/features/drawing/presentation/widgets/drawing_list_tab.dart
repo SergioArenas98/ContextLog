@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/status_badge.dart';
+import '../../../../core/widgets/surface_card.dart';
 import '../../domain/models/drawing_model.dart';
 import '../providers/drawing_providers.dart';
 import 'drawing_form_sheet.dart';
@@ -31,9 +35,15 @@ class DrawingListTab extends ConsumerWidget {
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space16,
+              AppSpacing.space8,
+              AppSpacing.space16,
+              AppSpacing.space64 + 32,
+            ),
             itemCount: drawings.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AppSpacing.space8),
             itemBuilder: (context, index) => _DrawingTile(
               drawing: drawings[index],
               featureId: featureId,
@@ -42,10 +52,10 @@ class DrawingListTab extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAdd(context, ref),
-        tooltip: 'Add Drawing',
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add Drawing'),
       ),
     );
   }
@@ -76,74 +86,122 @@ class _DrawingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(8),
+    final theme = Theme.of(context);
+    return SurfaceCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space16,
+        vertical: AppSpacing.space12,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Badge
+          StatusBadge(
+            label: drawing.drawingNumber,
+            backgroundColor: theme.colorScheme.secondaryContainer,
+            foregroundColor: theme.colorScheme.onSecondaryContainer,
+            pill: false,
           ),
-          child: Center(
-            child: Text(
-              drawing.drawingNumber,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondaryContainer,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(width: AppSpacing.space12),
+          // Metadata
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Drawing ${drawing.drawingNumber}',
+                  style: theme.textTheme.titleSmall,
+                ),
+                if (drawing.drawingType != null ||
+                    drawing.facing != CardinalOrientation.unknown) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    [
+                      if (drawing.drawingType != null)
+                        drawing.drawingType!.displayName,
+                      if (drawing.facing != CardinalOrientation.unknown)
+                        'Facing ${drawing.facing.displayName}',
+                    ].join('  ·  '),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+                if (drawing.boardNumber != null) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    'Board: ${drawing.boardNumber}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+                if (drawing.notes != null &&
+                    drawing.notes!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    drawing.notes!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
             ),
           ),
-        ),
-        title: Text('Drawing ${drawing.drawingNumber}'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (drawing.boardNumber != null)
-              Text('Board: ${drawing.boardNumber}'),
-            if (drawing.notes != null && drawing.notes!.isNotEmpty)
-              Text(
-                drawing.notes!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-        trailing: PopupMenuButton<String>(
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'edit', child: Text('Edit')),
-            const PopupMenuItem(value: 'delete', child: Text('Delete')),
-          ],
-          onSelected: (v) async {
-            if (v == 'edit') {
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => DrawingFormSheet(
-                  featureId: featureId,
-                  drawing: drawing,
-                  onSaved: () =>
-                      ref.invalidate(drawingsByFeatureProvider(featureId)),
+          // Actions
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.edit_rounded,
+                  size: 18,
+                  color: theme.colorScheme.primary,
                 ),
-              );
-            } else if (v == 'delete') {
-              final confirmed = await showConfirmDeleteDialog(
-                context,
-                title: 'Delete drawing?',
-                message: 'This will permanently remove the drawing record.',
-              );
-              if (confirmed) {
-                await ref.read(drawingRepositoryProvider).delete(drawing.id);
-                ref.invalidate(drawingsByFeatureProvider(featureId));
-              }
-            }
-          },
-        ),
+                padding: const EdgeInsets.all(AppSpacing.space8),
+                constraints:
+                    const BoxConstraints(minWidth: 40, minHeight: 40),
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (_) => DrawingFormSheet(
+                    featureId: featureId,
+                    drawing: drawing,
+                    onSaved: () =>
+                        ref.invalidate(drawingsByFeatureProvider(featureId)),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete_rounded,
+                  size: 18,
+                  color: theme.colorScheme.error,
+                ),
+                padding: const EdgeInsets.all(AppSpacing.space8),
+                constraints:
+                    const BoxConstraints(minWidth: 40, minHeight: 40),
+                onPressed: () async {
+                  final confirmed = await showConfirmDeleteDialog(
+                    context,
+                    title: 'Delete drawing?',
+                    message: 'This will permanently remove the drawing record.',
+                  );
+                  if (confirmed && context.mounted) {
+                    await ref
+                        .read(drawingRepositoryProvider)
+                        .delete(drawing.id);
+                    ref.invalidate(drawingsByFeatureProvider(featureId));
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

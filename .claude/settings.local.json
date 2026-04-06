@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(flutter --version)",
+      "Bash(flutter create:*)",
+      "Bash(flutter pub:*)",
+      "Bash(dart run:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); pkgs={p[''''name'''']:p[''''version''''] for p in d.get\\(''''packages'''',[]\\)}; print\\(''''analyzer:'''', pkgs.get\\(''''analyzer'''',''''?''''\\)\\); print\\(''''analyzer_plugin:'''', pkgs.get\\(''''analyzer_plugin'''',''''?''''\\)\\); print\\(''''build_runner:'''', pkgs.get\\(''''build_runner'''',''''?''''\\)\\); print\\(''''drift_dev:'''', pkgs.get\\(''''drift_dev'''',''''?''''\\)\\); print\\(''''freezed:'''', pkgs.get\\(''''freezed'''',''''?''''\\)\\)\")",
+      "Bash(xargs grep:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)",
+      "Bash(wc -l \"C:/Users/sejum/Desktop/Mis documentos/Proyectos/ContextLog/context_log/docs/\"*.md \"C:/Users/sejum/Desktop/Mis documentos/Proyectos/ContextLog/context_log/README.md\")",
+      "Bash(grep -v \"^$\")"
+    ]
+  }
+}

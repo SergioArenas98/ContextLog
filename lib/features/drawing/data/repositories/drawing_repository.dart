@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/enums.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/models/drawing_model.dart';
 
@@ -29,6 +30,8 @@ class DrawingRepository {
     required String featureId,
     required String drawingNumber,
     String? boardNumber,
+    DrawingType? drawingType,
+    CardinalOrientation facing = CardinalOrientation.unknown,
     String? notes,
   }) async {
     final now = DateTime.now();
@@ -39,6 +42,8 @@ class DrawingRepository {
             featureId: featureId,
             drawingNumber: drawingNumber,
             boardNumber: Value(boardNumber),
+            drawingType: Value(drawingType),
+            facing: Value(facing),
             notes: Value(notes),
             createdAt: now,
             updatedAt: now,
@@ -51,6 +56,8 @@ class DrawingRepository {
     required String id,
     required String drawingNumber,
     String? boardNumber,
+    DrawingType? drawingType,
+    CardinalOrientation facing = CardinalOrientation.unknown,
     String? notes,
   }) async {
     final now = DateTime.now();
@@ -58,6 +65,8 @@ class DrawingRepository {
       DrawingsTableCompanion(
         drawingNumber: Value(drawingNumber),
         boardNumber: Value(boardNumber),
+        drawingType: Value(drawingType),
+        facing: Value(facing),
         notes: Value(notes),
         updatedAt: Value(now),
       ),
@@ -74,6 +83,8 @@ class DrawingRepository {
         featureId: row.featureId,
         drawingNumber: row.drawingNumber,
         boardNumber: row.boardNumber,
+        drawingType: row.drawingType,
+        facing: row.facing,
         notes: row.notes,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,

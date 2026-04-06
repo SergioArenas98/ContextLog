@@ -18,14 +18,7 @@ void main() {
     featureRepo = FeatureRepository(db);
     contextRepo = ContextRepository(db);
 
-    final feature = await featureRepo.create(
-      site: 'Test Site',
-      trench: 'T1',
-      area: 'A1',
-      featureNumber: '001',
-      excavator: 'Tester',
-      date: DateTime(2024, 1, 1),
-    );
+    final feature = await featureRepo.create(area: 'A1');
     featureId = feature.id;
   });
 
@@ -87,14 +80,7 @@ void main() {
 
     test('contextNumberExistsInFeature returns false for different feature',
         () async {
-      final otherFeature = await featureRepo.create(
-        site: 'Other',
-        trench: 'T2',
-        area: 'A2',
-        featureNumber: '002',
-        excavator: 'Tester',
-        date: DateTime.now(),
-      );
+      final otherFeature = await featureRepo.create(area: 'A2');
       await contextRepo.createCut(
         featureId: otherFeature.id,
         contextNumber: 100,

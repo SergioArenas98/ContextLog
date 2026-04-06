@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/surface_card.dart';
+import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
 import '../../domain/models/harris_relation_model.dart';
 import '../providers/harris_providers.dart';
@@ -38,12 +41,18 @@ class MatrixTab extends ConsumerWidget {
 
             return Column(
               children: [
-                if (relations.isNotEmpty)
-                  _RelationChips(
-                    relations: relations,
-                    featureId: featureId,
-                    ref: ref,
-                  ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: relations.isNotEmpty ? null : 0,
+                  child: relations.isNotEmpty
+                      ? _RelationInfoBar(
+                          relations: relations,
+                          featureId: featureId,
+                          ref: ref,
+                          contexts: contexts,
+                        )
+                      : null,
+                ),
                 Expanded(
                   child: relations.isEmpty
                       ? EmptyStateWidget(
@@ -64,10 +73,11 @@ class MatrixTab extends ConsumerWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAdd(context, ref),
         tooltip: 'Add stratigraphic relation',
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add_link_rounded),
+        label: const Text('Add Relation'),
       ),
     );
   }
@@ -85,38 +95,61 @@ class MatrixTab extends ConsumerWidget {
   }
 }
 
-class _RelationChips extends StatelessWidget {
-  const _RelationChips({
+// ── Relation info bar ──────────────────��───────────────────────────────────────
+
+class _RelationInfoBar extends StatelessWidget {
+  const _RelationInfoBar({
     required this.relations,
     required this.featureId,
     required this.ref,
+    required this.contexts,
   });
 
   final List<HarrisRelationModel> relations;
   final String featureId;
   final WidgetRef ref;
+  final List<ContextModel> contexts;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: [
-          const Icon(Icons.info_outline, size: 16),
-          const SizedBox(width: 8),
-          Text(
-            '${relations.length} relation${relations.length == 1 ? '' : 's'}',
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-          const Spacer(),
-          TextButton.icon(
-            icon: const Icon(Icons.list, size: 16),
-            label: const Text('List'),
-            onPressed: () => _showRelationsList(context),
-            style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
-          ),
-        ],
+    final theme = Theme.of(context);
+    final count = relations.length;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space16,
+        AppSpacing.space8,
+        AppSpacing.space16,
+        0,
+      ),
+      child: SurfaceCard(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space16,
+          vertical: AppSpacing.space8,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.account_tree_rounded,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+            const SizedBox(width: AppSpacing.space8),
+            Text(
+              '$count relation${count == 1 ? '' : 's'}',
+              style: theme.textTheme.labelMedium,
+            ),
+            const Spacer(),
+            TextButton.icon(
+              icon: const Icon(Icons.list_rounded, size: 16),
+              label: const Text('Show list'),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: theme.colorScheme.primary,
+              ),
+              onPressed: () => _showRelationsList(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -129,73 +162,191 @@ class _RelationChips extends StatelessWidget {
         relations: relations,
         featureId: featureId,
         ref: ref,
+        contexts: contexts,
       ),
     );
   }
 }
+
+// ── Relations list sheet ───────────────────────────���───────────────────────────
 
 class _RelationsListSheet extends StatelessWidget {
   const _RelationsListSheet({
     required this.relations,
     required this.featureId,
     required this.ref,
+    required this.contexts,
   });
 
   final List<HarrisRelationModel> relations;
   final String featureId;
   final WidgetRef ref;
+  final List<ContextModel> contexts;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    final theme = Theme.of(context);
+    // Build a lookup from context ID → context number for proper display
+    final idToNumber = <String, String>{
+      for (final ctx in contexts) ctx.id: ctx.contextNumber.toString(),
+    };
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Text(
-              'Stratigraphic Relations',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space24,
+            AppSpacing.space16,
+            AppSpacing.space8,
+            0,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Stratigraphic Relations',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
         ),
-        ...relations.map(
-          (r) => ListTile(
-            dense: true,
-            title: Text(
-              'C${_contextNumber(r.fromContextId)} ${r.relationType.displayName.toLowerCase()} C${_contextNumber(r.toContextId)}',
+        const Divider(),
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space16,
+              AppSpacing.space8,
+              AppSpacing.space16,
+              AppSpacing.space24,
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20),
-              onPressed: () async {
-                final confirmed = await showConfirmDeleteDialog(
-                  context,
-                  title: 'Remove relation?',
-                  message: 'This will remove the stratigraphic relation.',
-                );
-                if (confirmed && context.mounted) {
-                  await ref
-                      .read(harrisRelationRepositoryProvider)
-                      .delete(r.id);
-                  ref.invalidate(harrisByFeatureProvider(featureId));
-                  if (context.mounted) Navigator.of(context).pop();
-                }
-              },
-            ),
+            children: relations
+                .map(
+                  (r) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.space8),
+                    child: SurfaceCard(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space16,
+                        vertical: AppSpacing.space8,
+                      ),
+                      child: Row(
+                        children: [
+                          // From badge
+                          _ContextPill(
+                            label: 'C${idToNumber[r.fromContextId] ?? '?'}',
+                            theme: theme,
+                            isPrimary: true,
+                          ),
+                          const SizedBox(width: AppSpacing.space8),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: AppSpacing.space8),
+                          // To badge
+                          _ContextPill(
+                            label: 'C${idToNumber[r.toContextId] ?? '?'}',
+                            theme: theme,
+                            isPrimary: false,
+                          ),
+                          const SizedBox(width: AppSpacing.space8),
+                          Expanded(
+                            child: Text(
+                              r.relationType.displayName.toLowerCase(),
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_rounded,
+                              size: 18,
+                              color: theme.colorScheme.error,
+                            ),
+                            padding: const EdgeInsets.all(AppSpacing.space8),
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            onPressed: () async {
+                              final confirmed =
+                                  await showConfirmDeleteDialog(
+                                context,
+                                title: 'Remove relation?',
+                                message:
+                                    'This will remove the stratigraphic relation.',
+                              );
+                              if (confirmed && context.mounted) {
+                                await ref
+                                    .read(harrisRelationRepositoryProvider)
+                                    .delete(r.id);
+                                ref.invalidate(
+                                    harrisByFeatureProvider(featureId));
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
       ],
     );
   }
-
-  // We don't have context numbers here easily — use IDs truncated
-  String _contextNumber(String contextId) =>
-      contextId.substring(0, 8);
 }
+
+class _ContextPill extends StatelessWidget {
+  const _ContextPill({
+    required this.label,
+    required this.theme,
+    required this.isPrimary,
+  });
+
+  final String label;
+  final ThemeData theme;
+  final bool isPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space8,
+        vertical: 3,
+      ),
+      decoration: BoxDecoration(
+        color: isPrimary
+            ? theme.colorScheme.primaryContainer
+            : theme.colorScheme.tertiaryContainer,
+        borderRadius: AppRadius.fullBorderRadius,
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: isPrimary
+              ? theme.colorScheme.onPrimaryContainer
+              : theme.colorScheme.onTertiaryContainer,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Harris Matrix canvas ─────────────────────────────���─────────────────────────
 
 class _HarrisMatrixView extends ConsumerWidget {
   const _HarrisMatrixView({
@@ -235,13 +386,12 @@ class _HarrisMatrixView extends ConsumerWidget {
     );
   }
 
-  Size _computeCanvasSize(List contexts) {
-    // Rough estimate: 120px per node width, 100px per layer height
+  Size _computeCanvasSize(List<ContextModel> contexts) {
     const nodesPerRow = 4;
     final rows = (contexts.length / nodesPerRow).ceil();
     return Size(
-      nodesPerRow * 140.0 + 100,
-      rows * 120.0 + 100,
+      nodesPerRow * 160.0 + 128,
+      rows * 120.0 + 128,
     );
   }
 }

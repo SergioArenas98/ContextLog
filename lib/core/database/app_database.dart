@@ -43,7 +43,15 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          // Future migrations go here
+          if (from < 2) {
+            // v1→v2: Features table redesigned (removed site/trench/excavator/notes,
+            // added rubiconCode/license; area made nullable).
+            // Drawings table: added drawingType and facing columns.
+            await m.drop(featuresTable);
+            await m.createTable(featuresTable);
+            await m.addColumn(drawingsTable, drawingsTable.drawingType);
+            await m.addColumn(drawingsTable, drawingsTable.facing);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/utils/validation_result.dart';
+import '../../../../core/widgets/app_sheet_header.dart';
 import '../../../../core/widgets/duplicate_warning_dialog.dart';
 import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
@@ -38,22 +40,17 @@ class _RelationFormSheetState extends ConsumerState<RelationFormSheet> {
           EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: ListView(
         shrinkWrap: true,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.space24,
+          AppSpacing.space16,
+          AppSpacing.space24,
+          AppSpacing.space24,
+        ),
         children: [
-          Row(
-            children: [
-              Text(
-                'Add Stratigraphic Relation',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
+          AppSheetHeader(
+            title: 'Add Relation',
+            onClose: () => Navigator.of(context).pop(),
           ),
-          const SizedBox(height: 16),
           contextsAsync.when(
             loading: () => const CircularProgressIndicator(),
             error: (e, _) => Text('Error: $e'),
@@ -77,12 +74,13 @@ class _RelationFormSheetState extends ConsumerState<RelationFormSheet> {
                 children: [
                   DropdownButtonFormField<String>(
                     value: _fromContextId,
-                    decoration:
-                        const InputDecoration(labelText: 'From context *'),
+                    decoration: const InputDecoration(
+                      labelText: 'From context *',
+                    ),
                     items: items,
                     onChanged: (v) => setState(() => _fromContextId = v),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.space12),
                   DropdownButtonFormField<HarrisRelationType>(
                     value: _relationType,
                     decoration:
@@ -99,7 +97,7 @@ class _RelationFormSheetState extends ConsumerState<RelationFormSheet> {
                       if (v != null) setState(() => _relationType = v);
                     },
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.space12),
                   DropdownButtonFormField<String>(
                     value: _toContextId,
                     decoration:
@@ -111,22 +109,31 @@ class _RelationFormSheetState extends ConsumerState<RelationFormSheet> {
               );
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.space8),
           _RelationHelpText(relationType: _relationType),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: (_saving ||
-                    _fromContextId == null ||
-                    _toContextId == null)
-                ? null
-                : _save,
-            child: _saving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Add Relation'),
+          const SizedBox(height: AppSpacing.space24),
+          SafeArea(
+            top: false,
+            child: FilledButton(
+              onPressed:
+                  (_saving || _fromContextId == null || _toContextId == null)
+                      ? null
+                      : _save,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: _saving
+                    ? const SizedBox(
+                        key: ValueKey('loading'),
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text(key: ValueKey('label'), 'Add Relation'),
+              ),
+            ),
           ),
         ],
       ),
@@ -209,19 +216,19 @@ class _RelationHelpText extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(AppSpacing.space12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        borderRadius: AppRadius.smBorderRadius,
       ),
       child: Row(
         children: [
           Icon(
-            Icons.info_outline,
+            Icons.info_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.outline,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space8),
           Expanded(
             child: Text(
               helpText,

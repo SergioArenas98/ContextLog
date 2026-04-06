@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/utils/validation_result.dart';
+import '../../../../core/widgets/app_sheet_header.dart';
 import '../../../../core/widgets/duplicate_warning_dialog.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
 import '../../domain/models/sample_model.dart';
@@ -68,22 +71,17 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
         key: _formKey,
         child: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space24,
+            AppSpacing.space16,
+            AppSpacing.space24,
+            AppSpacing.space24,
+          ),
           children: [
-            Row(
-              children: [
-                Text(
-                  widget.sample == null ? 'Add Sample' : 'Edit Sample',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+            AppSheetHeader(
+              title: widget.sample == null ? 'Add Sample' : 'Edit Sample',
+              onClose: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 16),
             TextFormField(
               controller: _sampleNumberCtrl,
               decoration: const InputDecoration(
@@ -99,23 +97,28 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space16),
+            SectionHeader(label: 'Provenance'),
+            const SizedBox(height: AppSpacing.space8),
             fillsAsync.when(
               loading: () => const CircularProgressIndicator(),
               error: (e, _) => Text('Error: $e'),
               data: (fills) {
                 if (fills.isEmpty) {
                   return Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.space12),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppRadius.smBorderRadius,
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.warning_amber),
-                        SizedBox(width: 8),
-                        Expanded(
+                        Icon(
+                          Icons.warning_rounded,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(width: AppSpacing.space8),
+                        const Expanded(
                           child: Text(
                             'No fills in this feature. Create a fill first.',
                           ),
@@ -141,7 +144,9 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
                 );
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space16),
+            SectionHeader(label: 'Sample Type'),
+            const SizedBox(height: AppSpacing.space8),
             DropdownButtonFormField<SampleType>(
               value: _sampleType,
               decoration: const InputDecoration(labelText: 'Sample type'),
@@ -156,7 +161,7 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
               },
             ),
             if (_sampleType == SampleType.other) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.space12),
               TextFormField(
                 controller: _customTypeCtrl,
                 decoration:
@@ -169,7 +174,9 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
                         : null,
               ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space16),
+            SectionHeader(label: 'Storage'),
+            const SizedBox(height: AppSpacing.space8),
             DropdownButtonFormField<StorageType>(
               value: _storageType,
               decoration: const InputDecoration(labelText: 'Storage type'),
@@ -183,12 +190,13 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
                 if (v != null) setState(() => _storageType = v);
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _litersCtrl,
               decoration: const InputDecoration(
-                labelText: 'Volume (litres)',
+                labelText: 'Volume',
                 hintText: 'e.g. 5',
+                suffixText: 'L',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               validator: (v) {
@@ -197,16 +205,29 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(widget.sample == null ? 'Save Sample' : 'Update'),
+            const SizedBox(height: AppSpacing.space24),
+            SafeArea(
+              top: false,
+              child: FilledButton(
+                onPressed: _saving ? null : _save,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _saving
+                      ? const SizedBox(
+                          key: ValueKey('loading'),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          key: const ValueKey('label'),
+                          widget.sample == null ? 'Save Sample' : 'Update',
+                        ),
+                ),
+              ),
             ),
           ],
         ),

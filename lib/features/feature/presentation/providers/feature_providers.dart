@@ -10,7 +10,7 @@ final featureRepositoryProvider = Provider<FeatureRepository>((ref) {
 });
 
 final featureValidatorProvider = Provider<FeatureValidator>((ref) {
-  return FeatureValidator(ref.watch(featureRepositoryProvider));
+  return const FeatureValidator();
 });
 
 /// Provides the full feature list, sorted by most-recent first.

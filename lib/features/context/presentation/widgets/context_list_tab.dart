@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/status_badge.dart';
+import '../../../../core/widgets/surface_card.dart';
 import '../../domain/models/context_model.dart';
 import '../providers/context_providers.dart';
 import 'context_form_sheet.dart';
@@ -30,16 +34,19 @@ class ContextListTab extends ConsumerWidget {
             );
           }
 
-          final cuts =
-              contexts.whereType<CutModel>().toList();
-          final fills =
-              contexts.whereType<FillModel>().toList();
+          final cuts = contexts.whereType<CutModel>().toList();
+          final fills = contexts.whereType<FillModel>().toList();
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space16,
+              AppSpacing.space8,
+              AppSpacing.space16,
+              AppSpacing.space64 + 32,
+            ),
             children: [
               if (cuts.isNotEmpty) ...[
-                _SectionHeader(label: 'Cuts (${cuts.length})'),
+                SectionHeader(label: 'Cuts (${cuts.length})'),
                 ...cuts.map(
                   (cut) => _ContextTile(
                     context_: cut,
@@ -51,10 +58,8 @@ class ContextListTab extends ConsumerWidget {
                   ),
                 ),
               ],
-              if (fills.isNotEmpty &&
-                  cuts.isEmpty) ...[
-                // orphaned fills (shouldn't normally happen)
-                _SectionHeader(label: 'Fills (${fills.length})'),
+              if (fills.isNotEmpty && cuts.isEmpty) ...[
+                SectionHeader(label: 'Fills (${fills.length})'),
                 ...fills.map(
                   (fill) => _ContextTile(
                     context_: fill,
@@ -67,59 +72,27 @@ class ContextListTab extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton.small(
-            heroTag: 'addFill',
-            onPressed: () => _showAdd(context, ref, ContextType.fill),
-            tooltip: 'Add Fill',
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 8),
-          FloatingActionButton.extended(
-            heroTag: 'addCut',
-            onPressed: () => _showAdd(context, ref, ContextType.cut),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Cut'),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'addContext',
+        onPressed: () => _showAdd(context, ref),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add Context'),
       ),
     );
   }
 
-  void _showAdd(BuildContext context, WidgetRef ref, ContextType type) {
+  void _showAdd(BuildContext context, WidgetRef ref) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
-        initialType: type,
         onSaved: () {
           ref.invalidate(contextsByFeatureProvider(featureId));
           ref.invalidate(cutsByFeatureProvider(featureId));
           ref.invalidate(fillsByFeatureProvider(featureId));
         },
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
       ),
     );
   }
@@ -152,113 +125,173 @@ class _ContextTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Card(
-          margin: const EdgeInsets.only(bottom: 4),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: bgColor,
-              child: Text(
-                'C${context_.contextNumber}',
-                style: TextStyle(
-                  color: fgColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+          child: SurfaceCard(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space16,
+              vertical: AppSpacing.space12,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Badge
+                StatusBadge(
+                  label: 'C${context_.contextNumber}',
+                  backgroundColor: bgColor,
+                  foregroundColor: fgColor,
                 ),
-              ),
-            ),
-            title: Text(
-              'Context ${context_.contextNumber} — ${isCut ? 'Cut' : 'Fill'}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            subtitle: _buildSubtitle(context_),
-            trailing: PopupMenuButton<String>(
-              itemBuilder: (_) => [
-                const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                const PopupMenuItem(value: 'delete', child: Text('Delete')),
-              ],
-              onSelected: (v) async {
-                if (v == 'edit') {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    builder: (_) => ContextFormSheet(
-                      featureId: featureId,
-                      existingContext: context_,
-                      onSaved: () {
-                        ref.invalidate(contextsByFeatureProvider(featureId));
-                        ref.invalidate(cutsByFeatureProvider(featureId));
-                        ref.invalidate(fillsByFeatureProvider(featureId));
+                const SizedBox(width: AppSpacing.space12),
+                // Title + subtitle
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Context ${context_.contextNumber} — ${isCut ? 'Cut' : 'Fill'}',
+                        style: theme.textTheme.titleSmall,
+                      ),
+                      if (_subtitle != null) ...[
+                        const SizedBox(height: AppSpacing.space2),
+                        Text(
+                          _subtitle!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                // Actions
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.edit_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                      padding: const EdgeInsets.all(AppSpacing.space8),
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 40,
+                      ),
+                      onPressed: () => showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        useSafeArea: true,
+                        builder: (_) => ContextFormSheet(
+                          featureId: featureId,
+                          existingContext: context_,
+                          onSaved: () {
+                            ref.invalidate(
+                                contextsByFeatureProvider(featureId));
+                            ref.invalidate(cutsByFeatureProvider(featureId));
+                            ref.invalidate(fillsByFeatureProvider(featureId));
+                          },
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete_rounded,
+                        size: 18,
+                        color: theme.colorScheme.error,
+                      ),
+                      padding: const EdgeInsets.all(AppSpacing.space8),
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 40,
+                      ),
+                      onPressed: () async {
+                        final confirmed = await showConfirmDeleteDialog(
+                          context,
+                          title: 'Delete context ${context_.contextNumber}?',
+                          message: isCut
+                              ? 'This will also delete all associated fills, finds, and samples.'
+                              : 'This will also delete all associated finds and samples.',
+                        );
+                        if (confirmed && context.mounted) {
+                          await ref
+                              .read(contextRepositoryProvider)
+                              .delete(context_.id);
+                          ref.invalidate(
+                              contextsByFeatureProvider(featureId));
+                          ref.invalidate(cutsByFeatureProvider(featureId));
+                          ref.invalidate(fillsByFeatureProvider(featureId));
+                        }
                       },
                     ),
-                  );
-                } else if (v == 'delete') {
-                  final confirmed = await showConfirmDeleteDialog(
-                    context,
-                    title: 'Delete context ${context_.contextNumber}?',
-                    message: isCut
-                        ? 'This will also delete all associated fills, finds, and samples.'
-                        : 'This will also delete all associated finds and samples.',
-                  );
-                  if (confirmed) {
-                    await ref
-                        .read(contextRepositoryProvider)
-                        .delete(context_.id);
-                    ref.invalidate(contextsByFeatureProvider(featureId));
-                    ref.invalidate(cutsByFeatureProvider(featureId));
-                    ref.invalidate(fillsByFeatureProvider(featureId));
-                  }
-                }
-              },
+                  ],
+                ),
+              ],
             ),
           ),
         ),
-        // Fills indented under their cut
+        // Fills indented under their cut with a connector line
         if (fills.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(left: 24, bottom: 4),
-            child: Column(
-              children: fills
-                  .map(
-                    (fill) => _ContextTile(
-                      context_: fill,
-                      featureId: featureId,
-                      ref: ref,
-                    ),
-                  )
-                  .toList(),
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 28,
+                  bottom: AppSpacing.space4,
+                ),
+                child: Container(
+                  width: 2,
+                  height: fills.length * 72.0,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outlineVariant,
+                    borderRadius: AppRadius.fullBorderRadius,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: AppSpacing.space8),
+                  child: Column(
+                    children: fills
+                        .map(
+                          (fill) => _ContextTile(
+                            context_: fill,
+                            featureId: featureId,
+                            ref: ref,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
       ],
     );
   }
 
-  Widget? _buildSubtitle(ContextModel ctx) {
-    return switch (ctx) {
-      CutModel(:final cutType, :final customCutTypeText, :final notes) =>
-        _subtitleText([
+  String? get _subtitle {
+    return switch (context_) {
+      CutModel(:final cutType, :final customCutTypeText, :final notes) => [
           if (cutType != null)
             cutType == CutType.other && customCutTypeText != null
                 ? customCutTypeText
                 : cutType.displayName,
           if (notes != null && notes.isNotEmpty) notes,
-        ]),
-      FillModel(:final color, :final composition, :final notes) =>
-        _subtitleText([
+        ].join(' · ').nullIfEmpty,
+      FillModel(:final color, :final composition, :final notes) => [
           if (color != null && color.isNotEmpty) 'Color: $color',
           if (composition != null && composition.isNotEmpty)
-            'Composition: $composition',
+            'Comp: $composition',
           if (notes != null && notes.isNotEmpty) notes,
-        ]),
+        ].join(' · ').nullIfEmpty,
     };
   }
+}
 
-  Widget? _subtitleText(List<String> parts) {
-    if (parts.isEmpty) return null;
-    return Text(
-      parts.join(' · '),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
+extension on String {
+  String? get nullIfEmpty => isEmpty ? null : this;
 }

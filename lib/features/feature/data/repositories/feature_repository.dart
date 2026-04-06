@@ -12,35 +12,34 @@ class FeatureRepository {
   final AppDatabase _db;
   static const _uuid = Uuid();
 
-  /// Returns all features sorted by most-recently-updated first.
+  /// Returns all features sorted by featureNumber ascending.
   Future<List<FeatureModel>> getAll() async {
     final rows = await (_db.select(_db.featuresTable)
           ..orderBy([
             (t) => OrderingTerm(
-                  expression: t.updatedAt,
-                  mode: OrderingMode.desc,
+                  expression: t.featureNumber,
+                  mode: OrderingMode.asc,
                 ),
           ]))
         .get();
     return rows.map(_rowToModel).toList();
   }
 
-  /// Returns features whose site, trench, area, or feature number matches [query].
+  /// Returns features whose number, area, rubiconCode, or license matches [query].
   Future<List<FeatureModel>> search(String query) async {
     final lower = query.toLowerCase();
     final rows = await (_db.select(_db.featuresTable)
           ..where(
             (t) =>
-                t.site.lower().contains(lower) |
-                t.trench.lower().contains(lower) |
-                t.area.lower().contains(lower) |
                 t.featureNumber.lower().contains(lower) |
-                t.excavator.lower().contains(lower),
+                t.area.lower().contains(lower) |
+                t.rubiconCode.lower().contains(lower) |
+                t.license.lower().contains(lower),
           )
           ..orderBy([
             (t) => OrderingTerm(
-                  expression: t.updatedAt,
-                  mode: OrderingMode.desc,
+                  expression: t.featureNumber,
+                  mode: OrderingMode.asc,
                 ),
           ]))
         .get();
@@ -55,51 +54,34 @@ class FeatureRepository {
     return row == null ? null : _rowToModel(row);
   }
 
-  /// Returns true if a feature with the given combination already exists.
-  /// Optionally excludes [excludeId] (used during edit to exclude self).
-  Future<bool> existsBySitetrenchAreaNumber({
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    String? excludeId,
-  }) async {
-    var query = _db.select(_db.featuresTable)
-      ..where(
-        (t) =>
-            t.site.lower().equals(site.toLowerCase()) &
-            t.trench.lower().equals(trench.toLowerCase()) &
-            t.area.lower().equals(area.toLowerCase()) &
-            t.featureNumber.lower().equals(featureNumber.toLowerCase()),
-      );
-    if (excludeId != null) {
-      query = query..where((t) => t.id.equals(excludeId).not());
+  /// Returns the next sequential feature number as a zero-padded 3-digit string.
+  /// E.g. if the highest existing number is "007", returns "008".
+  Future<String> nextFeatureNumber() async {
+    final rows = await _db.select(_db.featuresTable).get();
+    int maxNum = 0;
+    for (final row in rows) {
+      final parsed = int.tryParse(row.featureNumber);
+      if (parsed != null && parsed > maxNum) maxNum = parsed;
     }
-    final row = await query.getSingleOrNull();
-    return row != null;
+    return (maxNum + 1).toString().padLeft(3, '0');
   }
 
-  /// Creates a new feature and returns the created model.
+  /// Creates a new feature with auto-assigned number and date.
   Future<FeatureModel> create({
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    required String excavator,
-    required DateTime date,
-    String? notes,
+    String? rubiconCode,
+    String? license,
+    String? area,
   }) async {
     final now = DateTime.now();
     final id = _uuid.v4();
+    final featureNumber = await nextFeatureNumber();
     final companion = FeaturesTableCompanion.insert(
       id: id,
-      site: site,
-      trench: trench,
-      area: area,
       featureNumber: featureNumber,
-      excavator: excavator,
-      date: date,
-      notes: Value(notes),
+      rubiconCode: Value(rubiconCode),
+      license: Value(license),
+      area: Value(area),
+      date: now,
       createdAt: now,
       updatedAt: now,
     );
@@ -107,28 +89,20 @@ class FeatureRepository {
     return (await getById(id))!;
   }
 
-  /// Updates an existing feature and returns the updated model.
+  /// Updates optional metadata on an existing feature.
   Future<FeatureModel> update({
     required String id,
-    required String site,
-    required String trench,
-    required String area,
-    required String featureNumber,
-    required String excavator,
-    required DateTime date,
-    String? notes,
+    String? rubiconCode,
+    String? license,
+    String? area,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id)))
         .write(
       FeaturesTableCompanion(
-        site: Value(site),
-        trench: Value(trench),
+        rubiconCode: Value(rubiconCode),
+        license: Value(license),
         area: Value(area),
-        featureNumber: Value(featureNumber),
-        excavator: Value(excavator),
-        date: Value(date),
-        notes: Value(notes),
         updatedAt: Value(now),
       ),
     );
@@ -142,13 +116,11 @@ class FeatureRepository {
 
   FeatureModel _rowToModel(FeaturesTableData row) => FeatureModel(
         id: row.id,
-        site: row.site,
-        trench: row.trench,
-        area: row.area,
         featureNumber: row.featureNumber,
-        excavator: row.excavator,
+        rubiconCode: row.rubiconCode,
+        license: row.license,
+        area: row.area,
         date: row.date,
-        notes: row.notes,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );

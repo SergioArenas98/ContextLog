@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_tokens.dart';
 import '../../../../core/utils/image_storage.dart';
+import '../../../../core/widgets/app_sheet_header.dart';
 import '../../domain/models/photo_model.dart';
 import '../providers/photo_providers.dart';
 
@@ -66,27 +68,31 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
         key: _formKey,
         child: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space24,
+            AppSpacing.space16,
+            AppSpacing.space24,
+            AppSpacing.space24,
+          ),
           children: [
-            Row(
-              children: [
-                Text(
-                  _isEditing ? 'Edit Photo' : 'Add Photo',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
+            AppSheetHeader(
+              title: _isEditing ? 'Edit Photo' : 'Add Photo',
+              onClose: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 16),
-            _StageDropdown(
+            DropdownButtonFormField<PhotoStage>(
               value: _stage,
-              onChanged: (v) => setState(() => _stage = v),
+              decoration: const InputDecoration(labelText: 'Stage'),
+              items: PhotoStage.values
+                  .map(
+                    (s) =>
+                        DropdownMenuItem(value: s, child: Text(s.displayName)),
+                  )
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) setState(() => _stage = v);
+              },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _photoNumberCtrl,
               decoration: const InputDecoration(
@@ -95,12 +101,22 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
               ),
               keyboardType: TextInputType.text,
             ),
-            const SizedBox(height: 12),
-            _OrientationPicker(
+            const SizedBox(height: AppSpacing.space12),
+            DropdownButtonFormField<CardinalOrientation>(
               value: _orientation,
-              onChanged: (v) => setState(() => _orientation = v),
+              decoration:
+                  const InputDecoration(labelText: 'Facing (cardinal direction)'),
+              items: CardinalOrientation.values
+                  .map(
+                    (o) =>
+                        DropdownMenuItem(value: o, child: Text(o.displayName)),
+                  )
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) setState(() => _orientation = v);
+              },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _notesCtrl,
               decoration: const InputDecoration(
@@ -110,22 +126,35 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.space16),
             _ReferencePhotoButton(
               imagePath: _localImagePath,
               onCapture: _capturePhoto,
               onRemove: () => setState(() => _localImagePath = null),
             ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(_isEditing ? 'Update' : 'Save Photo'),
+            const SizedBox(height: AppSpacing.space24),
+            SafeArea(
+              top: false,
+              child: FilledButton(
+                onPressed: _saving ? null : _save,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _saving
+                      ? const SizedBox(
+                          key: ValueKey('loading'),
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          key: const ValueKey('label'),
+                          _isEditing ? 'Update' : 'Save Photo',
+                        ),
+                ),
+              ),
             ),
           ],
         ),
@@ -158,7 +187,8 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
               ? null
               : _photoNumberCtrl.text.trim(),
           cardinalOrientation: _orientation,
-          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          notes:
+              _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           localImagePath: _localImagePath,
         );
       } else {
@@ -169,7 +199,8 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
               ? null
               : _photoNumberCtrl.text.trim(),
           cardinalOrientation: _orientation,
-          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          notes:
+              _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           localImagePath: _localImagePath,
         );
       }
@@ -187,52 +218,6 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
   }
 }
 
-class _StageDropdown extends StatelessWidget {
-  const _StageDropdown({required this.value, required this.onChanged});
-
-  final PhotoStage value;
-  final ValueChanged<PhotoStage> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<PhotoStage>(
-      value: value,
-      decoration: const InputDecoration(labelText: 'Stage'),
-      items: PhotoStage.values
-          .map(
-            (s) => DropdownMenuItem(value: s, child: Text(s.displayName)),
-          )
-          .toList(),
-      onChanged: (v) {
-        if (v != null) onChanged(v);
-      },
-    );
-  }
-}
-
-class _OrientationPicker extends StatelessWidget {
-  const _OrientationPicker({required this.value, required this.onChanged});
-
-  final CardinalOrientation value;
-  final ValueChanged<CardinalOrientation> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<CardinalOrientation>(
-      value: value,
-      decoration: const InputDecoration(labelText: 'Facing (cardinal direction)'),
-      items: CardinalOrientation.values
-          .map(
-            (o) => DropdownMenuItem(value: o, child: Text(o.displayName)),
-          )
-          .toList(),
-      onChanged: (v) {
-        if (v != null) onChanged(v);
-      },
-    );
-  }
-}
-
 class _ReferencePhotoButton extends StatelessWidget {
   const _ReferencePhotoButton({
     required this.imagePath,
@@ -246,44 +231,86 @@ class _ReferencePhotoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final path = imagePath;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Reference photo (optional)',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.space8),
         if (path != null)
-          Row(
+          Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.mdBorderRadius,
                 child: Image.file(
                   File(path),
-                  width: 80,
-                  height: 80,
+                  width: double.infinity,
+                  height: 160,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.broken_image, size: 40),
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 160,
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    child: const Icon(Icons.broken_image, size: 40),
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.delete_outline),
-                label: const Text('Remove'),
-                onPressed: onRemove,
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Material(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withAlpha(220),
+                  borderRadius: AppRadius.fullBorderRadius,
+                  child: InkWell(
+                    borderRadius: AppRadius.fullBorderRadius,
+                    onTap: onRemove,
+                    child: const Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(Icons.close_rounded, size: 18),
+                    ),
+                  ),
+                ),
               ),
             ],
           )
         else
-          OutlinedButton.icon(
-            icon: const Icon(Icons.camera_alt_outlined),
-            label: const Text('Capture reference photo'),
-            onPressed: onCapture,
+          InkWell(
+            onTap: onCapture,
+            borderRadius: AppRadius.mdBorderRadius,
+            child: Container(
+              width: double.infinity,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: AppRadius.mdBorderRadius,
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant,
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_a_photo_rounded,
+                    size: 32,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: AppSpacing.space8),
+                  Text(
+                    'Tap to capture reference photo',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
       ],
     );

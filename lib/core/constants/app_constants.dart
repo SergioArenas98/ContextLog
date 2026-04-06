@@ -6,7 +6,7 @@ abstract final class AppConstants {
   static const String databaseFileName = 'context_log.db';
 
   /// Current database schema version.
-  static const int databaseVersion = 1;
+  static const int databaseVersion = 2;
 
   /// Debounce delay for autosave in milliseconds.
   static const int autosaveDebounceMs = 2000;
@@ -25,7 +25,7 @@ abstract final class AppConstants {
 abstract final class ValidationMessages {
   static const String required = 'This field is required';
   static const String featureExists =
-      'A feature with this site, trench, area, and number already exists';
+      'A feature with this number already exists';
   static const String contextNumberExists =
       'This context number already exists in this feature';
   static const String sampleNumberExists =

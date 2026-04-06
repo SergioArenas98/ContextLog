@@ -21,14 +21,7 @@ void main() {
     contextRepo = ContextRepository(db);
     validator = ContextValidator(contextRepo);
 
-    final feature = await featureRepo.create(
-      site: 'Carrowmore',
-      trench: 'T1',
-      area: 'A1',
-      featureNumber: '001',
-      excavator: 'Murphy',
-      date: DateTime(2024, 1, 1),
-    );
+    final feature = await featureRepo.create(area: 'A1');
     featureId = feature.id;
   });
 
@@ -83,14 +76,7 @@ void main() {
     });
 
     test('same number in different feature does not trigger warning', () async {
-      final other = await featureRepo.create(
-        site: 'Knocknarea',
-        trench: 'T2',
-        area: 'A2',
-        featureNumber: '002',
-        excavator: 'Smith',
-        date: DateTime.now(),
-      );
+      final other = await featureRepo.create(area: 'A2');
       await contextRepo.createCut(
         featureId: other.id,
         contextNumber: 100,
@@ -153,14 +139,7 @@ void main() {
 
     test('returns Invalid when parent cut belongs to a different feature',
         () async {
-      final other = await featureRepo.create(
-        site: 'Knocknarea',
-        trench: 'T2',
-        area: 'A2',
-        featureNumber: '002',
-        excavator: 'Smith',
-        date: DateTime.now(),
-      );
+      final other = await featureRepo.create(area: 'A2');
       final otherCut = await contextRepo.createCut(
         featureId: other.id,
         contextNumber: 100,
