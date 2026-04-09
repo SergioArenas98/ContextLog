@@ -14,6 +14,7 @@ import '../../features/feature/data/tables/features_table.dart';
 import '../../features/find/data/tables/finds_table.dart';
 import '../../features/harris_matrix/data/tables/harris_relations_table.dart';
 import '../../features/photo/data/tables/photos_table.dart';
+import '../../features/project/data/tables/projects_table.dart';
 import '../../features/sample/data/tables/samples_table.dart';
 
 part 'app_database.g.dart';
@@ -22,6 +23,7 @@ part 'app_database.g.dart';
 /// All tables are registered here and the database is opened via [openConnection].
 @DriftDatabase(
   tables: [
+    ProjectsTable,
     FeaturesTable,
     PhotosTable,
     DrawingsTable,
@@ -51,6 +53,16 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(featuresTable);
             await m.addColumn(drawingsTable, drawingsTable.drawingType);
             await m.addColumn(drawingsTable, drawingsTable.facing);
+          }
+          if (from < 3) {
+            // v2→v3: Projects introduced. Features now reference a project.
+            // rubiconCode and license moved from features to projects.
+            // NOTE: existing rubiconCode/license data in the SQLite file is
+            // preserved in the raw DB but no longer accessed by the app.
+            await m.createTable(projectsTable);
+            await m.addColumn(featuresTable, featuresTable.projectId);
+            // rubicon_code and license columns remain in SQLite but are no longer
+            // part of the Drift table class — they become inert dead columns.
           }
         },
         beforeOpen: (OpeningDetails details) async {

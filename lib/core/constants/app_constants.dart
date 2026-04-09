@@ -6,7 +6,7 @@ abstract final class AppConstants {
   static const String databaseFileName = 'context_log.db';
 
   /// Current database schema version.
-  static const int databaseVersion = 2;
+  static const int databaseVersion = 3;
 
   /// Debounce delay for autosave in milliseconds.
   static const int autosaveDebounceMs = 2000;
@@ -40,4 +40,7 @@ abstract final class ValidationMessages {
       'A context cannot have a stratigraphic relation with itself';
   static const String duplicateRelation =
       'This stratigraphic relation already exists';
+  static const String noProjectSelected = 'Please select a project';
+  static const String noProjectsExist =
+      'Create a project first before adding a feature';
 }

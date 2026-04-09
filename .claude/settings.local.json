@@ -11,7 +11,8 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter build:*)",
       "Bash(wc -l \"C:/Users/sejum/Desktop/Mis documentos/Proyectos/ContextLog/context_log/docs/\"*.md \"C:/Users/sejum/Desktop/Mis documentos/Proyectos/ContextLog/context_log/README.md\")",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(flutter test:*)"
     ]
   }
 }

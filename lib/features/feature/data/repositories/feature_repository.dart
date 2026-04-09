@@ -25,16 +25,14 @@ class FeatureRepository {
     return rows.map(_rowToModel).toList();
   }
 
-  /// Returns features whose number, area, rubiconCode, or license matches [query].
+  /// Returns features whose number or area matches [query].
   Future<List<FeatureModel>> search(String query) async {
     final lower = query.toLowerCase();
     final rows = await (_db.select(_db.featuresTable)
           ..where(
             (t) =>
                 t.featureNumber.lower().contains(lower) |
-                t.area.lower().contains(lower) |
-                t.rubiconCode.lower().contains(lower) |
-                t.license.lower().contains(lower),
+                t.area.lower().contains(lower),
           )
           ..orderBy([
             (t) => OrderingTerm(
@@ -55,7 +53,6 @@ class FeatureRepository {
   }
 
   /// Returns the next sequential feature number as a zero-padded 3-digit string.
-  /// E.g. if the highest existing number is "007", returns "008".
   Future<String> nextFeatureNumber() async {
     final rows = await _db.select(_db.featuresTable).get();
     int maxNum = 0;
@@ -67,9 +64,9 @@ class FeatureRepository {
   }
 
   /// Creates a new feature with auto-assigned number and date.
+  /// [projectId] must reference a valid project.
   Future<FeatureModel> create({
-    String? rubiconCode,
-    String? license,
+    required String projectId,
     String? area,
   }) async {
     final now = DateTime.now();
@@ -78,9 +75,8 @@ class FeatureRepository {
     final companion = FeaturesTableCompanion.insert(
       id: id,
       featureNumber: featureNumber,
-      rubiconCode: Value(rubiconCode),
-      license: Value(license),
-      area: Value(area),
+      projectId: Value(projectId),
+      area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
       date: now,
       createdAt: now,
       updatedAt: now,
@@ -92,17 +88,14 @@ class FeatureRepository {
   /// Updates optional metadata on an existing feature.
   Future<FeatureModel> update({
     required String id,
-    String? rubiconCode,
-    String? license,
+    required String projectId,
     String? area,
   }) async {
     final now = DateTime.now();
-    await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id)))
-        .write(
+    await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id))).write(
       FeaturesTableCompanion(
-        rubiconCode: Value(rubiconCode),
-        license: Value(license),
-        area: Value(area),
+        projectId: Value(projectId),
+        area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
         updatedAt: Value(now),
       ),
     );
@@ -117,8 +110,7 @@ class FeatureRepository {
   FeatureModel _rowToModel(FeaturesTableData row) => FeatureModel(
         id: row.id,
         featureNumber: row.featureNumber,
-        rubiconCode: row.rubiconCode,
-        license: row.license,
+        projectId: row.projectId,
         area: row.area,
         date: row.date,
         createdAt: row.createdAt,

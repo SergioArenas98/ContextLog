@@ -4,13 +4,20 @@ import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/metadata_row.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/surface_card.dart';
+import '../../../project/domain/models/project_model.dart';
 import '../../domain/models/feature_model.dart';
 
 /// Compact feature metadata tab (kept for reference; not currently shown in tabs).
 class FeatureSummaryTab extends StatelessWidget {
-  const FeatureSummaryTab({super.key, required this.feature});
+  const FeatureSummaryTab({
+    super.key,
+    required this.feature,
+    this.project,
+  });
 
   final FeatureModel feature;
+  /// Associated project, loaded by the caller. May be null for legacy features.
+  final ProjectModel? project;
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +45,13 @@ class FeatureSummaryTab extends StatelessWidget {
               ),
               if (feature.area != null)
                 MetadataRow(label: 'Area', value: feature.area!),
-              if (feature.rubiconCode != null)
-                MetadataRow(label: 'Rubicon Code', value: feature.rubiconCode!),
-              if (feature.license != null)
-                MetadataRow(label: 'License', value: feature.license!),
+              if (project != null) ...[
+                MetadataRow(label: 'Project', value: project!.name),
+                if (project!.rubiconCode != null)
+                  MetadataRow(label: 'Rubicon Code', value: project!.rubiconCode!),
+                if (project!.licenceNumber != null)
+                  MetadataRow(label: 'Licence Number', value: project!.licenceNumber!),
+              ],
             ],
           ),
         ),

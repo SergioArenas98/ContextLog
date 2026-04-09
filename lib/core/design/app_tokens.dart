@@ -19,15 +19,19 @@ abstract final class AppSpacing {
 }
 
 /// Corner radius tokens.
-/// STRATUM uses generous modern radii — premium tool feel, not lab instrument.
+///
+/// PROBE uses hard-edge, precise corners.
+/// Consumer apps use generous rounded corners (lg=16, xl=24).
+/// Instrument panels use sharp corners with minimal rounding.
+/// Max panel radius: 10. Chip radius: 6. Badge: 4.
 abstract final class AppRadius {
   static const double none = 0.0;
-  static const double xs = 4.0;
-  static const double sm = 8.0;
-  static const double md = 12.0;
-  static const double lg = 16.0;
-  static const double xl = 24.0;
-  static const double xxl = 32.0;
+  static const double xs = 3.0;  // badges, tight chips
+  static const double sm = 6.0;  // inputs, buttons, small chips
+  static const double md = 10.0; // panels, cards
+  static const double lg = 14.0; // modals, dialogs
+  static const double xl = 18.0; // bottom sheets
+  static const double xxl = 24.0;
   static const double full = 999.0;
 
   static const BorderRadius noneBorderRadius =
@@ -48,47 +52,48 @@ abstract final class AppRadius {
       BorderRadius.all(Radius.circular(full));
 }
 
-/// Left-accent stripe widths (for context-type indicators).
+/// Left-accent stripe widths (context-type indicators).
 abstract final class AppBorder {
-  static const double accentStripe = 4.0;
-  static const double accentStripeLg = 5.0;
+  static const double accentStripe = 3.0;
+  static const double accentStripeLg = 4.0;
   static const double thin = 1.0;
 }
 
-/// Shadow / elevation tokens.
+/// Shadow tokens — minimal, purposeful.
+/// Instrument surfaces rely on color layering, not shadows.
 abstract final class AppElevation {
   static const List<BoxShadow> none = [];
 
   static const List<BoxShadow> level1 = [
     BoxShadow(
-      color: Color(0x3D000000),
-      blurRadius: 6,
-      offset: Offset(0, 2),
+      color: Color(0x28000000),
+      blurRadius: 4,
+      offset: Offset(0, 1),
     ),
   ];
 
   static const List<BoxShadow> level2 = [
     BoxShadow(
-      color: Color(0x55000000),
-      blurRadius: 12,
-      offset: Offset(0, 4),
+      color: Color(0x44000000),
+      blurRadius: 10,
+      offset: Offset(0, 3),
     ),
     BoxShadow(
-      color: Color(0x28000000),
-      blurRadius: 3,
+      color: Color(0x1E000000),
+      blurRadius: 2,
       offset: Offset(0, 1),
     ),
   ];
 
   static const List<BoxShadow> level3 = [
     BoxShadow(
-      color: Color(0x70000000),
-      blurRadius: 24,
-      offset: Offset(0, 8),
+      color: Color(0x60000000),
+      blurRadius: 20,
+      offset: Offset(0, 6),
     ),
     BoxShadow(
-      color: Color(0x40000000),
-      blurRadius: 6,
+      color: Color(0x38000000),
+      blurRadius: 4,
       offset: Offset(0, 2),
     ),
   ];

@@ -8,46 +8,35 @@ import '../../../../core/design/app_typography.dart';
 import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
 import '../../../context/presentation/widgets/context_form_sheet.dart';
-import '../../../drawing/presentation/widgets/drawing_list_tab.dart';
-import '../../../find/presentation/widgets/find_list_tab.dart';
-import '../../../harris_matrix/presentation/widgets/harris_matrix_painter.dart';
+import '../../../project/presentation/providers/project_providers.dart';
+import '../../../harris_matrix/domain/models/harris_relation_model.dart';
 import '../../../harris_matrix/presentation/providers/harris_providers.dart';
-import '../../../harris_matrix/presentation/widgets/matrix_tab.dart';
+import '../../../harris_matrix/presentation/widgets/harris_interactive_matrix.dart';
 import '../../../harris_matrix/presentation/widgets/relation_form_sheet.dart';
-import '../../../photo/presentation/widgets/photo_list_tab.dart';
-import '../../../sample/presentation/widgets/sample_list_tab.dart';
 import '../providers/feature_providers.dart';
+import 'context_station_panel.dart';
 
-/// Feature Workbench — replaces the 6-tab FeatureDetailScreen.
-///
-/// What was eliminated:
-/// - 6-tab structure (Contexts / Photos / Drawings / Finds / Samples / Matrix)
-/// - Harris Matrix buried at tab position #6
-/// - Independent FAB per tab (6 separate entry points)
-/// - No way to see contexts as a whole across tabs
-///
-/// What replaced it:
-/// - Harris Matrix as the primary view (upper ~55% of screen)
-/// - Horizontal context strip (lower ~25%) replacing the tab-per-entity pattern
-/// - 3-action bottom bar: Add Context | Add Relation | More Evidence
-/// - Context nodes/cards navigate to a dedicated Context Focus screen
-///
-/// Navigation from here:
-///   Tap context strip card  → ContextFocusScreen
-///   Tap "More" menu item    → Evidence view in modal sheet
-///   Tap "Context"           → ContextFormSheet
-///   Tap "Relation"          → RelationFormSheet
-class FeatureDetailScreen extends ConsumerWidget {
+/// Excavation Station — the primary workspace for a feature.
+class FeatureDetailScreen extends ConsumerStatefulWidget {
   const FeatureDetailScreen({super.key, required this.featureId});
 
   final String featureId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final featureAsync = ref.watch(featureDetailProvider(featureId));
+  ConsumerState<FeatureDetailScreen> createState() =>
+      _FeatureDetailScreenState();
+}
+
+class _FeatureDetailScreenState extends ConsumerState<FeatureDetailScreen> {
+  String? _selectedContextId;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    final featureAsync = ref.watch(featureDetailProvider(widget.featureId));
 
     return featureAsync.when(
-      loading: () => const _WorkbenchSkeleton(),
+      loading: () => const _StationSkeleton(),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: const Text('Feature')),
         body: Center(child: Text('Error: $e')),
@@ -61,257 +50,383 @@ class FeatureDetailScreen extends ConsumerWidget {
         }
 
         return Scaffold(
-          backgroundColor: AppColors.base,
+          backgroundColor: colors.base,
           body: Column(
             children: [
-              _WorkbenchHeader(
+              _StationHeader(
                 featureNumber: feature.featureNumber,
                 area: feature.area,
-                featureId: featureId,
+                featureId: widget.featureId,
+                projectId: feature.projectId,
               ),
-              const _SectionLabel(label: 'STRATIGRAPHY'),
+              Container(height: 1, color: colors.rule),
               Expanded(
-                flex: 55,
-                child: _MatrixPanel(featureId: featureId),
+                child: _StationBody(
+                  featureId: widget.featureId,
+                  selectedContextId: _selectedContextId,
+                  onContextSelected: _openContextPanel,
+                ),
               ),
-              const _SectionLabel(label: 'CONTEXTS'),
-              SizedBox(
-                height: 130,
-                child: _ContextStrip(featureId: featureId),
+              Container(height: 1, color: colors.rule),
+              _ActionDock(
+                featureId: widget.featureId,
+                onContextAdded: () {
+                  ref.invalidate(contextsByFeatureProvider(widget.featureId));
+                  ref.invalidate(harrisByFeatureProvider(widget.featureId));
+                },
+                onRelationAdded: () {
+                  ref.invalidate(harrisByFeatureProvider(widget.featureId));
+                },
               ),
-              _WorkbenchActionRow(featureId: featureId),
             ],
           ),
         );
       },
     );
   }
+
+  void _openContextPanel(String contextId) {
+    setState(() => _selectedContextId = contextId);
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withAlpha(120),
+      builder: (ctx) => ContextStationPanel(
+        featureId: widget.featureId,
+        contextId: contextId,
+        onDismiss: () {
+          setState(() => _selectedContextId = null);
+        },
+        onNavigateToDetail: (fId, cId) {
+          setState(() => _selectedContextId = null);
+          context.push('/features/$fId/contexts/$cId');
+        },
+      ),
+    ).then((_) {
+      if (mounted) setState(() => _selectedContextId = null);
+    });
+  }
 }
 
-// ── Workbench header ───────────────────────────────────────────────────────────
+// ── Station header ─────────────────────────────────────────────────────────────
 
-class _WorkbenchHeader extends ConsumerWidget {
-  const _WorkbenchHeader({
+class _StationHeader extends ConsumerWidget {
+  const _StationHeader({
     required this.featureNumber,
     required this.area,
     required this.featureId,
+    this.projectId,
   });
 
   final String featureNumber;
   final String? area;
   final String featureId;
+  final String? projectId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
+    final projectAsync = projectId != null
+        ? ref.watch(projectDetailProvider(projectId!))
+        : null;
+    final project = projectAsync?.valueOrNull;
+
     return Container(
-      color: AppColors.s0,
+      color: colors.s0,
       child: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.space4,
-            AppSpacing.space4,
-            AppSpacing.space8,
-            AppSpacing.space8,
-          ),
+        child: SizedBox(
+          height: 56,
           child: Row(
             children: [
+              // Back button
               IconButton(
-                icon: const Icon(Icons.arrow_back_rounded),
-                color: AppColors.t1,
+                icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                color: colors.t1,
                 onPressed: () => context.pop(),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'FEATURE',
-                    style: TextStyle(
-                      fontFamily: AppTypography.monoFontFamily,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 9,
-                      letterSpacing: 2.5,
-                      color: AppColors.t2,
-                    ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
+              // Feature label
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Project name row
+                    if (project != null)
                       Text(
-                        featureNumber.padLeft(3, '0'),
+                        project.name.toUpperCase(),
                         style: TextStyle(
                           fontFamily: AppTypography.monoFontFamily,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 26,
-                          letterSpacing: -1,
-                          height: 1,
-                          color: AppColors.t0,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 8,
+                          letterSpacing: 2.0,
+                          color: colors.t2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    else
+                      Text(
+                        'FEATURE',
+                        style: TextStyle(
+                          fontFamily: AppTypography.monoFontFamily,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 8,
+                          letterSpacing: 2.0,
+                          color: colors.t2,
                         ),
                       ),
-                      if (area != null) ...[
-                        const SizedBox(width: AppSpacing.space8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
                         Text(
-                          area!,
+                          featureNumber.padLeft(3, '0'),
                           style: TextStyle(
-                            fontFamily: AppTypography.sansFontFamily,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: AppColors.t1,
+                            fontFamily: AppTypography.monoFontFamily,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 22,
+                            letterSpacing: -1,
+                            height: 1,
+                            color: colors.t0,
                           ),
                         ),
+                        if (area != null) ...[
+                          const SizedBox(width: AppSpacing.space8),
+                          Text(
+                            area!,
+                            style: TextStyle(
+                              fontFamily: AppTypography.sansFontFamily,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: colors.t1,
+                            ),
+                          ),
+                        ],
+                        if (project?.rubiconCode != null) ...[
+                          const SizedBox(width: AppSpacing.space8),
+                          Text(
+                            project!.rubiconCode!,
+                            style: TextStyle(
+                              fontFamily: AppTypography.monoFontFamily,
+                              fontSize: 10,
+                              color: colors.t2,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              // Full matrix view
               IconButton(
-                icon: const Icon(Icons.edit_rounded, size: 20),
-                color: AppColors.t1,
+                icon: const Icon(Icons.open_in_full_rounded, size: 18),
+                color: colors.t1,
+                tooltip: 'Expand matrix',
+                onPressed: () => context.push('/features/$featureId/matrix'),
+              ),
+              // Edit feature
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                color: colors.t1,
                 tooltip: 'Edit feature',
                 onPressed: () => context.push('/features/$featureId/edit'),
               ),
-              PopupMenuButton<String>(
-                icon:
-                    Icon(Icons.more_horiz_rounded, size: 22, color: AppColors.t1),
-                tooltip: 'More views',
-                onSelected: (value) => _openView(context, ref, value),
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
-                    value: 'photos',
-                    child: Row(children: [
-                      Icon(Icons.photo_library_outlined, size: 18),
-                      SizedBox(width: 10),
-                      Text('Photos'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: 'finds',
-                    child: Row(children: [
-                      Icon(Icons.category_outlined, size: 18),
-                      SizedBox(width: 10),
-                      Text('All Finds'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: 'samples',
-                    child: Row(children: [
-                      Icon(Icons.science_outlined, size: 18),
-                      SizedBox(width: 10),
-                      Text('All Samples'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: 'drawings',
-                    child: Row(children: [
-                      Icon(Icons.draw_outlined, size: 18),
-                      SizedBox(width: 10),
-                      Text('Drawings'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: 'matrix_full',
-                    child: Row(children: [
-                      Icon(Icons.account_tree_outlined, size: 18),
-                      SizedBox(width: 10),
-                      Text('Full Matrix'),
-                    ]),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  void _openView(BuildContext context, WidgetRef ref, String view) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (ctx) => _FullViewSheet(
-        title: switch (view) {
-          'photos' => 'Photos',
-          'finds' => 'All Finds',
-          'samples' => 'All Samples',
-          'drawings' => 'Drawings',
-          'matrix_full' => 'Stratigraphic Matrix',
-          _ => '',
-        },
-        child: switch (view) {
-          'photos' => PhotoListTab(featureId: featureId),
-          'finds' => FindListTab(featureId: featureId),
-          'samples' => SampleListTab(featureId: featureId),
-          'drawings' => DrawingListTab(featureId: featureId),
-          'matrix_full' => MatrixTab(featureId: featureId),
-          _ => const SizedBox.shrink(),
-        },
+// ── Station body ───────────────────────────────────────────────────────────────
+
+class _StationBody extends ConsumerWidget {
+  const _StationBody({
+    required this.featureId,
+    required this.selectedContextId,
+    required this.onContextSelected,
+  });
+
+  final String featureId;
+  final String? selectedContextId;
+  final void Function(String contextId) onContextSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
+    final relationsAsync = ref.watch(harrisByFeatureProvider(featureId));
+    final contextsAsync = ref.watch(contextsByFeatureProvider(featureId));
+
+    return relationsAsync.when(
+      loading: () => Center(
+        child: CircularProgressIndicator(color: colors.primary, strokeWidth: 2),
       ),
-    );
-  }
-}
-
-class _FullViewSheet extends StatelessWidget {
-  const _FullViewSheet({required this.title, required this.child});
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: AppSpacing.space8),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.space20,
-            AppSpacing.space8,
-            AppSpacing.space8,
-            0,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(title, style: Theme.of(context).textTheme.titleLarge),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
+      error: (e, _) => Center(child: Text('Error: $e')),
+      data: (relations) => contextsAsync.when(
+        loading: () => Center(
+          child: CircularProgressIndicator(color: colors.primary, strokeWidth: 2),
         ),
-        const Divider(height: 1),
-        Expanded(child: child),
-      ],
-    );
-  }
-}
-
-// ── Section label ──────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.s0,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Divider(height: 1, color: AppColors.rule),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.space16,
-              AppSpacing.space6,
-              AppSpacing.space8,
-              AppSpacing.space6,
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (contexts) => Column(
+          children: [
+            // ── Stratigraphy zone ──────────────────────────────────────────
+            Expanded(
+              flex: 56,
+              child: _StratigraphyZone(
+                featureId: featureId,
+                contexts: contexts,
+                relations: relations,
+                selectedContextId: selectedContextId,
+                onNodeTap: onContextSelected,
+              ),
             ),
+
+            // ── Zone separator with context count ──────────────────────────
+            _ZoneSeparator(
+              label: 'CONTEXTS',
+              count: contexts.length,
+              featureId: featureId,
+            ),
+
+            // ── Context manifest ───────────────────────────────────────────
+            Expanded(
+              flex: 44,
+              child: _ContextManifest(
+                featureId: featureId,
+                contexts: contexts,
+                selectedContextId: selectedContextId,
+                onContextTap: onContextSelected,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Stratigraphy zone ─────────────────────────────────────────────────────────
+
+class _StratigraphyZone extends StatelessWidget {
+  const _StratigraphyZone({
+    required this.featureId,
+    required this.contexts,
+    required this.relations,
+    required this.selectedContextId,
+    required this.onNodeTap,
+  });
+
+  final String featureId;
+  final List<ContextModel> contexts;
+  final List<HarrisRelationModel> relations;
+  final String? selectedContextId;
+  final void Function(String) onNodeTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    if (contexts.isEmpty) {
+      return _EmptyMatrixHint();
+    }
+
+    return Container(
+      color: colors.base,
+      child: HarrisInteractiveMatrix(
+        contexts: contexts,
+        relations: relations,
+        selectedContextId: selectedContextId,
+        onNodeTap: onNodeTap,
+      ),
+    );
+  }
+}
+
+class _EmptyMatrixHint extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Container(
+      color: colors.base,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: colors.s1,
+                borderRadius: AppRadius.smBorderRadius,
+                border: Border.all(color: colors.ruleMid, width: 1),
+              ),
+              child: Icon(
+                Icons.account_tree_outlined,
+                size: 22,
+                color: colors.t2,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space16),
+            Text(
+              'NO STRATIGRAPHY',
+              style: TextStyle(
+                fontFamily: AppTypography.monoFontFamily,
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+                letterSpacing: 2.0,
+                color: colors.t2,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space6),
+            Text(
+              'Add a context below to begin recording.',
+              style: TextStyle(
+                fontFamily: AppTypography.sansFontFamily,
+                fontSize: 12,
+                color: colors.t2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Zone separator ─────────────────────────────────────────────────────────────
+
+class _ZoneSeparator extends StatelessWidget {
+  const _ZoneSeparator({
+    required this.label,
+    required this.count,
+    required this.featureId,
+  });
+
+  final String label;
+  final int count;
+  final String featureId;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Container(
+      height: 30,
+      color: colors.s1,
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 30,
+            color: colors.primary.withAlpha(60),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
             child: Row(
               children: [
                 Text(
@@ -319,162 +434,90 @@ class _SectionLabel extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: AppTypography.monoFontFamily,
                     fontWeight: FontWeight.w700,
-                    fontSize: 10,
+                    fontSize: 9,
                     letterSpacing: 2.0,
-                    color: AppColors.t2,
+                    color: colors.t2,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.s3,
+                    borderRadius: AppRadius.xsBorderRadius,
+                  ),
+                  child: Text(
+                    '$count',
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 9,
+                      color: count > 0 ? colors.primary : colors.t2,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+          const Spacer(),
+          Container(height: 1, color: colors.rule),
         ],
       ),
     );
   }
 }
 
-// ── Matrix panel ───────────────────────────────────────────────────────────────
+// ── Context manifest ──────────────────────────────────────────────────────────
 
-class _MatrixPanel extends ConsumerWidget {
-  const _MatrixPanel({required this.featureId});
+class _ContextManifest extends StatelessWidget {
+  const _ContextManifest({
+    required this.featureId,
+    required this.contexts,
+    required this.selectedContextId,
+    required this.onContextTap,
+  });
+
   final String featureId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final relationsAsync = ref.watch(harrisByFeatureProvider(featureId));
-    final contextsAsync = ref.watch(contextsByFeatureProvider(featureId));
-
-    return Container(
-      color: AppColors.base,
-      child: relationsAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (relations) => contextsAsync.when(
-          loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.primary)),
-          error: (e, _) => Center(child: Text('Error: $e')),
-          data: (contexts) {
-            if (contexts.isEmpty) {
-              return _EmptyMatrixHint(featureId: featureId);
-            }
-            return InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(200),
-              minScale: 0.25,
-              maxScale: 4,
-              child: RepaintBoundary(
-                child: CustomPaint(
-                  painter: HarrisMatrixPainter(
-                    contexts: contexts,
-                    relations: relations,
-                    theme: Theme.of(context),
-                  ),
-                  size: _canvasSize(contexts),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Size _canvasSize(List<ContextModel> contexts) {
-    const nodesPerRow = 4;
-    final rows = (contexts.length / nodesPerRow).ceil().clamp(1, 999);
-    return Size(nodesPerRow * 160.0 + 128, rows * 120.0 + 128);
-  }
-}
-
-class _EmptyMatrixHint extends StatelessWidget {
-  const _EmptyMatrixHint({required this.featureId});
-  final String featureId;
+  final List<ContextModel> contexts;
+  final String? selectedContextId;
+  final void Function(String) onContextTap;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppColors.s2,
-              borderRadius: AppRadius.lgBorderRadius,
-            ),
-            child: const Icon(Icons.account_tree_outlined,
-                size: 28, color: AppColors.t2),
-          ),
-          const SizedBox(height: AppSpacing.space16),
-          Text(
-            'No stratigraphy yet',
-            style: TextStyle(
-              fontFamily: AppTypography.monoFontFamily,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: AppColors.t1,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space8),
-          Text(
-            'Add a context below to start\nbuilding the Harris Matrix.',
+    final colors = AppColors.of(context);
+    if (contexts.isEmpty) {
+      return Container(
+        color: colors.s0,
+        child: Center(
+          child: Text(
+            'No contexts — use Add Context below',
             style: TextStyle(
               fontFamily: AppTypography.sansFontFamily,
               fontSize: 12,
-              color: AppColors.t2,
-              height: 1.5,
+              color: colors.t2,
             ),
-            textAlign: TextAlign.center,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Context strip ──────────────────────────────────────────────────────────────
-
-class _ContextStrip extends ConsumerWidget {
-  const _ContextStrip({required this.featureId});
-  final String featureId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final contextsAsync = ref.watch(contextsByFeatureProvider(featureId));
+        ),
+      );
+    }
 
     return Container(
-      color: AppColors.s0,
-      child: contextsAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (contexts) {
-          if (contexts.isEmpty) {
-            return Center(
-              child: Text(
-                'No contexts — tap + below to add one',
-                style: TextStyle(
-                  fontFamily: AppTypography.sansFontFamily,
-                  fontSize: 12,
-                  color: AppColors.t2,
-                ),
-              ),
-            );
-          }
-          return ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space16,
-              vertical: 10,
-            ),
-            itemCount: contexts.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(width: AppSpacing.space8),
-            itemBuilder: (context, index) => _ContextStripCard(
-              context_: contexts[index],
-              featureId: featureId,
-            ),
+      color: colors.s0,
+      child: ListView.separated(
+        itemCount: contexts.length,
+        separatorBuilder: (_, __) => Container(
+          height: 1,
+          color: colors.rule,
+        ),
+        itemBuilder: (context, index) {
+          final ctx = contexts[index];
+          return _ContextManifestRow(
+            context_: ctx,
+            isSelected: selectedContextId == ctx.id,
+            onTap: () => onContextTap(ctx.id),
           );
         },
       ),
@@ -482,146 +525,225 @@ class _ContextStrip extends ConsumerWidget {
   }
 }
 
-class _ContextStripCard extends StatelessWidget {
-  const _ContextStripCard({
+class _ContextManifestRow extends StatefulWidget {
+  const _ContextManifestRow({
     required this.context_,
-    required this.featureId,
+    required this.isSelected,
+    required this.onTap,
   });
 
   final ContextModel context_;
-  final String featureId;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_ContextManifestRow> createState() => _ContextManifestRowState();
+}
+
+class _ContextManifestRowState extends State<_ContextManifestRow> {
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final isCut = context_ is CutModel;
-    final accentColor = isCut ? AppColors.cut : AppColors.fill;
-    final surfaceColor = isCut ? AppColors.cutSurface : AppColors.fillSurface;
-    final textColor = isCut ? AppColors.cutText : AppColors.fillText;
+    final colors = AppColors.of(context);
+    final ctx = widget.context_;
+    final isCut = ctx is CutModel;
+    final accentColor = isCut ? colors.cut : colors.fill;
+    final textColor = isCut ? colors.cutText : colors.fillText;
+    final surfaceColor = isCut ? colors.cutSurface : colors.fillSurface;
     final typeLabel = isCut ? 'CUT' : 'FILL';
-    final num = context_.contextNumber.toString().padLeft(3, '0');
+    final num = ctx.contextNumber.toString().padLeft(3, '0');
+
+    String? subtitle;
+    if (ctx is CutModel && ctx.cutType != null) {
+      subtitle = ctx.cutType!.displayName;
+    } else if (ctx is FillModel && ctx.composition != null) {
+      subtitle = ctx.composition;
+    }
 
     return GestureDetector(
-      onTap: () =>
-          context.push('/features/$featureId/contexts/${context_.id}'),
-      child: Container(
-        width: 100,
-        decoration: BoxDecoration(
-          color: AppColors.s1,
-          borderRadius: AppRadius.mdBorderRadius,
-          border: Border(
-            left: BorderSide(color: accentColor, width: AppBorder.accentStripe),
-            top: const BorderSide(color: AppColors.rule, width: 1),
-            right: const BorderSide(color: AppColors.rule, width: 1),
-            bottom: const BorderSide(color: AppColors.rule, width: 1),
-          ),
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 80),
+        color: widget.isSelected
+            ? colors.primaryContainer.withAlpha(100)
+            : _pressed
+                ? colors.s2
+                : colors.s0,
+        padding: const EdgeInsets.fromLTRB(
+          0,
+          AppSpacing.space8,
+          AppSpacing.space16,
+          AppSpacing.space8,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space6, vertical: AppSpacing.space2),
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: AppRadius.xsBorderRadius,
-                ),
-                child: Text(
-                  typeLabel,
-                  style: TextStyle(
-                    fontFamily: AppTypography.monoFontFamily,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 9,
-                    letterSpacing: 1.5,
-                    color: textColor,
-                  ),
-                ),
+        child: Row(
+          children: [
+            // ── Left accent bar ─────────────────────────────────────────
+            Container(
+              width: AppBorder.accentStripe,
+              height: 36,
+              margin: const EdgeInsets.only(right: AppSpacing.space12),
+              color: widget.isSelected ? colors.primary : accentColor,
+            ),
+
+            // ── Type badge ──────────────────────────────────────────────
+            Container(
+              width: 40,
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              decoration: BoxDecoration(
+                color: widget.isSelected
+                    ? colors.primaryContainer
+                    : surfaceColor,
+                borderRadius: AppRadius.xsBorderRadius,
               ),
-              const SizedBox(height: AppSpacing.space6),
-              Text(
-                num,
+              alignment: Alignment.center,
+              child: Text(
+                typeLabel,
                 style: TextStyle(
                   fontFamily: AppTypography.monoFontFamily,
                   fontWeight: FontWeight.w800,
-                  fontSize: 22,
-                  letterSpacing: -0.5,
-                  height: 1,
-                  color: AppColors.t0,
+                  fontSize: 8,
+                  letterSpacing: 1.5,
+                  color: widget.isSelected ? colors.primary : textColor,
                 ),
               ),
-              const Spacer(),
-              Text(
-                'view →',
-                style: TextStyle(
-                  fontFamily: AppTypography.monoFontFamily,
-                  fontSize: 9,
-                  color: AppColors.t2,
-                  letterSpacing: 0.5,
-                ),
+            ),
+
+            const SizedBox(width: 10.0),
+
+            // ── Number + subtitle ────────────────────────────────────────
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    num,
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      letterSpacing: -0.3,
+                      height: 1,
+                      color: widget.isSelected
+                          ? colors.primary
+                          : colors.t0,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontFamily: AppTypography.sansFontFamily,
+                        fontSize: 11,
+                        color: colors.t1,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // ── Chevron ──────────────────────────────────────────────────
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: widget.isSelected ? colors.primary : colors.t2,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ── Workbench action row ───────────────────────────────────────────────────────
+// ── Action dock ───────────────────────────────────────────────────────────────
 
-class _WorkbenchActionRow extends ConsumerWidget {
-  const _WorkbenchActionRow({required this.featureId});
+class _ActionDock extends ConsumerWidget {
+  const _ActionDock({
+    required this.featureId,
+    required this.onContextAdded,
+    required this.onRelationAdded,
+  });
+
   final String featureId;
+  final VoidCallback onContextAdded;
+  final VoidCallback onRelationAdded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
     return Container(
-      color: AppColors.s1,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Divider(height: 1, color: AppColors.rule),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space16,
-                vertical: 10,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.layers_rounded,
-                      label: 'Context',
-                      color: AppColors.cut,
-                      onTap: () => _addContext(context, ref),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space8),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.add_link_rounded,
-                      label: 'Relation',
-                      color: AppColors.primary,
-                      onTap: () => _addRelation(context, ref),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space8),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.more_horiz_rounded,
-                      label: 'More',
-                      color: AppColors.t2,
-                      onTap: () => _showMore(context),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      color: colors.s1,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space12,
+            10.0,
+            AppSpacing.space12,
+            10.0,
           ),
-        ],
+          child: Row(
+            children: [
+              // ── Primary: Add Context ──────────────────────────────────
+              Expanded(
+                flex: 3,
+                child: FilledButton.icon(
+                  onPressed: () => _addContext(context, ref),
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: Text(
+                    'ADD CONTEXT',
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    foregroundColor: colors.s0,
+                    minimumSize: const Size(0, 44),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadius.smBorderRadius,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space8),
+
+              // ── Secondary: Relation ───────────────────────────────────
+              Expanded(
+                flex: 2,
+                child: _DockSecondaryButton(
+                  icon: Icons.add_link_rounded,
+                  label: 'RELATION',
+                  onTap: () => _addRelation(context, ref),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space8),
+
+              // ── Secondary: Evidence ───────────────────────────────────
+              Expanded(
+                flex: 2,
+                child: _DockSecondaryButton(
+                  icon: Icons.folder_outlined,
+                  label: 'EVIDENCE',
+                  onTap: () => _showEvidence(context),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -633,9 +755,7 @@ class _WorkbenchActionRow extends ConsumerWidget {
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
-        onSaved: () {
-          ref.invalidate(contextsByFeatureProvider(featureId));
-        },
+        onSaved: onContextAdded,
       ),
     );
   }
@@ -647,23 +767,155 @@ class _WorkbenchActionRow extends ConsumerWidget {
       useSafeArea: true,
       builder: (_) => RelationFormSheet(
         featureId: featureId,
-        onSaved: () {
-          ref.invalidate(harrisByFeatureProvider(featureId));
-        },
+        onSaved: onRelationAdded,
       ),
     );
   }
 
-  void _showMore(BuildContext context) {
+  void _showEvidence(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (_) => _MoreActionsSheet(featureId: featureId),
+      useSafeArea: true,
+      builder: (_) => _EvidenceSheet(featureId: featureId),
     );
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
+class _DockSecondaryButton extends StatelessWidget {
+  const _DockSecondaryButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Material(
+      color: colors.s2,
+      borderRadius: AppRadius.smBorderRadius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.smBorderRadius,
+        child: Container(
+          height: 44,
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.smBorderRadius,
+            border: Border.all(color: colors.ruleMid, width: 1),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 16, color: colors.t1),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: AppTypography.monoFontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 8,
+                  letterSpacing: 1.2,
+                  color: colors.t1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Evidence sheet ─────────────────────────────────────────────────────────────
+
+class _EvidenceSheet extends StatelessWidget {
+  const _EvidenceSheet({required this.featureId});
+  final String featureId;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: AppSpacing.space8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+            child: Row(
+              children: [
+                Text(
+                  'EVIDENCE',
+                  style: TextStyle(
+                    fontFamily: AppTypography.monoFontFamily,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    letterSpacing: 2.0,
+                    color: colors.t0,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  color: colors.t1,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          Container(height: 1, color: colors.rule),
+          _EvidenceTile(
+            icon: Icons.photo_library_outlined,
+            label: 'Photos',
+            color: colors.doc,
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/features/$featureId/evidence/photos');
+            },
+          ),
+          Container(height: 1, color: colors.rule),
+          _EvidenceTile(
+            icon: Icons.draw_outlined,
+            label: 'Drawings',
+            color: colors.doc,
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/features/$featureId/evidence/drawings');
+            },
+          ),
+          Container(height: 1, color: colors.rule),
+          _EvidenceTile(
+            icon: Icons.category_outlined,
+            label: 'All Finds',
+            color: colors.find,
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/features/$featureId/evidence/finds');
+            },
+          ),
+          Container(height: 1, color: colors.rule),
+          _EvidenceTile(
+            icon: Icons.science_outlined,
+            label: 'All Samples',
+            color: colors.sample,
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/features/$featureId/evidence/samples');
+            },
+          ),
+          const SizedBox(height: AppSpacing.space16),
+        ],
+      ),
+    );
+  }
+}
+
+class _EvidenceTile extends StatelessWidget {
+  const _EvidenceTile({
     required this.icon,
     required this.label,
     required this.color,
@@ -677,121 +929,49 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.smBorderRadius,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+    final colors = AppColors.of(context);
+    return ListTile(
+      leading: Container(
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
-          color: AppColors.s2,
-          borderRadius: AppRadius.smBorderRadius,
-          border: Border.all(color: AppColors.ruleMid, width: 1),
+          color: color.withAlpha(20),
+          borderRadius: AppRadius.xsBorderRadius,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: AppTypography.sansFontFamily,
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
-                color: AppColors.t1,
-              ),
-            ),
-          ],
+        child: Icon(icon, size: 16, color: color),
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontFamily: AppTypography.sansFontFamily,
+          fontWeight: FontWeight.w500,
+          fontSize: 14,
+          color: colors.t0,
         ),
       ),
-    );
-  }
-}
-
-class _MoreActionsSheet extends StatelessWidget {
-  const _MoreActionsSheet({required this.featureId});
-  final String featureId;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: AppSpacing.space8),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space20),
-            child: Row(
-              children: [
-                Text(
-                  'Add evidence',
-                  style: TextStyle(
-                    fontFamily: AppTypography.sansFontFamily,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                    color: AppColors.t0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space8),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.photo_library_outlined),
-            title: const Text('Photos'),
-            onTap: () {
-              Navigator.pop(context);
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => _FullViewSheet(
-                  title: 'Photos',
-                  child: PhotoListTab(featureId: featureId),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.draw_outlined),
-            title: const Text('Drawings'),
-            onTap: () {
-              Navigator.pop(context);
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (_) => _FullViewSheet(
-                  title: 'Drawings',
-                  child: DrawingListTab(featureId: featureId),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: AppSpacing.space8),
-        ],
-      ),
+      trailing: Icon(Icons.chevron_right_rounded, size: 16, color: colors.t2),
+      onTap: onTap,
     );
   }
 }
 
 // ── Loading skeleton ───────────────────────────────────────────────────────────
 
-class _WorkbenchSkeleton extends StatelessWidget {
-  const _WorkbenchSkeleton();
+class _StationSkeleton extends StatelessWidget {
+  const _StationSkeleton();
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     return Scaffold(
-      backgroundColor: AppColors.base,
+      backgroundColor: colors.base,
       body: Column(
         children: [
-          Container(color: AppColors.s0, height: 80),
-          const SizedBox(height: 1),
-          Expanded(child: Container(color: AppColors.base)),
-          Container(color: AppColors.s0, height: 160),
+          Container(color: colors.s0, height: 60),
+          Container(height: 1, color: colors.rule),
+          Expanded(child: Container(color: colors.base)),
+          Container(height: 1, color: colors.rule),
+          Container(color: colors.s1, height: 64),
         ],
       ),
     );

@@ -6,57 +6,21 @@ import '../../../../core/constants/enums.dart';
 import '../../../context/domain/models/context_model.dart';
 import '../../domain/models/harris_relation_model.dart';
 
-/// Draws the Harris Matrix as a layered directed graph.
-///
-/// Layout: Kahn's BFS topological sort assigns layer positions.
-/// Nodes: cuts = sharp rectangles, fills = rounded rectangles (stadium).
-/// Edges: cubic bezier curves with arrowheads; contemporary/equal = dashed.
-/// Legend: drawn in the top-left corner of the canvas.
-class HarrisMatrixPainter extends CustomPainter {
-  HarrisMatrixPainter({
-    required this.contexts,
-    required this.relations,
-    required this.theme,
-  });
+/// Layout constants shared between the interactive matrix and the arrows painter.
+abstract final class HarrisMatrixLayout {
+  static const double nodeWidth = 120.0;
+  static const double nodeHeight = 58.0;
+  static const double layerSpacing = 110.0;
+  static const double nodeSpacing = 148.0;
+  static const double padding = 56.0;
 
-  final List<ContextModel> contexts;
-  final List<HarrisRelationModel> relations;
-  final ThemeData theme;
+  /// Compute node center positions from topological sort.
+  static Map<String, Offset> computePositions(
+    List<ContextModel> contexts,
+    List<HarrisRelationModel> relations,
+  ) {
+    if (contexts.isEmpty) return {};
 
-  static const double _nodeWidth = 130;
-  static const double _nodeHeight = 68;
-  static const double _layerSpacing = 120;
-  static const double _nodeSpacing = 160;
-  static const double _padding = 64;
-  static const double _arrowSize = 10;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (contexts.isEmpty) return;
-
-    final positions = _computeLayout();
-    _drawGrid(canvas, size);
-    _drawEdges(canvas, positions);
-    _drawNodes(canvas, positions);
-    _drawLegend(canvas, size);
-  }
-
-  void _drawGrid(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = theme.colorScheme.outlineVariant.withAlpha(50)
-      ..style = PaintingStyle.fill;
-
-    const gridSpacing = 32.0;
-    const dotRadius = 1.5;
-
-    for (var x = gridSpacing; x < size.width; x += gridSpacing) {
-      for (var y = gridSpacing; y < size.height; y += gridSpacing) {
-        canvas.drawCircle(Offset(x, y), dotRadius, paint);
-      }
-    }
-  }
-
-  Map<String, Offset> _computeLayout() {
     final inDegree = <String, int>{};
     final adj = <String, List<String>>{};
 
@@ -114,12 +78,12 @@ class HarrisMatrixPainter extends CustomPainter {
     for (var li = 0; li < sortedLayers.length; li++) {
       final layerIndex = sortedLayers[li];
       final nodes = byLayer[layerIndex]!;
-      final layerWidth = nodes.length * _nodeSpacing;
+      final layerWidth = nodes.length * nodeSpacing;
       final startX =
-          _padding + (maxLayerCount * _nodeSpacing - layerWidth) / 2;
-      final y = _padding + li * _layerSpacing;
+          padding + (maxLayerCount * nodeSpacing - layerWidth) / 2;
+      final y = padding + li * layerSpacing;
       for (var ni = 0; ni < nodes.length; ni++) {
-        final x = startX + ni * _nodeSpacing;
+        final x = startX + ni * nodeSpacing;
         positions[nodes[ni]] = Offset(x, y);
       }
     }
@@ -127,16 +91,77 @@ class HarrisMatrixPainter extends CustomPainter {
     return positions;
   }
 
-  void _drawEdges(Canvas canvas, Map<String, Offset> positions) {
+  /// Compute canvas size from positions.
+  static Size canvasSize(Map<String, Offset> positions) {
+    if (positions.isEmpty) return const Size(400, 300);
+    var maxX = 0.0;
+    var maxY = 0.0;
+    for (final pos in positions.values) {
+      if (pos.dx + nodeWidth > maxX) maxX = pos.dx + nodeWidth;
+      if (pos.dy + nodeHeight > maxY) maxY = pos.dy + nodeHeight;
+    }
+    return Size(maxX + padding, maxY + padding);
+  }
+}
+
+/// Draws ONLY the arrows between nodes.
+///
+/// Changed from previous HarrisMatrixPainter:
+/// - Nodes are no longer drawn here — they are Stack-positioned widgets
+/// - This painter draws only bezier curves and arrowheads
+/// - This enables native GestureDetector taps on individual nodes
+///
+/// The grid dot background is preserved as a subtle orientation marker.
+class HarrisArrowPainter extends CustomPainter {
+  HarrisArrowPainter({
+    required this.relations,
+    required this.positions,
+    required this.outlineColor,
+    required this.outlineVariantColor,
+    required this.selectedContextId,
+    required this.primaryColor,
+  });
+
+  final List<HarrisRelationModel> relations;
+  final Map<String, Offset> positions;
+  final Color outlineColor;
+  final Color outlineVariantColor;
+  final String? selectedContextId;
+  final Color primaryColor;
+
+  static const double _arrowSize = 9.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _drawGrid(canvas, size);
+    _drawEdges(canvas);
+  }
+
+  void _drawGrid(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = outlineVariantColor.withAlpha(30)
+      ..style = PaintingStyle.fill;
+
+    const gridSpacing = 28.0;
+    const dotRadius = 1.0;
+
+    for (var x = gridSpacing; x < size.width; x += gridSpacing) {
+      for (var y = gridSpacing; y < size.height; y += gridSpacing) {
+        canvas.drawCircle(Offset(x, y), dotRadius, paint);
+      }
+    }
+  }
+
+  void _drawEdges(Canvas canvas) {
     final edgePaint = Paint()
-      ..color = theme.colorScheme.outline
-      ..strokeWidth = 2.0
+      ..color = outlineColor
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
     final dashedPaint = Paint()
-      ..color = theme.colorScheme.outline.withAlpha(140)
-      ..strokeWidth = 1.8
+      ..color = outlineVariantColor.withAlpha(160)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
@@ -146,11 +171,11 @@ class HarrisMatrixPainter extends CustomPainter {
       if (fromPos == null || toPos == null) continue;
 
       final fromPoint = Offset(
-        fromPos.dx + _nodeWidth / 2,
-        fromPos.dy + _nodeHeight,
+        fromPos.dx + HarrisMatrixLayout.nodeWidth / 2,
+        fromPos.dy + HarrisMatrixLayout.nodeHeight,
       );
       final toPoint = Offset(
-        toPos.dx + _nodeWidth / 2,
+        toPos.dx + HarrisMatrixLayout.nodeWidth / 2,
         toPos.dy,
       );
 
@@ -158,7 +183,20 @@ class HarrisMatrixPainter extends CustomPainter {
           rel.relationType == HarrisRelationType.contemporaryWith ||
               rel.relationType == HarrisRelationType.equalTo;
 
-      if (isDashed) {
+      // Highlight edges connected to selected node
+      final isHighlighted = selectedContextId != null &&
+          (rel.fromContextId == selectedContextId ||
+              rel.toContextId == selectedContextId);
+
+      if (isHighlighted) {
+        final highlightPaint = Paint()
+          ..color = primaryColor.withAlpha(200)
+          ..strokeWidth = 2.0
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+        _drawBezier(canvas, fromPoint, toPoint, highlightPaint);
+        _drawArrowHead(canvas, fromPoint, toPoint, highlightPaint);
+      } else if (isDashed) {
         _drawDashedBezier(canvas, fromPoint, toPoint, dashedPaint);
       } else {
         _drawBezier(canvas, fromPoint, toPoint, edgePaint);
@@ -169,7 +207,7 @@ class HarrisMatrixPainter extends CustomPainter {
 
   void _drawBezier(Canvas canvas, Offset from, Offset to, Paint paint) {
     final dy = (to.dy - from.dy).abs();
-    final controlOffset = dy * 0.4 + 20;
+    final controlOffset = dy * 0.35 + 16;
     final path = Path()
       ..moveTo(from.dx, from.dy)
       ..cubicTo(
@@ -184,22 +222,21 @@ class HarrisMatrixPainter extends CustomPainter {
   }
 
   void _drawDashedBezier(Canvas canvas, Offset from, Offset to, Paint paint) {
-    // Approximate with a polyline sampled from the bezier
     const steps = 20;
-    const dashLength = 6.0;
+    const dashLength = 5.0;
     const gapLength = 4.0;
 
     final dy = (to.dy - from.dy).abs();
-    final controlOffset = dy * 0.4 + 20;
+    final controlOffset = dy * 0.35 + 16;
 
     final points = <Offset>[];
     for (var i = 0; i <= steps; i++) {
       final t = i / steps;
       final mt = 1 - t;
-      final p1 = Offset(from.dx, from.dy);
+      final p1 = from;
       final p2 = Offset(from.dx, from.dy + controlOffset);
       final p3 = Offset(to.dx, to.dy - controlOffset);
-      final p4 = Offset(to.dx, to.dy);
+      final p4 = to;
       final x = mt * mt * mt * p1.dx +
           3 * mt * mt * t * p2.dx +
           3 * mt * t * t * p3.dx +
@@ -215,9 +252,7 @@ class HarrisMatrixPainter extends CustomPainter {
     var drawing = true;
     for (var i = 0; i < points.length - 1; i++) {
       final segLen = (points[i + 1] - points[i]).distance;
-      if (drawing) {
-        canvas.drawLine(points[i], points[i + 1], paint);
-      }
+      if (drawing) canvas.drawLine(points[i], points[i + 1], paint);
       drawn += segLen;
       if (drawing && drawn >= dashLength) {
         drawn = 0;
@@ -253,11 +288,48 @@ class HarrisMatrixPainter extends CustomPainter {
     canvas.drawPath(arrowPath, fillPaint);
   }
 
-  void _drawNodes(Canvas canvas, Map<String, Offset> positions) {
+  @override
+  bool shouldRepaint(HarrisArrowPainter oldDelegate) =>
+      oldDelegate.relations != relations ||
+      oldDelegate.positions != positions ||
+      oldDelegate.selectedContextId != selectedContextId;
+}
+
+// ── Legacy alias kept for matrix_tab.dart which uses the old class name ────────
+// matrix_tab.dart uses HarrisMatrixPainter — we keep the old interface.
+class HarrisMatrixPainter extends CustomPainter {
+  HarrisMatrixPainter({
+    required this.contexts,
+    required this.relations,
+    required this.theme,
+  });
+
+  final List<ContextModel> contexts;
+  final List<HarrisRelationModel> relations;
+  final ThemeData theme;
+
+  late final Map<String, Offset> _positions =
+      HarrisMatrixLayout.computePositions(contexts, relations);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final arrowPainter = HarrisArrowPainter(
+      relations: relations,
+      positions: _positions,
+      outlineColor: theme.colorScheme.outline,
+      outlineVariantColor: theme.colorScheme.outlineVariant,
+      selectedContextId: null,
+      primaryColor: theme.colorScheme.primary,
+    );
+    arrowPainter.paint(canvas, size);
+    _drawNodes(canvas);
+  }
+
+  void _drawNodes(Canvas canvas) {
     final fillPaint = Paint()..style = PaintingStyle.fill;
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+      ..strokeWidth = 1.5;
 
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -265,25 +337,16 @@ class HarrisMatrixPainter extends CustomPainter {
     );
 
     for (final ctx in contexts) {
-      final pos = positions[ctx.id];
+      final pos = _positions[ctx.id];
       if (pos == null) continue;
 
-      final rect = Rect.fromLTWH(pos.dx, pos.dy, _nodeWidth, _nodeHeight);
+      final rect = Rect.fromLTWH(
+        pos.dx,
+        pos.dy,
+        HarrisMatrixLayout.nodeWidth,
+        HarrisMatrixLayout.nodeHeight,
+      );
       final isCut = ctx is CutModel;
-
-      // Drop shadow
-      final shadowPaint = Paint()
-        ..color = Colors.black.withAlpha(40)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-      final shadowRect = rect.translate(0, 3);
-      if (isCut) {
-        canvas.drawRect(shadowRect, shadowPaint);
-      } else {
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(shadowRect, const Radius.circular(34)),
-          shadowPaint,
-        );
-      }
 
       fillPaint.color = isCut
           ? theme.colorScheme.primaryContainer
@@ -296,38 +359,34 @@ class HarrisMatrixPainter extends CustomPainter {
         canvas.drawRect(rect, fillPaint);
         canvas.drawRect(rect, borderPaint);
       } else {
-        final rrect =
-            RRect.fromRectAndRadius(rect, const Radius.circular(34));
+        final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(29));
         canvas.drawRRect(rrect, fillPaint);
         canvas.drawRRect(rrect, borderPaint);
       }
 
-      // Two-line label: context number on top, type on bottom
       final labelColor = isCut
           ? theme.colorScheme.onPrimaryContainer
           : theme.colorScheme.onTertiaryContainer;
 
-      // Line 1 — context number
       textPainter.text = TextSpan(
         text: 'C${ctx.contextNumber}',
         style: TextStyle(
           color: labelColor,
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
+          letterSpacing: 0.3,
           height: 1.1,
         ),
       );
-      textPainter.layout(maxWidth: _nodeWidth - 12);
+      textPainter.layout(maxWidth: HarrisMatrixLayout.nodeWidth - 12);
       textPainter.paint(
         canvas,
         Offset(
-          pos.dx + (_nodeWidth - textPainter.width) / 2,
-          pos.dy + _nodeHeight / 2 - textPainter.height - 1,
+          pos.dx + (HarrisMatrixLayout.nodeWidth - textPainter.width) / 2,
+          pos.dy + HarrisMatrixLayout.nodeHeight / 2 - textPainter.height - 1,
         ),
       );
 
-      // Line 2 — type label
       final cutCtx = isCut ? ctx as CutModel : null;
       final typeLabel = isCut
           ? 'Cut${cutCtx!.cutType != null ? ' · ${cutCtx.cutType!.displayName}' : ''}'
@@ -335,129 +394,22 @@ class HarrisMatrixPainter extends CustomPainter {
       textPainter.text = TextSpan(
         text: typeLabel,
         style: TextStyle(
-          color: labelColor.withAlpha(200),
-          fontSize: 11,
+          color: labelColor.withAlpha(180),
+          fontSize: 10,
           fontWeight: FontWeight.w500,
           letterSpacing: 0.2,
           height: 1.2,
         ),
       );
-      textPainter.layout(maxWidth: _nodeWidth - 12);
+      textPainter.layout(maxWidth: HarrisMatrixLayout.nodeWidth - 12);
       textPainter.paint(
         canvas,
         Offset(
-          pos.dx + (_nodeWidth - textPainter.width) / 2,
-          pos.dy + _nodeHeight / 2 + 1,
+          pos.dx + (HarrisMatrixLayout.nodeWidth - textPainter.width) / 2,
+          pos.dy + HarrisMatrixLayout.nodeHeight / 2 + 1,
         ),
       );
     }
-  }
-
-  void _drawLegend(Canvas canvas, Size size) {
-    const legendX = 12.0;
-    const legendY = 12.0;
-    const legendWidth = 108.0;
-    const legendHeight = 72.0;
-    const itemH = 24.0;
-
-    // Background
-    final bgPaint = Paint()
-      ..color = theme.colorScheme.surface.withAlpha(220)
-      ..style = PaintingStyle.fill;
-    final borderPaint = Paint()
-      ..color = theme.colorScheme.outlineVariant
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final bgRect = RRect.fromRectAndRadius(
-      const Rect.fromLTWH(legendX, legendY, legendWidth, legendHeight),
-      const Radius.circular(8),
-    );
-    canvas.drawRRect(bgRect, bgPaint);
-    canvas.drawRRect(bgRect, borderPaint);
-
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.left,
-    );
-
-    // Cut sample
-    final cutFill = Paint()
-      ..color = theme.colorScheme.primaryContainer
-      ..style = PaintingStyle.fill;
-    final cutBorder = Paint()
-      ..color = theme.colorScheme.primary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    final cutRect = const Rect.fromLTWH(legendX + 8, legendY + 10, 24, 14);
-    canvas.drawRect(cutRect, cutFill);
-    canvas.drawRect(cutRect, cutBorder);
-
-    textPainter.text = TextSpan(
-      text: 'Cut',
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(canvas, Offset(legendX + 38, legendY + 10 + (14 - textPainter.height) / 2));
-
-    // Fill sample
-    final fillFillPaint = Paint()
-      ..color = theme.colorScheme.tertiaryContainer
-      ..style = PaintingStyle.fill;
-    final fillBorder = Paint()
-      ..color = theme.colorScheme.tertiary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    final fillRect =
-        const Rect.fromLTWH(legendX + 8, legendY + 10 + itemH, 24, 14);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(fillRect, const Radius.circular(7)),
-      fillFillPaint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(fillRect, const Radius.circular(7)),
-      fillBorder,
-    );
-
-    textPainter.text = TextSpan(
-      text: 'Fill',
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(legendX + 38, legendY + 10 + itemH + (14 - textPainter.height) / 2),
-    );
-
-    // Dashed line for contemporary/equal
-    final dashedPaint = Paint()
-      ..color = theme.colorScheme.outline.withAlpha(140)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-    const lineY = legendY + 10 + itemH * 2 + 7;
-    var x = legendX + 8.0;
-    while (x < legendX + 32) {
-      canvas.drawLine(Offset(x, lineY), Offset(min(x + 5, legendX + 32), lineY), dashedPaint);
-      x += 9;
-    }
-
-    textPainter.text = TextSpan(
-      text: '= / ~',
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(canvas, Offset(legendX + 38, lineY - textPainter.height / 2));
   }
 
   @override

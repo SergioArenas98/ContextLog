@@ -16,17 +16,7 @@ import '../../domain/models/context_model.dart';
 import '../providers/context_providers.dart';
 import '../widgets/context_form_sheet.dart';
 
-/// Context Focus Screen — context as a first-class navigatable destination.
-///
-/// Structural change: contexts were list rows inside tab #1 of the feature detail.
-/// Now: tapping a context from the workbench strip opens a dedicated screen.
-///
-/// For Fill contexts: shows properties + all finds linked to this fill.
-/// For Cut contexts: shows properties + all child fills.
-///
-/// The evidence (finds) can be added directly from this screen,
-/// making the fill/context the organizational hub for evidence rather than
-/// having finds floating in a parallel tab list.
+/// Context Detail Screen — full edit/detail view for a context.
 class ContextFocusScreen extends ConsumerWidget {
   const ContextFocusScreen({
     super.key,
@@ -73,7 +63,7 @@ class ContextFocusScreen extends ConsumerWidget {
   }
 }
 
-// ── Cut focus ─────────────────────────────────────────────────────────────────
+// ── Cut detail ────────────────────────────────────────────────────────────────
 
 class _CutFocusScaffold extends StatelessWidget {
   const _CutFocusScaffold({
@@ -88,41 +78,39 @@ class _CutFocusScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final fills = allContexts
         .whereType<FillModel>()
         .where((f) => f.parentCutId == cut.id)
         .toList();
 
     return Scaffold(
-      backgroundColor: AppColors.base,
+      backgroundColor: colors.s0,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: _ContextHeader(
               typeLabel: 'CUT',
-              accentColor: AppColors.cut,
-              textColor: AppColors.cutText,
-              surfaceColor: AppColors.cutSurface,
+              accentColor: colors.cut,
+              textColor: colors.cutText,
+              surfaceColor: colors.cutSurface,
               number: cut.contextNumber,
               featureId: featureId,
               context_: cut,
             ),
           ),
           SliverToBoxAdapter(
-            child: _PropertiesSection(
-              title: 'Excavation Properties',
-              rows: [
-                if (cut.cutType != null)
-                  _PropRow('Type', cut.cutType!.displayName),
-                if (cut.height != null)
-                  _PropRow('Height', '${cut.height!.toStringAsFixed(2)} m'),
-                if (cut.width != null)
-                  _PropRow('Width', '${cut.width!.toStringAsFixed(2)} m'),
-                if (cut.depth != null)
-                  _PropRow('Depth', '${cut.depth!.toStringAsFixed(2)} m'),
-                if (cut.notes != null) _PropRow('Notes', cut.notes!),
-              ],
-            ),
+            child: _PropertiesSection(rows: [
+              if (cut.cutType != null)
+                _PropRow('Type', cut.cutType!.displayName),
+              if (cut.height != null)
+                _PropRow('Height', '${cut.height!.toStringAsFixed(2)} m'),
+              if (cut.width != null)
+                _PropRow('Width', '${cut.width!.toStringAsFixed(2)} m'),
+              if (cut.depth != null)
+                _PropRow('Depth', '${cut.depth!.toStringAsFixed(2)} m'),
+              if (cut.notes != null) _PropRow('Notes', cut.notes!),
+            ]),
           ),
           SliverToBoxAdapter(
             child: _SectionDivider(label: 'FILLS (${fills.length})'),
@@ -130,24 +118,18 @@ class _CutFocusScaffold extends StatelessWidget {
           if (fills.isEmpty)
             const SliverToBoxAdapter(
               child: _EmptySection(
-                message:
-                    'No fills recorded for this cut.\nFills must reference this cut as parent.',
+                message: 'No fills reference this cut.',
               ),
             )
           else
             SliverList.separated(
               itemCount: fills.length,
-              separatorBuilder: (_, __) => const Divider(
-                height: 1,
-                indent: AppSpacing.space16,
-                endIndent: AppSpacing.space16,
-                color: AppColors.rule,
-              ),
+              separatorBuilder: (_, __) =>
+                  Container(height: 1, color: colors.rule),
               itemBuilder: (context, index) =>
                   _FillRow(fill: fills[index], featureId: featureId),
             ),
-          const SliverToBoxAdapter(
-              child: SizedBox(height: AppSpacing.space80)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space80)),
         ],
       ),
     );
@@ -161,54 +143,85 @@ class _FillRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () =>
-          context.push('/features/$featureId/contexts/${fill.id}'),
-      leading: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: AppColors.fillSurface,
-          borderRadius: AppRadius.smBorderRadius,
+    final colors = AppColors.of(context);
+    return InkWell(
+      onTap: () => context.push('/features/$featureId/contexts/${fill.id}'),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          0,
+          AppSpacing.space12,
+          AppSpacing.space16,
+          AppSpacing.space12,
         ),
-        alignment: Alignment.center,
-        child: Text(
-          fill.contextNumber.toString().padLeft(3, '0'),
-          style: TextStyle(
-            fontFamily: AppTypography.monoFontFamily,
-            fontWeight: FontWeight.w700,
-            fontSize: 10,
-            color: AppColors.fillText,
-          ),
+        child: Row(
+          children: [
+            Container(
+              width: AppBorder.accentStripe,
+              height: 32,
+              color: colors.fill,
+              margin: const EdgeInsets.only(
+                left: AppSpacing.space16,
+                right: AppSpacing.space12,
+              ),
+            ),
+            Container(
+              width: 36,
+              height: 28,
+              decoration: BoxDecoration(
+                color: colors.fillSurface,
+                borderRadius: AppRadius.xsBorderRadius,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                fill.contextNumber.toString().padLeft(3, '0'),
+                style: TextStyle(
+                  fontFamily: AppTypography.monoFontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                  color: colors.fillText,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Fill ${fill.contextNumber.toString().padLeft(3, '0')}',
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: colors.t0,
+                    ),
+                  ),
+                  if (fill.composition != null)
+                    Text(
+                      fill.composition!,
+                      style: TextStyle(
+                        fontFamily: AppTypography.sansFontFamily,
+                        fontSize: 12,
+                        color: colors.t1,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: colors.t2,
+              size: 16,
+            ),
+          ],
         ),
-      ),
-      title: Text(
-        'Fill ${fill.contextNumber.toString().padLeft(3, '0')}',
-        style: TextStyle(
-          fontFamily: AppTypography.monoFontFamily,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-          color: AppColors.t0,
-        ),
-      ),
-      subtitle: fill.composition != null
-          ? Text(
-              fill.composition!,
-              style: TextStyle(fontSize: 12, color: AppColors.t1),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            )
-          : null,
-      trailing: const Icon(
-        Icons.chevron_right_rounded,
-        color: AppColors.t2,
-        size: 20,
       ),
     );
   }
 }
 
-// ── Fill focus ─────────────────────────────────────────────────────────────────
+// ── Fill detail ────────────────────────────────────────────────────────────────
 
 class _FillFocusScaffold extends ConsumerWidget {
   const _FillFocusScaffold({
@@ -221,10 +234,11 @@ class _FillFocusScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
     final findsAsync = ref.watch(findsByFeatureProvider(featureId));
 
     return Scaffold(
-      backgroundColor: AppColors.base,
+      backgroundColor: colors.s0,
       body: findsAsync.when(
         loading: () => const _FocusSkeleton(),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -237,59 +251,38 @@ class _FillFocusScaffold extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: _ContextHeader(
                   typeLabel: 'FILL',
-                  accentColor: AppColors.fill,
-                  textColor: AppColors.fillText,
-                  surfaceColor: AppColors.fillSurface,
+                  accentColor: colors.fill,
+                  textColor: colors.fillText,
+                  surfaceColor: colors.fillSurface,
                   number: fill.contextNumber,
                   featureId: featureId,
                   context_: fill,
                 ),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.space16,
-                    AppSpacing.space8,
-                    AppSpacing.space16,
-                    AppSpacing.space4,
-                  ),
-                  child: _StatsRow(findCount: fillFinds.length),
-                ),
+                child: _PropertiesSection(rows: [
+                  if (fill.composition != null)
+                    _PropRow('Composition', fill.composition!),
+                  if (fill.color != null) _PropRow('Color', fill.color!),
+                  if (fill.compaction != null)
+                    _PropRow('Compaction', fill.compaction!),
+                  if (fill.inclusions != null)
+                    _PropRow('Inclusions', fill.inclusions!),
+                  if (fill.notes != null) _PropRow('Notes', fill.notes!),
+                ]),
               ),
               SliverToBoxAdapter(
-                child: _PropertiesSection(
-                  title: 'Deposit Properties',
-                  rows: [
-                    if (fill.composition != null)
-                      _PropRow('Composition', fill.composition!),
-                    if (fill.color != null) _PropRow('Color', fill.color!),
-                    if (fill.compaction != null)
-                      _PropRow('Compaction', fill.compaction!),
-                    if (fill.inclusions != null)
-                      _PropRow('Inclusions', fill.inclusions!),
-                    if (fill.notes != null) _PropRow('Notes', fill.notes!),
-                  ],
-                ),
-              ),
-              SliverToBoxAdapter(
-                child:
-                    _SectionDivider(label: 'FINDS (${fillFinds.length})'),
+                child: _SectionDivider(label: 'FINDS (${fillFinds.length})'),
               ),
               if (fillFinds.isEmpty)
                 const SliverToBoxAdapter(
-                  child: _EmptySection(
-                    message: 'No finds recorded for this fill.\nUse the button below to add one.',
-                  ),
+                  child: _EmptySection(message: 'No finds for this fill.'),
                 )
               else
                 SliverList.separated(
                   itemCount: fillFinds.length,
-                  separatorBuilder: (_, __) => const Divider(
-                    height: 1,
-                    indent: AppSpacing.space16,
-                    endIndent: AppSpacing.space16,
-                    color: AppColors.rule,
-                  ),
+                  separatorBuilder: (_, __) =>
+                      Container(height: 1, color: colors.rule),
                   itemBuilder: (context, index) =>
                       _FindRow(find: fillFinds[index]),
                 ),
@@ -299,81 +292,7 @@ class _FillFocusScaffold extends ConsumerWidget {
           );
         },
       ),
-      bottomNavigationBar: _FillActionBar(
-        fill: fill,
-        featureId: featureId,
-      ),
-    );
-  }
-}
-
-class _StatsRow extends StatelessWidget {
-  const _StatsRow({required this.findCount});
-  final int findCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: AppSpacing.space8,
-      children: [
-        _StatChip(
-          icon: Icons.category_rounded,
-          count: findCount,
-          label: 'Finds',
-          color: AppColors.find,
-          surface: AppColors.findSurface,
-          textColor: AppColors.findText,
-        ),
-      ],
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  const _StatChip({
-    required this.icon,
-    required this.count,
-    required this.label,
-    required this.color,
-    required this.surface,
-    required this.textColor,
-  });
-
-  final IconData icon;
-  final int count;
-  final String label;
-  final Color color;
-  final Color surface;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space12,
-        vertical: AppSpacing.space8,
-      ),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: AppRadius.smBorderRadius,
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: AppSpacing.space6),
-          Text(
-            '$count $label',
-            style: TextStyle(
-              fontFamily: AppTypography.monoFontFamily,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: textColor,
-            ),
-          ),
-        ],
-      ),
+      bottomNavigationBar: _FillActionBar(fill: fill, featureId: featureId),
     );
   }
 }
@@ -384,47 +303,68 @@ class _FindRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: AppColors.findSurface,
-          borderRadius: AppRadius.smBorderRadius,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          find.findNumber.toString().padLeft(3, '0'),
-          style: TextStyle(
-            fontFamily: AppTypography.monoFontFamily,
-            fontWeight: FontWeight.w700,
-            fontSize: 10,
-            color: AppColors.findText,
+    final colors = AppColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10.0, AppSpacing.space16, 10.0),
+      child: Row(
+        children: [
+          Container(
+            width: AppBorder.accentStripe,
+            height: 32,
+            color: colors.find,
+            margin: const EdgeInsets.only(
+              left: AppSpacing.space16,
+              right: AppSpacing.space12,
+            ),
           ),
-        ),
-      ),
-      title: Text(
-        find.materialType.displayName,
-        style: TextStyle(
-          fontFamily: AppTypography.sansFontFamily,
-          fontWeight: FontWeight.w500,
-          fontSize: 13,
-          color: AppColors.t0,
-        ),
-      ),
-      subtitle: Text(
-        'qty: ${find.quantity}',
-        style: TextStyle(
-          fontFamily: AppTypography.monoFontFamily,
-          fontSize: 11,
-          color: AppColors.t2,
-        ),
+          Container(
+            width: 36,
+            height: 28,
+            decoration: BoxDecoration(
+              color: colors.findSurface,
+              borderRadius: AppRadius.xsBorderRadius,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              find.findNumber.toString().padLeft(3, '0'),
+              style: TextStyle(
+                fontFamily: AppTypography.monoFontFamily,
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+                color: colors.findText,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  find.materialType.displayName,
+                  style: TextStyle(
+                    fontFamily: AppTypography.sansFontFamily,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: colors.t0,
+                  ),
+                ),
+                Text(
+                  '×${find.quantity}',
+                  style: TextStyle(
+                    fontFamily: AppTypography.monoFontFamily,
+                    fontSize: 11,
+                    color: colors.t2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-
-// ── Fill action bar ────────────────────────────────────────────────────────────
 
 class _FillActionBar extends ConsumerWidget {
   const _FillActionBar({required this.fill, required this.featureId});
@@ -433,41 +373,42 @@ class _FillActionBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
     return Container(
-      color: AppColors.s1,
+      color: colors.s1,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Divider(height: 1, color: AppColors.rule),
+          Container(height: 1, color: colors.rule),
           SafeArea(
             top: false,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space16,
-                vertical: AppSpacing.space12,
+                horizontal: AppSpacing.space12,
+                vertical: 10.0,
               ),
               child: Row(
                 children: [
-                  _EvidenceButton(
-                    icon: Icons.category_rounded,
-                    label: 'Add Find',
-                    color: AppColors.find,
+                  Expanded(child: _ActionButton(
+                    icon: Icons.category_outlined,
+                    label: 'FIND',
+                    color: colors.find,
                     onTap: () => _addFind(context, ref),
-                  ),
+                  )),
                   const SizedBox(width: AppSpacing.space8),
-                  _EvidenceButton(
+                  Expanded(child: _ActionButton(
                     icon: Icons.science_outlined,
-                    label: 'Add Sample',
-                    color: AppColors.doc,
+                    label: 'SAMPLE',
+                    color: colors.sample,
                     onTap: () => _addSample(context, ref),
-                  ),
+                  )),
                   const SizedBox(width: AppSpacing.space8),
-                  _EvidenceButton(
+                  Expanded(child: _ActionButton(
                     icon: Icons.photo_camera_outlined,
-                    label: 'Photo',
-                    color: AppColors.doc,
+                    label: 'PHOTO',
+                    color: colors.doc,
                     onTap: () => _addPhoto(context, ref),
-                  ),
+                  )),
                 ],
               ),
             ),
@@ -514,8 +455,8 @@ class _FillActionBar extends ConsumerWidget {
   }
 }
 
-class _EvidenceButton extends StatelessWidget {
-  const _EvidenceButton({
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
     required this.icon,
     required this.label,
     required this.color,
@@ -529,29 +470,31 @@ class _EvidenceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Material(
+      color: color.withAlpha(18),
+      borderRadius: AppRadius.smBorderRadius,
       child: InkWell(
         onTap: onTap,
         borderRadius: AppRadius.smBorderRadius,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          height: 44,
           decoration: BoxDecoration(
-            color: AppColors.s2,
             borderRadius: AppRadius.smBorderRadius,
-            border: Border.all(color: AppColors.ruleMid, width: 1),
+            border: Border.all(color: color.withAlpha(60), width: 1),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 18, color: color),
-              const SizedBox(height: AppSpacing.space4),
+              Icon(icon, size: 16, color: color),
+              const SizedBox(height: 2),
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: AppTypography.sansFontFamily,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 10,
-                  color: AppColors.t1,
+                  fontFamily: AppTypography.monoFontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 8,
+                  letterSpacing: 1.2,
+                  color: color,
                 ),
               ),
             ],
@@ -585,62 +528,63 @@ class _ContextHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
     return Container(
-      color: AppColors.s0,
+      color: colors.s0,
       child: SafeArea(
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.space4,
-                AppSpacing.space4,
-                AppSpacing.space8,
-                0,
-              ),
+            // Nav bar
+            SizedBox(
+              height: 52,
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_rounded),
-                    color: AppColors.t1,
+                    icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                    color: colors.t1,
                     onPressed: () => context.pop(),
                   ),
                   Expanded(
                     child: Text(
-                      'Feature ${featureId.substring(0, 8)}…',
+                      'CONTEXT DETAIL',
                       style: TextStyle(
                         fontFamily: AppTypography.monoFontFamily,
-                        fontSize: 11,
-                        color: AppColors.t2,
+                        fontSize: 9,
+                        letterSpacing: 1.8,
+                        color: colors.t2,
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.edit_rounded, size: 20),
-                    color: AppColors.t1,
-                    tooltip: 'Edit context',
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    color: colors.t1,
+                    tooltip: 'Edit',
                     onPressed: () => _editContext(context, ref),
                   ),
                 ],
               ),
             ),
+            // Identity block
             Container(
-              width: double.infinity,
               margin: const EdgeInsets.fromLTRB(
                 AppSpacing.space16,
-                AppSpacing.space8,
+                0,
                 AppSpacing.space16,
                 AppSpacing.space16,
               ),
-              padding: const EdgeInsets.all(AppSpacing.space16),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space12,
+                10.0,
+                AppSpacing.space12,
+                AppSpacing.space12,
+              ),
               decoration: BoxDecoration(
                 color: surfaceColor,
-                borderRadius: AppRadius.mdBorderRadius,
+                borderRadius: AppRadius.smBorderRadius,
                 border: Border(
-                  left: BorderSide(
-                    color: accentColor,
-                    width: AppBorder.accentStripeLg,
-                  ),
+                  left: BorderSide(color: accentColor, width: AppBorder.accentStripeLg),
                 ),
               ),
               child: Column(
@@ -651,18 +595,17 @@ class _ContextHeader extends ConsumerWidget {
                     style: TextStyle(
                       fontFamily: AppTypography.monoFontFamily,
                       fontWeight: FontWeight.w800,
-                      fontSize: 10,
-                      letterSpacing: 2.5,
+                      fontSize: 9,
+                      letterSpacing: 2.0,
                       color: accentColor,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.space4),
                   Text(
                     number.toString().padLeft(3, '0'),
                     style: TextStyle(
                       fontFamily: AppTypography.monoFontFamily,
                       fontWeight: FontWeight.w800,
-                      fontSize: 48,
+                      fontSize: 44,
                       letterSpacing: -3,
                       height: 1,
                       color: textColor,
@@ -685,20 +628,19 @@ class _ContextHeader extends ConsumerWidget {
       builder: (_) => ContextFormSheet(
         featureId: featureId,
         existingContext: context_,
-        onSaved: () =>
-            ref.invalidate(contextsByFeatureProvider(featureId)),
+        onSaved: () => ref.invalidate(contextsByFeatureProvider(featureId)),
       ),
     );
   }
 }
 
 class _PropertiesSection extends StatelessWidget {
-  const _PropertiesSection({required this.title, required this.rows});
-  final String title;
+  const _PropertiesSection({required this.rows});
   final List<_PropRow> rows;
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     if (rows.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -708,77 +650,61 @@ class _PropertiesSection extends StatelessWidget {
         AppSpacing.space16,
         0,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title.toUpperCase(),
-            style: TextStyle(
-              fontFamily: AppTypography.monoFontFamily,
-              fontWeight: FontWeight.w700,
-              fontSize: 10,
-              letterSpacing: 1.8,
-              color: AppColors.t2,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space12),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.s1,
-              borderRadius: AppRadius.mdBorderRadius,
-              border: Border.all(color: AppColors.rule, width: 1),
-            ),
-            child: Column(
-              children: [
-                for (int i = 0; i < rows.length; i++) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space16,
-                      vertical: AppSpacing.space12,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            rows[i].label,
-                            style: TextStyle(
-                              fontFamily: AppTypography.monoFontFamily,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 11,
-                              color: AppColors.t2,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.s1,
+          borderRadius: AppRadius.smBorderRadius,
+          border: Border.all(color: colors.rule, width: 1),
+        ),
+        child: Column(
+          children: [
+            for (int i = 0; i < rows.length; i++) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space16,
+                  vertical: AppSpacing.space12,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 88,
+                      child: Text(
+                        rows[i].label,
+                        style: TextStyle(
+                          fontFamily: AppTypography.monoFontFamily,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                          color: colors.t2,
                         ),
-                        const SizedBox(width: AppSpacing.space12),
-                        Expanded(
-                          child: Text(
-                            rows[i].value,
-                            style: TextStyle(
-                              fontFamily: AppTypography.sansFontFamily,
-                              fontSize: 13,
-                              color: AppColors.t0,
-                              height: 1.4,
-                            ),
-                          ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space12),
+                    Expanded(
+                      child: Text(
+                        rows[i].value,
+                        style: TextStyle(
+                          fontFamily: AppTypography.sansFontFamily,
+                          fontSize: 13,
+                          color: colors.t0,
+                          height: 1.4,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  if (i < rows.length - 1)
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.space16,
-                      endIndent: AppSpacing.space16,
-                      color: AppColors.rule,
-                    ),
-                ],
-              ],
-            ),
-          ),
-        ],
+                  ],
+                ),
+              ),
+              if (i < rows.length - 1)
+                Container(
+                  height: 1,
+                  color: colors.rule,
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space16),
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -796,6 +722,7 @@ class _SectionDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.space16,
@@ -810,13 +737,13 @@ class _SectionDivider extends StatelessWidget {
             style: TextStyle(
               fontFamily: AppTypography.monoFontFamily,
               fontWeight: FontWeight.w700,
-              fontSize: 10,
+              fontSize: 9,
               letterSpacing: 2.0,
-              color: AppColors.t2,
+              color: colors.t2,
             ),
           ),
           const SizedBox(width: AppSpacing.space12),
-          const Expanded(child: Divider(height: 1, color: AppColors.ruleMid)),
+          Expanded(child: Divider(height: 1, color: colors.ruleMid)),
         ],
       ),
     );
@@ -829,18 +756,16 @@ class _EmptySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.space32),
-      child: Center(
-        child: Text(
-          message,
-          style: TextStyle(
-            fontFamily: AppTypography.sansFontFamily,
-            fontSize: 12,
-            color: AppColors.t2,
-            height: 1.6,
-          ),
-          textAlign: TextAlign.center,
+      padding: const EdgeInsets.all(AppSpacing.space24),
+      child: Text(
+        message,
+        style: TextStyle(
+          fontFamily: AppTypography.sansFontFamily,
+          fontSize: 12,
+          color: colors.t2,
+          fontStyle: FontStyle.italic,
         ),
       ),
     );
@@ -852,10 +777,11 @@ class _FocusSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.base,
+    final colors = AppColors.of(context);
+    return Scaffold(
+      backgroundColor: colors.s0,
       body: Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+        child: CircularProgressIndicator(color: colors.primary, strokeWidth: 2),
       ),
     );
   }

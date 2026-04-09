@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../design/app_colors.dart';
 import '../design/app_tokens.dart';
+import '../design/app_typography.dart';
 
 /// DEEP FIELD: ALL-CAPS tracked section label with count badge and rule line.
 ///
@@ -28,6 +28,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final theme = Theme.of(context);
 
     return Padding(
@@ -39,10 +40,11 @@ class SectionHeader extends StatelessWidget {
             children: [
               Text(
                 label.toUpperCase(),
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.t2,
+                style: TextStyle(
+                  fontFamily: AppTypography.monoFontFamily,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  color: colors.t2,
                   letterSpacing: 2.0,
                   height: 1.2,
                 ),
@@ -60,8 +62,9 @@ class SectionHeader extends StatelessWidget {
                   ),
                   child: Text(
                     '$count',
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 10,
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontSize: 9,
                       fontWeight: FontWeight.w700,
                       color: theme.colorScheme.onPrimaryContainer,
                       letterSpacing: 0.5,
@@ -77,7 +80,7 @@ class SectionHeader extends StatelessWidget {
             const SizedBox(height: AppSpacing.space8),
             Container(
               height: 1,
-              color: AppColors.rule,
+              color: colors.rule,
             ),
           ],
         ],

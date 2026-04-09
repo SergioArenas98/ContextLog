@@ -41,6 +41,8 @@ dependencies:
 
   # Typography
   google_fonts: ^6.2.1
+  shared_preferences: ^2.5.5
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

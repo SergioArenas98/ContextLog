@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-/// STRATUM domain-semantic colors as a ThemeExtension.
+/// PROBE domain-semantic colors as a ThemeExtension.
 ///
-/// Consolidated from 6 independent accents to 4 meaningful categories:
-/// - Cut: excavation actions (terracotta)
-/// - Fill: sediment deposits (sage green)
-/// - Find: artifact discoveries (amethyst)
-/// - Doc: documentation — photos, drawings, samples (survey blue)
+/// Five distinct domain categories (sample is now separate from doc):
+/// - Cut: excavation actions (oxidized copper)
+/// - Fill: sediment deposits (deep viridian)
+/// - Find: artifact discoveries (deep indigo)
+/// - Sample: organic/earth material (raw umber)
+/// - Doc: documentation — photos, drawings (steel blue)
 ///
 /// Access via: `Theme.of(context).extension<AppThemeExtension>()!`
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
@@ -22,6 +23,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     required this.findAccent,
     required this.findSurface,
     required this.findText,
+    required this.sampleAccent,
+    required this.sampleSurface,
+    required this.sampleText,
     required this.docAccent,
     required this.docSurface,
     required this.docText,
@@ -38,16 +42,16 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   final Color findAccent;
   final Color findSurface;
   final Color findText;
+  final Color sampleAccent;
+  final Color sampleSurface;
+  final Color sampleText;
   final Color docAccent;
   final Color docSurface;
   final Color docText;
   final Color monoHighlight;
   final Color divider;
 
-  // Convenience accessors — samples and drawings map to doc category
-  Color get sampleAccent => docAccent;
-  Color get sampleSurface => docSurface;
-  Color get sampleText => docText;
+  // Convenience: photos and drawings map to doc category
   Color get photoAccent => docAccent;
   Color get photoSurface => docSurface;
   Color get photoText => docText;
@@ -65,6 +69,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     findAccent: AppColors.find,
     findSurface: AppColors.findSurface,
     findText: AppColors.findText,
+    sampleAccent: AppColors.sample,
+    sampleSurface: AppColors.sampleSurface,
+    sampleText: AppColors.sampleText,
     docAccent: AppColors.doc,
     docSurface: AppColors.docSurface,
     docText: AppColors.docText,
@@ -73,20 +80,23 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   );
 
   static const AppThemeExtension light = AppThemeExtension(
-    cutAccent: Color(0xFF8B3A14),
-    cutSurface: Color(0xFFFFDCCA),
-    cutText: Color(0xFF3B0E00),
-    fillAccent: Color(0xFF2C6B40),
-    fillSurface: Color(0xFFB0F0C3),
-    fillText: Color(0xFF00210D),
-    findAccent: Color(0xFF5B3AB8),
-    findSurface: Color(0xFFE8E0FF),
-    findText: Color(0xFF20104A),
-    docAccent: Color(0xFF1D5C8A),
-    docSurface: Color(0xFFD0E8F8),
-    docText: Color(0xFF082A44),
-    monoHighlight: Color(0xFF8B3A14),
-    divider: Color(0xFFD0C8C0),
+    cutAccent: Color(0xFF703820),
+    cutSurface: Color(0xFFFFD8C8),
+    cutText: Color(0xFF2C0E04),
+    fillAccent: Color(0xFF1A5E38),
+    fillSurface: Color(0xFF98E8B4),
+    fillText: Color(0xFF001E0C),
+    findAccent: Color(0xFF4830A0),
+    findSurface: Color(0xFFE4DCFF),
+    findText: Color(0xFF1A0840),
+    sampleAccent: Color(0xFF5A4018),
+    sampleSurface: Color(0xFFEEDFC0),
+    sampleText: Color(0xFF241808),
+    docAccent: Color(0xFF1C4E7C),
+    docSurface: Color(0xFFCCE4F4),
+    docText: Color(0xFF082030),
+    monoHighlight: Color(0xFF7A5400),
+    divider: Color(0xFFCCC8C0),
   );
 
   @override
@@ -100,6 +110,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     Color? findAccent,
     Color? findSurface,
     Color? findText,
+    Color? sampleAccent,
+    Color? sampleSurface,
+    Color? sampleText,
     Color? docAccent,
     Color? docSurface,
     Color? docText,
@@ -116,6 +129,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       findAccent: findAccent ?? this.findAccent,
       findSurface: findSurface ?? this.findSurface,
       findText: findText ?? this.findText,
+      sampleAccent: sampleAccent ?? this.sampleAccent,
+      sampleSurface: sampleSurface ?? this.sampleSurface,
+      sampleText: sampleText ?? this.sampleText,
       docAccent: docAccent ?? this.docAccent,
       docSurface: docSurface ?? this.docSurface,
       docText: docText ?? this.docText,
@@ -137,6 +153,9 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       findAccent: Color.lerp(findAccent, other.findAccent, t)!,
       findSurface: Color.lerp(findSurface, other.findSurface, t)!,
       findText: Color.lerp(findText, other.findText, t)!,
+      sampleAccent: Color.lerp(sampleAccent, other.sampleAccent, t)!,
+      sampleSurface: Color.lerp(sampleSurface, other.sampleSurface, t)!,
+      sampleText: Color.lerp(sampleText, other.sampleText, t)!,
       docAccent: Color.lerp(docAccent, other.docAccent, t)!,
       docSurface: Color.lerp(docSurface, other.docSurface, t)!,
       docText: Color.lerp(docText, other.docText, t)!,

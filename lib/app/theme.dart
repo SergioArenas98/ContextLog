@@ -6,10 +6,16 @@ import '../core/design/app_theme_extension.dart';
 import '../core/design/app_tokens.dart';
 import '../core/design/app_typography.dart';
 
-/// STRATUM theme — premium dark fieldwork tool.
+/// PROBE theme — precision instrument, dark-first.
 ///
-/// Design language: warm-earth surfaces, terracotta primary, generous radius,
-/// JetBrains Mono identifiers + DM Sans prose.
+/// Design language: pure-black panels, amber-gold primary, hard-edge geometry,
+/// Space Grotesk UI text + JetBrains Mono identifiers.
+///
+/// Contrast from previous STRATUM theme:
+/// - No warm tints on any surface
+/// - Smaller radii (max md=10 for panels vs previous lg=16)
+/// - Tighter UI density (more instrument panel, less consumer app)
+/// - Amber primary vs terracotta primary
 abstract final class AppTheme {
   // ── Dark ──────────────────────────────────────────────────────────────────
 
@@ -78,7 +84,7 @@ abstract final class AppTheme {
           surfaceTintColor: Colors.transparent,
         ),
 
-        // ── Cards ────────────────────────────────────────────────────────────
+        // ── Cards — no elevation, hard-edge ─────────────────────────────────
         cardTheme: CardThemeData(
           color: AppColors.s1,
           elevation: 0,
@@ -114,8 +120,7 @@ abstract final class AppTheme {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: AppRadius.smBorderRadius,
-            borderSide:
-                const BorderSide(color: AppColors.primary, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: AppRadius.smBorderRadius,
@@ -127,9 +132,9 @@ abstract final class AppTheme {
           ),
           labelStyle: TextStyle(
             color: AppColors.t1,
-            fontSize: 11,
+            fontSize: 10,
             fontFamily: AppTypography.monoFontFamily,
-            letterSpacing: 0.6,
+            letterSpacing: 0.8,
           ),
           hintStyle: TextStyle(
             color: AppColors.t2,
@@ -138,9 +143,9 @@ abstract final class AppTheme {
           ),
           floatingLabelStyle: TextStyle(
             color: AppColors.primary,
-            fontSize: 11,
+            fontSize: 10,
             fontFamily: AppTypography.monoFontFamily,
-            letterSpacing: 0.6,
+            letterSpacing: 0.8,
           ),
         ),
 
@@ -149,12 +154,12 @@ abstract final class AppTheme {
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.s0,
-            minimumSize: const Size(64, 52),
+            minimumSize: const Size(64, 48),
             textStyle: TextStyle(
               fontFamily: AppTypography.sansFontFamily,
               fontWeight: FontWeight.w700,
-              fontSize: 14,
-              letterSpacing: 0,
+              fontSize: 13,
+              letterSpacing: 0.2,
             ),
             shape: const RoundedRectangleBorder(
               borderRadius: AppRadius.smBorderRadius,
@@ -165,7 +170,7 @@ abstract final class AppTheme {
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.t1,
             side: const BorderSide(color: AppColors.ruleStrong, width: 1),
-            minimumSize: const Size(64, 48),
+            minimumSize: const Size(64, 44),
             textStyle: TextStyle(
               fontFamily: AppTypography.sansFontFamily,
               fontWeight: FontWeight.w500,
@@ -193,40 +198,14 @@ abstract final class AppTheme {
           foregroundColor: AppColors.s0,
           elevation: 0,
           shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.lgBorderRadius,
+            borderRadius: AppRadius.smBorderRadius,
           ),
           extendedTextStyle: TextStyle(
             fontFamily: AppTypography.sansFontFamily,
             fontWeight: FontWeight.w700,
-            fontSize: 14,
-            letterSpacing: 0,
+            fontSize: 13,
+            letterSpacing: 0.2,
           ),
-        ),
-
-        // ── Bottom navigation ────────────────────────────────────────────────
-        navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: AppColors.s1,
-          indicatorColor: AppColors.primaryContainer,
-          iconTheme: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return const IconThemeData(color: AppColors.onPrimaryContainer, size: 24);
-            }
-            return const IconThemeData(color: AppColors.t2, size: 24);
-          }),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            final selected = states.contains(WidgetState.selected);
-            return TextStyle(
-              fontFamily: AppTypography.sansFontFamily,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-              fontSize: 11,
-              color: selected ? AppColors.onPrimaryContainer : AppColors.t2,
-            );
-          }),
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          elevation: 0,
-          height: 72,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         ),
 
         // ── Icon buttons ─────────────────────────────────────────────────────
@@ -296,50 +275,13 @@ abstract final class AppTheme {
           ),
         ),
 
-        // ── SegmentedButton ──────────────────────────────────────────────────
-        segmentedButtonTheme: SegmentedButtonThemeData(
-          style: SegmentedButton.styleFrom(
-            backgroundColor: AppColors.s2,
-            selectedBackgroundColor: AppColors.primaryContainer,
-            selectedForegroundColor: AppColors.onPrimaryContainer,
-            foregroundColor: AppColors.t1,
-            side: const BorderSide(color: AppColors.ruleMid, width: 1),
-            textStyle: TextStyle(
-              fontFamily: AppTypography.sansFontFamily,
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
-            shape: const RoundedRectangleBorder(
-              borderRadius: AppRadius.smBorderRadius,
-            ),
-          ),
-        ),
-
-        // ── TabBar (kept for possible edge cases) ────────────────────────────
-        tabBarTheme: TabBarThemeData(
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.t0,
-          unselectedLabelColor: AppColors.t2,
-          dividerColor: AppColors.rule,
-          labelStyle: TextStyle(
-            fontFamily: AppTypography.sansFontFamily,
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontFamily: AppTypography.sansFontFamily,
-            fontWeight: FontWeight.w400,
-            fontSize: 13,
-          ),
-        ),
-
         // ── Search bar ───────────────────────────────────────────────────────
         searchBarTheme: SearchBarThemeData(
-          backgroundColor: WidgetStatePropertyAll(AppColors.s2),
+          backgroundColor: const WidgetStatePropertyAll(AppColors.s2),
           surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
           elevation: const WidgetStatePropertyAll(0),
-          side: WidgetStatePropertyAll(
-            const BorderSide(color: AppColors.ruleMid, width: 1),
+          side: const WidgetStatePropertyAll(
+            BorderSide(color: AppColors.ruleMid, width: 1),
           ),
           shape: const WidgetStatePropertyAll(
             RoundedRectangleBorder(borderRadius: AppRadius.smBorderRadius),
@@ -374,7 +316,7 @@ abstract final class AppTheme {
           ),
           behavior: SnackBarBehavior.floating,
           shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.mdBorderRadius,
+            borderRadius: AppRadius.smBorderRadius,
           ),
           elevation: 0,
         ),
@@ -387,9 +329,7 @@ abstract final class AppTheme {
         // ── Switch / checkbox / radio ────────────────────────────────────────
         switchTheme: SwitchThemeData(
           thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return AppColors.primary;
-            }
+            if (states.contains(WidgetState.selected)) return AppColors.primary;
             return AppColors.t2;
           }),
           trackColor: WidgetStateProperty.resolveWith((states) {
@@ -436,13 +376,32 @@ abstract final class AppTheme {
           ),
         ),
 
+        // ── SegmentedButton ──────────────────────────────────────────────────
+        segmentedButtonTheme: SegmentedButtonThemeData(
+          style: SegmentedButton.styleFrom(
+            backgroundColor: AppColors.s2,
+            selectedBackgroundColor: AppColors.primaryContainer,
+            selectedForegroundColor: AppColors.onPrimaryContainer,
+            foregroundColor: AppColors.t1,
+            side: const BorderSide(color: AppColors.ruleMid, width: 1),
+            textStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: AppRadius.smBorderRadius,
+            ),
+          ),
+        ),
+
         // ── Scrollbar ────────────────────────────────────────────────────────
         scrollbarTheme: const ScrollbarThemeData(
           thumbColor: WidgetStatePropertyAll(AppColors.ruleStrong),
         ),
       );
 
-  // ── Light (minimal — app is dark-primary) ─────────────────────────────────
+  // ── Light (minimal) ───────────────────────────────────────────────────────
 
   static ThemeData get light => ThemeData(
         useMaterial3: true,
@@ -471,15 +430,15 @@ abstract final class AppTheme {
           surface: AppColors.surfaceLight,
           onSurface: AppColors.onSurfaceLight,
           outlineVariant: AppColors.outlineVariantLight,
-          outline: Color(0xFF8A7060),
+          outline: Color(0xFF706860),
           surfaceContainerLowest: Color(0xFFFFFFFF),
-          surfaceContainerLow: Color(0xFFF0EBE6),
-          surfaceContainer: Color(0xFFE8E2DC),
-          surfaceContainerHigh: Color(0xFFE0D8D2),
-          surfaceContainerHighest: Color(0xFFD8CEC8),
-          onSurfaceVariant: Color(0xFF5A4A3A),
-          inverseSurface: Color(0xFF2A1E18),
-          onInverseSurface: Color(0xFFF5EEE8),
+          surfaceContainerLow: Color(0xFFEEECE8),
+          surfaceContainer: Color(0xFFE8E6E0),
+          surfaceContainerHigh: Color(0xFFE0DCD8),
+          surfaceContainerHighest: Color(0xFFD8D4CE),
+          onSurfaceVariant: Color(0xFF484440),
+          inverseSurface: Color(0xFF201E1C),
+          onInverseSurface: Color(0xFFF4F2EE),
           inversePrimary: AppColors.primaryDark,
           scrim: Color(0xFF000000),
           shadow: Color(0xFF000000),

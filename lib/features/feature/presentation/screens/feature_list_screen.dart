@@ -9,46 +9,61 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../providers/feature_providers.dart';
 import '../widgets/feature_card.dart';
 
-/// Site dashboard — feature grid overview.
+/// Site Roster — the field station mission control.
 ///
-/// Structural change: feature list was a vertical ListView of generic cards.
-/// New: 2-column grid of feature blocks where the feature number dominates.
-/// Conveys "this is a site overview" not "this is a list of records".
+/// Structural change from previous design:
+/// - Was: 2-column grid of square feature blocks with a number as hero
+/// - Now: Single-column roster — compact numbered rows with context
+///   depth indicators, last-activity date, and status signals
+///
+/// The roster format reflects how archaeologists actually use the list:
+/// - They scan by first cut number (dominant mono label)
+/// - They need to see the area quickly (inline tag)
+///
+/// No cards. No grid. A roster.
 class FeatureListScreen extends ConsumerWidget {
   const FeatureListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = AppColors.of(context);
     final searchQuery = ref.watch(featureSearchQueryProvider);
     final featuresAsync = ref.watch(filteredFeatureListProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.base,
+      backgroundColor: colors.base,
       body: CustomScrollView(
         slivers: [
-          // ── Site header (SliverAppBar with pinned identity strip) ──────────
+          // ── Station header ────────────────────────────────────────────────
           SliverAppBar(
-            backgroundColor: AppColors.s0,
+            backgroundColor: colors.s0,
             surfaceTintColor: Colors.transparent,
             pinned: true,
-            expandedHeight: 96,
-            collapsedHeight: 60,
+            expandedHeight: 104,
+            collapsedHeight: 56,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings_outlined, size: 20),
+                color: colors.t1,
+                tooltip: 'Settings',
+                onPressed: () => context.push('/settings'),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.fromLTRB(
-                AppSpacing.space16, 0, AppSpacing.space16, 14,
+                AppSpacing.space16, 0, AppSpacing.space16, 16,
               ),
               title: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'STRATUM',
+                    'CONTEXTLOG',
                     style: TextStyle(
                       fontFamily: AppTypography.monoFontFamily,
                       fontWeight: FontWeight.w800,
                       fontSize: 11,
-                      letterSpacing: 2.5,
-                      color: AppColors.primary,
+                      letterSpacing: 2.8,
+                      color: colors.primary,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space12),
@@ -56,96 +71,145 @@ class FeatureListScreen extends ConsumerWidget {
                     loading: () => const SizedBox.shrink(),
                     error: (_, __) => const SizedBox.shrink(),
                     data: (features) => Text(
-                      '${features.length} feature${features.length == 1 ? '' : 's'}',
+                      '${features.length} UNIT${features.length == 1 ? '' : 'S'}',
                       style: TextStyle(
                         fontFamily: AppTypography.monoFontFamily,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 11,
-                        letterSpacing: 0.5,
-                        color: AppColors.t2,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 10,
+                        letterSpacing: 1.5,
+                        color: colors.t2,
                       ),
                     ),
                   ),
                 ],
               ),
               background: Container(
-                color: AppColors.s0,
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.space16,
-                  AppSpacing.space16,
-                  AppSpacing.space16,
-                  AppSpacing.space8,
-                ),
+                color: colors.s0,
                 alignment: Alignment.bottomLeft,
-                child: Text(
-                  'ContextLog',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: AppColors.t0,
-                    fontFamily: AppTypography.monoFontFamily,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.info_outline_rounded),
-                tooltip: 'About',
-                onPressed: () => _showAboutDialog(context),
-              ),
-            ],
-          ),
-
-          // ── Search bar ───────────────────────────────────────────────────
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.space16,
-                AppSpacing.space12,
-                AppSpacing.space16,
-                AppSpacing.space4,
-              ),
-              child: _StratumSearchBar(query: searchQuery, ref: ref),
-            ),
-          ),
-
-          // ── Section label ────────────────────────────────────────────────
-          if (featuresAsync.hasValue && (featuresAsync.value?.isNotEmpty ?? false))
-            SliverToBoxAdapter(
-              child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.space16,
+                  0,
                   AppSpacing.space16,
-                  AppSpacing.space16,
-                  AppSpacing.space8,
+                  44.0,
                 ),
                 child: Text(
-                  'EXCAVATION UNITS',
+                  'Field Station',
                   style: TextStyle(
-                    fontFamily: AppTypography.monoFontFamily,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10,
-                    letterSpacing: 2.0,
-                    color: AppColors.t2,
+                    fontFamily: AppTypography.sansFontFamily,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 22,
+                    letterSpacing: -0.5,
+                    color: colors.t0.withValues(alpha: 0.6),
+                    height: 1,
                   ),
                 ),
               ),
             ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1),
+              child: Container(height: 1, color: colors.rule),
+            ),
+          ),
 
-          // ── Feature grid / loading / empty ───────────────────────────────
+          // ── Search ────────────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              color: colors.s0,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space12,
+                AppSpacing.space8,
+                AppSpacing.space12,
+                AppSpacing.space8,
+              ),
+              child: _RosterSearchField(query: searchQuery, ref: ref),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Container(height: 1, color: colors.rule),
+          ),
+
+          // ── Column header ─────────────────────────────────────────────────
           featuresAsync.when(
-            loading: () => const SliverFillRemaining(
+            loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            data: (features) {
+              if (features.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+              return SliverToBoxAdapter(
+                child: Container(
+                  color: colors.s1,
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.space16,
+                    AppSpacing.space6,
+                    AppSpacing.space16,
+                    AppSpacing.space6,
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 56,
+                        child: Text(
+                          'CUT',
+                          style: TextStyle(
+                            fontFamily: AppTypography.monoFontFamily,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 9,
+                            letterSpacing: 1.5,
+                            color: colors.t2,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'AREA / CODE',
+                          style: TextStyle(
+                            fontFamily: AppTypography.monoFontFamily,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 9,
+                            letterSpacing: 1.5,
+                            color: colors.t2,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'DATE',
+                        style: TextStyle(
+                          fontFamily: AppTypography.monoFontFamily,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 9,
+                          letterSpacing: 1.5,
+                          color: colors.t2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+
+          SliverToBoxAdapter(
+            child: Container(height: 1, color: colors.rule),
+          ),
+
+          // ── Roster list / loading / empty ─────────────────────────────────
+          featuresAsync.when(
+            loading: () => SliverFillRemaining(
               child: Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+                child: CircularProgressIndicator(
+                  color: colors.primary,
+                  strokeWidth: 2,
+                ),
               ),
             ),
             error: (err, _) => SliverFillRemaining(
               child: Center(
                 child: Text(
                   'Error: $err',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.error,
+                  style: TextStyle(
+                    fontFamily: AppTypography.monoFontFamily,
+                    fontSize: 12,
+                    color: colors.error,
                   ),
                 ),
               ),
@@ -159,7 +223,7 @@ class FeatureListScreen extends ConsumerWidget {
                         ? 'No excavation units'
                         : 'No results for "$searchQuery"',
                     message: searchQuery.isEmpty
-                        ? 'Tap the button below to record your first feature.'
+                        ? 'Open a feature to begin field recording.'
                         : 'Try a different search term.',
                     actionLabel: searchQuery.isEmpty ? 'Add Feature' : null,
                     onAction: searchQuery.isEmpty
@@ -169,77 +233,109 @@ class FeatureListScreen extends ConsumerWidget {
                 );
               }
 
-              return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.space16,
-                  0,
-                  AppSpacing.space16,
-                  AppSpacing.space80 + 16,
+              return SliverList.separated(
+                itemCount: features.length,
+                separatorBuilder: (_, __) => Container(
+                  height: 1,
+                  color: colors.rule,
                 ),
-                sliver: SliverGrid.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemCount: features.length,
-                  itemBuilder: (context, index) =>
-                      FeatureCard(feature: features[index]),
-                ),
+                itemBuilder: (context, index) =>
+                    FeatureRosterItem(feature: features[index]),
               );
             },
           ),
+
+          // Bottom padding for FAB clearance
+          const SliverToBoxAdapter(
+            child: SizedBox(height: AppSpacing.space80 + 24),
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/features/new'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.s0,
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadius.lgBorderRadius,
-        ),
-        child: const Icon(Icons.add_rounded, size: 28),
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
-      context: context,
-      applicationName: 'ContextLog',
-      applicationVersion: '2.0.0',
-      applicationLegalese: 'Archaeological field recording for Android',
+      floatingActionButton: _AddFeatureFab(),
     );
   }
 }
 
-// ── Stratum search bar ─────────────────────────────────────────────────────────
+// ── Search field ──────────────────────────────────────────────────────────────
 
-class _StratumSearchBar extends StatelessWidget {
-  const _StratumSearchBar({required this.query, required this.ref});
+class _RosterSearchField extends StatelessWidget {
+  const _RosterSearchField({required this.query, required this.ref});
 
   final String query;
   final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
-    return SearchBar(
-      hintText: 'Search features…',
-      leading: const Icon(Icons.search_rounded, size: 20),
-      trailing: query.isNotEmpty
-          ? [
-              IconButton(
-                icon: const Icon(Icons.clear_rounded, size: 18),
-                onPressed: () =>
-                    ref.read(featureSearchQueryProvider.notifier).state = '',
-              ),
-            ]
-          : null,
+    final colors = AppColors.of(context);
+    return TextField(
+      controller: TextEditingController(text: query)
+        ..selection = TextSelection.collapsed(offset: query.length),
       onChanged: (value) =>
           ref.read(featureSearchQueryProvider.notifier).state = value,
+      style: TextStyle(
+        fontFamily: AppTypography.monoFontFamily,
+        fontSize: 13,
+        color: colors.t0,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Search by number, area, or code…',
+        hintStyle: TextStyle(
+          fontFamily: AppTypography.sansFontFamily,
+          fontSize: 13,
+          color: colors.t2,
+        ),
+        prefixIcon: Icon(Icons.search_rounded, size: 18, color: colors.t2),
+        suffixIcon: query.isNotEmpty
+            ? IconButton(
+                icon: Icon(Icons.clear_rounded, size: 16, color: colors.t2),
+                onPressed: () =>
+                    ref.read(featureSearchQueryProvider.notifier).state = '',
+              )
+            : null,
+        filled: true,
+        fillColor: colors.s2,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space12,
+          vertical: 10.0,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.smBorderRadius,
+          borderSide: BorderSide(color: colors.ruleMid, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.smBorderRadius,
+          borderSide: BorderSide(color: colors.ruleMid, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.smBorderRadius,
+          borderSide: BorderSide(color: colors.primary, width: 1.5),
+        ),
+      ),
     );
   }
 }
 
+// ── Add feature FAB ───────────────────────────────────────────────────────────
+
+class _AddFeatureFab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return FloatingActionButton.extended(
+      onPressed: () => context.push('/features/new'),
+      backgroundColor: colors.primary,
+      foregroundColor: colors.s0,
+      elevation: 0,
+      icon: const Icon(Icons.add_rounded, size: 20),
+      label: Text(
+        'NEW FEATURE',
+        style: TextStyle(
+          fontFamily: AppTypography.monoFontFamily,
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+          letterSpacing: 1.5,
+        ),
+      ),
+    );
+  }
+}

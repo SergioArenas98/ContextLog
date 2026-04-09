@@ -6,19 +6,25 @@ import 'package:context_log/core/database/app_database.dart';
 import 'package:context_log/features/feature/data/repositories/feature_repository.dart';
 import 'package:context_log/features/context/data/repositories/context_repository.dart';
 import 'package:context_log/features/context/domain/models/context_model.dart';
+import 'package:context_log/features/project/data/repositories/project_repository.dart';
 
 void main() {
   late AppDatabase db;
   late FeatureRepository featureRepo;
   late ContextRepository contextRepo;
+  late ProjectRepository projectRepo;
   late String featureId;
+  late String projectId;
 
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
     featureRepo = FeatureRepository(db);
     contextRepo = ContextRepository(db);
+    projectRepo = ProjectRepository(db);
 
-    final feature = await featureRepo.create(area: 'A1');
+    final project = await projectRepo.create(name: 'Test Site');
+    projectId = project.id;
+    final feature = await featureRepo.create(projectId: projectId, area: 'A1');
     featureId = feature.id;
   });
 
@@ -80,7 +86,7 @@ void main() {
 
     test('contextNumberExistsInFeature returns false for different feature',
         () async {
-      final otherFeature = await featureRepo.create(area: 'A2');
+      final otherFeature = await featureRepo.create(projectId: projectId, area: 'A2');
       await contextRepo.createCut(
         featureId: otherFeature.id,
         contextNumber: 100,

@@ -1,69 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../design/app_colors.dart';
 import '../design/app_tokens.dart';
+import '../design/app_typography.dart';
 
-/// STRATUM: minimal empty state.
+/// PROBE empty state — instrument panel "no signal" style.
 ///
-/// Monospace label + message + optional action.
+/// Changed from soft icon + friendly copy to technical readout presentation.
+/// Icon lives in a precise square container. Copy is brief and clinical.
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({
     super.key,
     required this.icon,
     required this.title,
-    required this.message,
+    this.message,
     this.actionLabel,
     this.onAction,
   });
 
   final IconData icon;
   final String title;
-  final String message;
+  final String? message;
   final String? actionLabel;
   final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colors = AppColors.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space48),
+        padding: const EdgeInsets.all(AppSpacing.space32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 40,
-              color: AppColors.t2,
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: colors.s1,
+                borderRadius: AppRadius.smBorderRadius,
+                border: Border.all(color: colors.ruleMid, width: 1),
+              ),
+              child: Icon(icon, size: 24, color: colors.t2),
             ),
-            const SizedBox(height: AppSpacing.space16),
+            const SizedBox(height: AppSpacing.space20),
             Text(
               title,
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 13,
+              style: TextStyle(
+                fontFamily: AppTypography.monoFontFamily,
                 fontWeight: FontWeight.w600,
-                color: AppColors.t1,
+                fontSize: 13,
+                color: colors.t1,
                 letterSpacing: 0.3,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: AppSpacing.space8),
-            Text(
-              message,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.t2,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (onAction != null && actionLabel != null) ...[
-              const SizedBox(height: AppSpacing.space24),
-              OutlinedButton(
-                onPressed: onAction,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(160, 48),
+            if (message != null) ...[
+              const SizedBox(height: AppSpacing.space8),
+              Text(
+                message!,
+                style: TextStyle(
+                  fontFamily: AppTypography.sansFontFamily,
+                  fontSize: 12,
+                  color: colors.t2,
+                  height: 1.6,
                 ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: AppSpacing.space24),
+              FilledButton(
+                onPressed: onAction,
                 child: Text(actionLabel!),
               ),
             ],

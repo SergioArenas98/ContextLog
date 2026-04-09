@@ -47,9 +47,10 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: colors.s0,
       body: Center(
         child: FadeTransition(
           opacity: _fade,
@@ -68,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen>
                 Text(
                   'ContextLog',
                   style: theme.textTheme.headlineLarge?.copyWith(
-                    color: AppColors.onSurfaceDark,
+                    color: colors.t0,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),
@@ -77,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen>
                 Text(
                   'Archaeological Field Recording',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariantDark,
+                    color: colors.t1,
                     letterSpacing: 0.5,
                   ),
                 ),

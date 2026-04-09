@@ -7,21 +7,27 @@ import 'package:context_log/core/utils/validation_result.dart';
 import 'package:context_log/features/feature/data/repositories/feature_repository.dart';
 import 'package:context_log/features/context/data/repositories/context_repository.dart';
 import 'package:context_log/features/context/domain/validators/context_validator.dart';
+import 'package:context_log/features/project/data/repositories/project_repository.dart';
 
 void main() {
   late AppDatabase db;
   late FeatureRepository featureRepo;
   late ContextRepository contextRepo;
   late ContextValidator validator;
+  late ProjectRepository projectRepo;
   late String featureId;
+  late String projectId;
 
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
     featureRepo = FeatureRepository(db);
     contextRepo = ContextRepository(db);
     validator = ContextValidator(contextRepo);
+    projectRepo = ProjectRepository(db);
 
-    final feature = await featureRepo.create(area: 'A1');
+    final project = await projectRepo.create(name: 'Test Site');
+    projectId = project.id;
+    final feature = await featureRepo.create(projectId: projectId, area: 'A1');
     featureId = feature.id;
   });
 
@@ -76,7 +82,7 @@ void main() {
     });
 
     test('same number in different feature does not trigger warning', () async {
-      final other = await featureRepo.create(area: 'A2');
+      final other = await featureRepo.create(projectId: projectId, area: 'A2');
       await contextRepo.createCut(
         featureId: other.id,
         contextNumber: 100,
@@ -139,7 +145,7 @@ void main() {
 
     test('returns Invalid when parent cut belongs to a different feature',
         () async {
-      final other = await featureRepo.create(area: 'A2');
+      final other = await featureRepo.create(projectId: projectId, area: 'A2');
       final otherCut = await contextRepo.createCut(
         featureId: other.id,
         contextNumber: 100,

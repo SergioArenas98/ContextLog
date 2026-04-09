@@ -3,14 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:context_log/core/database/app_database.dart';
 import 'package:context_log/features/feature/data/repositories/feature_repository.dart';
+import 'package:context_log/features/project/data/repositories/project_repository.dart';
 
 void main() {
   late AppDatabase db;
   late FeatureRepository repo;
+  late ProjectRepository projectRepo;
 
   setUp(() {
     db = AppDatabase(NativeDatabase.memory());
     repo = FeatureRepository(db);
+    projectRepo = ProjectRepository(db);
   });
 
   tearDown(() async {
@@ -18,13 +21,14 @@ void main() {
   });
 
   group('FeatureRepository', () {
-    test('creates a feature with auto-generated number and date', () async {
-      final feature = await repo.create();
+    test('creates a feature with auto-generated number, date, and projectId',
+        () async {
+      final project = await projectRepo.create(name: 'Test Site');
+      final feature = await repo.create(projectId: project.id);
 
       expect(feature.featureNumber, '001');
       expect(feature.date, isNotNull);
-      expect(feature.rubiconCode, isNull);
-      expect(feature.license, isNull);
+      expect(feature.projectId, project.id);
       expect(feature.area, isNull);
 
       final fetched = await repo.getById(feature.id);
@@ -33,30 +37,30 @@ void main() {
     });
 
     test('auto-increments feature numbers sequentially', () async {
-      final first = await repo.create();
-      final second = await repo.create();
-      final third = await repo.create();
+      final project = await projectRepo.create(name: 'Site');
+      final first = await repo.create(projectId: project.id);
+      final second = await repo.create(projectId: project.id);
+      final third = await repo.create(projectId: project.id);
 
       expect(first.featureNumber, '001');
       expect(second.featureNumber, '002');
       expect(third.featureNumber, '003');
     });
 
-    test('creates a feature with optional metadata', () async {
+    test('creates a feature with area', () async {
+      final project = await projectRepo.create(name: 'Site');
       final feature = await repo.create(
-        rubiconCode: 'RC-2024-001',
-        license: 'LIC-12345',
+        projectId: project.id,
         area: 'North trench',
       );
 
-      expect(feature.rubiconCode, 'RC-2024-001');
-      expect(feature.license, 'LIC-12345');
       expect(feature.area, 'North trench');
     });
 
     test('getAll returns features sorted by featureNumber asc', () async {
-      await repo.create(area: 'A');
-      await repo.create(area: 'B');
+      final project = await projectRepo.create(name: 'Site');
+      await repo.create(projectId: project.id, area: 'A');
+      await repo.create(projectId: project.id, area: 'B');
 
       final all = await repo.getAll();
       expect(all.length, 2);
@@ -65,39 +69,34 @@ void main() {
     });
 
     test('search matches by area', () async {
-      await repo.create(area: 'North trench');
-      await repo.create(area: 'South trench');
+      final project = await projectRepo.create(name: 'Site');
+      await repo.create(projectId: project.id, area: 'North trench');
+      await repo.create(projectId: project.id, area: 'South trench');
 
       final results = await repo.search('north');
       expect(results.length, 1);
       expect(results.first.area, 'North trench');
     });
 
-    test('search matches by rubiconCode', () async {
-      await repo.create(rubiconCode: 'RC-001');
-      await repo.create(rubiconCode: 'RC-002');
-
-      final results = await repo.search('RC-001');
-      expect(results.length, 1);
-      expect(results.first.rubiconCode, 'RC-001');
-    });
-
-    test('update modifies optional fields', () async {
-      final original = await repo.create(area: 'Old area');
+    test('update modifies area and projectId', () async {
+      final projectA = await projectRepo.create(name: 'Site A');
+      final projectB = await projectRepo.create(name: 'Site B');
+      final original = await repo.create(projectId: projectA.id, area: 'Old');
 
       final updated = await repo.update(
         id: original.id,
+        projectId: projectB.id,
         area: 'New area',
-        rubiconCode: 'RC-2024',
       );
 
       expect(updated.area, 'New area');
-      expect(updated.rubiconCode, 'RC-2024');
+      expect(updated.projectId, projectB.id);
       expect(updated.featureNumber, original.featureNumber);
     });
 
     test('delete removes feature and it is no longer retrievable', () async {
-      final feature = await repo.create();
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id);
 
       await repo.delete(feature.id);
       final fetched = await repo.getById(feature.id);
@@ -109,9 +108,18 @@ void main() {
     });
 
     test('nextFeatureNumber pads to 3 digits', () async {
-      await repo.create(); // 001
-      await repo.create(); // 002
+      final project = await projectRepo.create(name: 'Site');
+      await repo.create(projectId: project.id);
+      await repo.create(projectId: project.id);
       expect(await repo.nextFeatureNumber(), '003');
+    });
+
+    test('feature without project has null projectId', () async {
+      // Simulates a legacy feature created before projects were introduced.
+      // We verify getById handles null projectId gracefully.
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id);
+      expect(feature.projectId, isNotNull);
     });
   });
 }

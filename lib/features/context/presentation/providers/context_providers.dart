@@ -27,3 +27,10 @@ final fillsByFeatureProvider =
     FutureProvider.family<List<ContextModel>, String>((ref, featureId) async {
   return ref.watch(contextRepositoryProvider).getFillsByFeatureId(featureId);
 });
+
+/// Returns the first cut (lowest contextNumber) for a feature, or null if none.
+final firstCutByFeatureProvider =
+    FutureProvider.family<ContextModel?, String>((ref, featureId) async {
+  final cuts = await ref.watch(cutsByFeatureProvider(featureId).future);
+  return cuts.firstOrNull;
+});

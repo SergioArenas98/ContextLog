@@ -3,6 +3,429 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class $ProjectsTableTable extends ProjectsTable
+    with TableInfo<$ProjectsTableTable, ProjectsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProjectsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rubiconCodeMeta = const VerificationMeta(
+    'rubiconCode',
+  );
+  @override
+  late final GeneratedColumn<String> rubiconCode = GeneratedColumn<String>(
+    'rubicon_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _licenceNumberMeta = const VerificationMeta(
+    'licenceNumber',
+  );
+  @override
+  late final GeneratedColumn<String> licenceNumber = GeneratedColumn<String>(
+    'licence_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    rubiconCode,
+    licenceNumber,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'projects';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ProjectsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('rubicon_code')) {
+      context.handle(
+        _rubiconCodeMeta,
+        rubiconCode.isAcceptableOrUnknown(
+          data['rubicon_code']!,
+          _rubiconCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('licence_number')) {
+      context.handle(
+        _licenceNumberMeta,
+        licenceNumber.isAcceptableOrUnknown(
+          data['licence_number']!,
+          _licenceNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ProjectsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProjectsTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      rubiconCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rubicon_code'],
+      ),
+      licenceNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}licence_number'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ProjectsTableTable createAlias(String alias) {
+    return $ProjectsTableTable(attachedDatabase, alias);
+  }
+}
+
+class ProjectsTableData extends DataClass
+    implements Insertable<ProjectsTableData> {
+  final String id;
+  final String name;
+  final String? rubiconCode;
+  final String? licenceNumber;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ProjectsTableData({
+    required this.id,
+    required this.name,
+    this.rubiconCode,
+    this.licenceNumber,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || rubiconCode != null) {
+      map['rubicon_code'] = Variable<String>(rubiconCode);
+    }
+    if (!nullToAbsent || licenceNumber != null) {
+      map['licence_number'] = Variable<String>(licenceNumber);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ProjectsTableCompanion toCompanion(bool nullToAbsent) {
+    return ProjectsTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      rubiconCode: rubiconCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rubiconCode),
+      licenceNumber: licenceNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(licenceNumber),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ProjectsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProjectsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      rubiconCode: serializer.fromJson<String?>(json['rubiconCode']),
+      licenceNumber: serializer.fromJson<String?>(json['licenceNumber']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'rubiconCode': serializer.toJson<String?>(rubiconCode),
+      'licenceNumber': serializer.toJson<String?>(licenceNumber),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ProjectsTableData copyWith({
+    String? id,
+    String? name,
+    Value<String?> rubiconCode = const Value.absent(),
+    Value<String?> licenceNumber = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ProjectsTableData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    rubiconCode: rubiconCode.present ? rubiconCode.value : this.rubiconCode,
+    licenceNumber: licenceNumber.present
+        ? licenceNumber.value
+        : this.licenceNumber,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ProjectsTableData copyWithCompanion(ProjectsTableCompanion data) {
+    return ProjectsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      rubiconCode: data.rubiconCode.present
+          ? data.rubiconCode.value
+          : this.rubiconCode,
+      licenceNumber: data.licenceNumber.present
+          ? data.licenceNumber.value
+          : this.licenceNumber,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectsTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('rubiconCode: $rubiconCode, ')
+          ..write('licenceNumber: $licenceNumber, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, rubiconCode, licenceNumber, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProjectsTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.rubiconCode == this.rubiconCode &&
+          other.licenceNumber == this.licenceNumber &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ProjectsTableCompanion extends UpdateCompanion<ProjectsTableData> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> rubiconCode;
+  final Value<String?> licenceNumber;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ProjectsTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.rubiconCode = const Value.absent(),
+    this.licenceNumber = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProjectsTableCompanion.insert({
+    required String id,
+    required String name,
+    this.rubiconCode = const Value.absent(),
+    this.licenceNumber = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ProjectsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? rubiconCode,
+    Expression<String>? licenceNumber,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (rubiconCode != null) 'rubicon_code': rubiconCode,
+      if (licenceNumber != null) 'licence_number': licenceNumber,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProjectsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? rubiconCode,
+    Value<String?>? licenceNumber,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ProjectsTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      rubiconCode: rubiconCode ?? this.rubiconCode,
+      licenceNumber: licenceNumber ?? this.licenceNumber,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (rubiconCode.present) {
+      map['rubicon_code'] = Variable<String>(rubiconCode.value);
+    }
+    if (licenceNumber.present) {
+      map['licence_number'] = Variable<String>(licenceNumber.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('rubiconCode: $rubiconCode, ')
+          ..write('licenceNumber: $licenceNumber, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $FeaturesTableTable extends FeaturesTable
     with TableInfo<$FeaturesTableTable, FeaturesTableData> {
   @override
@@ -29,23 +452,12 @@ class $FeaturesTableTable extends FeaturesTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _rubiconCodeMeta = const VerificationMeta(
-    'rubiconCode',
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
   );
   @override
-  late final GeneratedColumn<String> rubiconCode = GeneratedColumn<String>(
-    'rubicon_code',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _licenseMeta = const VerificationMeta(
-    'license',
-  );
-  @override
-  late final GeneratedColumn<String> license = GeneratedColumn<String>(
-    'license',
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -95,8 +507,7 @@ class $FeaturesTableTable extends FeaturesTable
   List<GeneratedColumn> get $columns => [
     id,
     featureNumber,
-    rubiconCode,
-    license,
+    projectId,
     area,
     date,
     createdAt,
@@ -130,19 +541,10 @@ class $FeaturesTableTable extends FeaturesTable
     } else if (isInserting) {
       context.missing(_featureNumberMeta);
     }
-    if (data.containsKey('rubicon_code')) {
+    if (data.containsKey('project_id')) {
       context.handle(
-        _rubiconCodeMeta,
-        rubiconCode.isAcceptableOrUnknown(
-          data['rubicon_code']!,
-          _rubiconCodeMeta,
-        ),
-      );
-    }
-    if (data.containsKey('license')) {
-      context.handle(
-        _licenseMeta,
-        license.isAcceptableOrUnknown(data['license']!, _licenseMeta),
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
       );
     }
     if (data.containsKey('area')) {
@@ -192,13 +594,9 @@ class $FeaturesTableTable extends FeaturesTable
         DriftSqlType.string,
         data['${effectivePrefix}feature_number'],
       )!,
-      rubiconCode: attachedDatabase.typeMapping.read(
+      projectId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}rubicon_code'],
-      ),
-      license: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}license'],
+        data['${effectivePrefix}project_id'],
       ),
       area: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -229,8 +627,7 @@ class FeaturesTableData extends DataClass
     implements Insertable<FeaturesTableData> {
   final String id;
   final String featureNumber;
-  final String? rubiconCode;
-  final String? license;
+  final String? projectId;
   final String? area;
   final DateTime date;
   final DateTime createdAt;
@@ -238,8 +635,7 @@ class FeaturesTableData extends DataClass
   const FeaturesTableData({
     required this.id,
     required this.featureNumber,
-    this.rubiconCode,
-    this.license,
+    this.projectId,
     this.area,
     required this.date,
     required this.createdAt,
@@ -250,11 +646,8 @@ class FeaturesTableData extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['feature_number'] = Variable<String>(featureNumber);
-    if (!nullToAbsent || rubiconCode != null) {
-      map['rubicon_code'] = Variable<String>(rubiconCode);
-    }
-    if (!nullToAbsent || license != null) {
-      map['license'] = Variable<String>(license);
+    if (!nullToAbsent || projectId != null) {
+      map['project_id'] = Variable<String>(projectId);
     }
     if (!nullToAbsent || area != null) {
       map['area'] = Variable<String>(area);
@@ -269,12 +662,9 @@ class FeaturesTableData extends DataClass
     return FeaturesTableCompanion(
       id: Value(id),
       featureNumber: Value(featureNumber),
-      rubiconCode: rubiconCode == null && nullToAbsent
+      projectId: projectId == null && nullToAbsent
           ? const Value.absent()
-          : Value(rubiconCode),
-      license: license == null && nullToAbsent
-          ? const Value.absent()
-          : Value(license),
+          : Value(projectId),
       area: area == null && nullToAbsent ? const Value.absent() : Value(area),
       date: Value(date),
       createdAt: Value(createdAt),
@@ -290,8 +680,7 @@ class FeaturesTableData extends DataClass
     return FeaturesTableData(
       id: serializer.fromJson<String>(json['id']),
       featureNumber: serializer.fromJson<String>(json['featureNumber']),
-      rubiconCode: serializer.fromJson<String?>(json['rubiconCode']),
-      license: serializer.fromJson<String?>(json['license']),
+      projectId: serializer.fromJson<String?>(json['projectId']),
       area: serializer.fromJson<String?>(json['area']),
       date: serializer.fromJson<DateTime>(json['date']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -304,8 +693,7 @@ class FeaturesTableData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'featureNumber': serializer.toJson<String>(featureNumber),
-      'rubiconCode': serializer.toJson<String?>(rubiconCode),
-      'license': serializer.toJson<String?>(license),
+      'projectId': serializer.toJson<String?>(projectId),
       'area': serializer.toJson<String?>(area),
       'date': serializer.toJson<DateTime>(date),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -316,8 +704,7 @@ class FeaturesTableData extends DataClass
   FeaturesTableData copyWith({
     String? id,
     String? featureNumber,
-    Value<String?> rubiconCode = const Value.absent(),
-    Value<String?> license = const Value.absent(),
+    Value<String?> projectId = const Value.absent(),
     Value<String?> area = const Value.absent(),
     DateTime? date,
     DateTime? createdAt,
@@ -325,8 +712,7 @@ class FeaturesTableData extends DataClass
   }) => FeaturesTableData(
     id: id ?? this.id,
     featureNumber: featureNumber ?? this.featureNumber,
-    rubiconCode: rubiconCode.present ? rubiconCode.value : this.rubiconCode,
-    license: license.present ? license.value : this.license,
+    projectId: projectId.present ? projectId.value : this.projectId,
     area: area.present ? area.value : this.area,
     date: date ?? this.date,
     createdAt: createdAt ?? this.createdAt,
@@ -338,10 +724,7 @@ class FeaturesTableData extends DataClass
       featureNumber: data.featureNumber.present
           ? data.featureNumber.value
           : this.featureNumber,
-      rubiconCode: data.rubiconCode.present
-          ? data.rubiconCode.value
-          : this.rubiconCode,
-      license: data.license.present ? data.license.value : this.license,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
       area: data.area.present ? data.area.value : this.area,
       date: data.date.present ? data.date.value : this.date,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -354,8 +737,7 @@ class FeaturesTableData extends DataClass
     return (StringBuffer('FeaturesTableData(')
           ..write('id: $id, ')
           ..write('featureNumber: $featureNumber, ')
-          ..write('rubiconCode: $rubiconCode, ')
-          ..write('license: $license, ')
+          ..write('projectId: $projectId, ')
           ..write('area: $area, ')
           ..write('date: $date, ')
           ..write('createdAt: $createdAt, ')
@@ -368,8 +750,7 @@ class FeaturesTableData extends DataClass
   int get hashCode => Object.hash(
     id,
     featureNumber,
-    rubiconCode,
-    license,
+    projectId,
     area,
     date,
     createdAt,
@@ -381,8 +762,7 @@ class FeaturesTableData extends DataClass
       (other is FeaturesTableData &&
           other.id == this.id &&
           other.featureNumber == this.featureNumber &&
-          other.rubiconCode == this.rubiconCode &&
-          other.license == this.license &&
+          other.projectId == this.projectId &&
           other.area == this.area &&
           other.date == this.date &&
           other.createdAt == this.createdAt &&
@@ -392,8 +772,7 @@ class FeaturesTableData extends DataClass
 class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   final Value<String> id;
   final Value<String> featureNumber;
-  final Value<String?> rubiconCode;
-  final Value<String?> license;
+  final Value<String?> projectId;
   final Value<String?> area;
   final Value<DateTime> date;
   final Value<DateTime> createdAt;
@@ -402,8 +781,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   const FeaturesTableCompanion({
     this.id = const Value.absent(),
     this.featureNumber = const Value.absent(),
-    this.rubiconCode = const Value.absent(),
-    this.license = const Value.absent(),
+    this.projectId = const Value.absent(),
     this.area = const Value.absent(),
     this.date = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -413,8 +791,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   FeaturesTableCompanion.insert({
     required String id,
     required String featureNumber,
-    this.rubiconCode = const Value.absent(),
-    this.license = const Value.absent(),
+    this.projectId = const Value.absent(),
     this.area = const Value.absent(),
     required DateTime date,
     required DateTime createdAt,
@@ -428,8 +805,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   static Insertable<FeaturesTableData> custom({
     Expression<String>? id,
     Expression<String>? featureNumber,
-    Expression<String>? rubiconCode,
-    Expression<String>? license,
+    Expression<String>? projectId,
     Expression<String>? area,
     Expression<DateTime>? date,
     Expression<DateTime>? createdAt,
@@ -439,8 +815,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (featureNumber != null) 'feature_number': featureNumber,
-      if (rubiconCode != null) 'rubicon_code': rubiconCode,
-      if (license != null) 'license': license,
+      if (projectId != null) 'project_id': projectId,
       if (area != null) 'area': area,
       if (date != null) 'date': date,
       if (createdAt != null) 'created_at': createdAt,
@@ -452,8 +827,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   FeaturesTableCompanion copyWith({
     Value<String>? id,
     Value<String>? featureNumber,
-    Value<String?>? rubiconCode,
-    Value<String?>? license,
+    Value<String?>? projectId,
     Value<String?>? area,
     Value<DateTime>? date,
     Value<DateTime>? createdAt,
@@ -463,8 +837,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     return FeaturesTableCompanion(
       id: id ?? this.id,
       featureNumber: featureNumber ?? this.featureNumber,
-      rubiconCode: rubiconCode ?? this.rubiconCode,
-      license: license ?? this.license,
+      projectId: projectId ?? this.projectId,
       area: area ?? this.area,
       date: date ?? this.date,
       createdAt: createdAt ?? this.createdAt,
@@ -482,11 +855,8 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     if (featureNumber.present) {
       map['feature_number'] = Variable<String>(featureNumber.value);
     }
-    if (rubiconCode.present) {
-      map['rubicon_code'] = Variable<String>(rubiconCode.value);
-    }
-    if (license.present) {
-      map['license'] = Variable<String>(license.value);
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
     }
     if (area.present) {
       map['area'] = Variable<String>(area.value);
@@ -511,8 +881,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     return (StringBuffer('FeaturesTableCompanion(')
           ..write('id: $id, ')
           ..write('featureNumber: $featureNumber, ')
-          ..write('rubiconCode: $rubiconCode, ')
-          ..write('license: $license, ')
+          ..write('projectId: $projectId, ')
           ..write('area: $area, ')
           ..write('date: $date, ')
           ..write('createdAt: $createdAt, ')
@@ -4456,6 +4825,7 @@ class HarrisRelationsTableCompanion
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $ProjectsTableTable projectsTable = $ProjectsTableTable(this);
   late final $FeaturesTableTable featuresTable = $FeaturesTableTable(this);
   late final $PhotosTableTable photosTable = $PhotosTableTable(this);
   late final $DrawingsTableTable drawingsTable = $DrawingsTableTable(this);
@@ -4469,6 +4839,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    projectsTable,
     featuresTable,
     photosTable,
     drawingsTable,
@@ -4552,12 +4923,238 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
+typedef $$ProjectsTableTableCreateCompanionBuilder =
+    ProjectsTableCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> rubiconCode,
+      Value<String?> licenceNumber,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ProjectsTableTableUpdateCompanionBuilder =
+    ProjectsTableCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> rubiconCode,
+      Value<String?> licenceNumber,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$ProjectsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ProjectsTableTable> {
+  $$ProjectsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get licenceNumber => $composableBuilder(
+    column: $table.licenceNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ProjectsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProjectsTableTable> {
+  $$ProjectsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get licenceNumber => $composableBuilder(
+    column: $table.licenceNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProjectsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProjectsTableTable> {
+  $$ProjectsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get rubiconCode => $composableBuilder(
+    column: $table.rubiconCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get licenceNumber => $composableBuilder(
+    column: $table.licenceNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ProjectsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProjectsTableTable,
+          ProjectsTableData,
+          $$ProjectsTableTableFilterComposer,
+          $$ProjectsTableTableOrderingComposer,
+          $$ProjectsTableTableAnnotationComposer,
+          $$ProjectsTableTableCreateCompanionBuilder,
+          $$ProjectsTableTableUpdateCompanionBuilder,
+          (
+            ProjectsTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $ProjectsTableTable,
+              ProjectsTableData
+            >,
+          ),
+          ProjectsTableData,
+          PrefetchHooks Function()
+        > {
+  $$ProjectsTableTableTableManager(_$AppDatabase db, $ProjectsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProjectsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProjectsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProjectsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> rubiconCode = const Value.absent(),
+                Value<String?> licenceNumber = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsTableCompanion(
+                id: id,
+                name: name,
+                rubiconCode: rubiconCode,
+                licenceNumber: licenceNumber,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> rubiconCode = const Value.absent(),
+                Value<String?> licenceNumber = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsTableCompanion.insert(
+                id: id,
+                name: name,
+                rubiconCode: rubiconCode,
+                licenceNumber: licenceNumber,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProjectsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProjectsTableTable,
+      ProjectsTableData,
+      $$ProjectsTableTableFilterComposer,
+      $$ProjectsTableTableOrderingComposer,
+      $$ProjectsTableTableAnnotationComposer,
+      $$ProjectsTableTableCreateCompanionBuilder,
+      $$ProjectsTableTableUpdateCompanionBuilder,
+      (
+        ProjectsTableData,
+        BaseReferences<_$AppDatabase, $ProjectsTableTable, ProjectsTableData>,
+      ),
+      ProjectsTableData,
+      PrefetchHooks Function()
+    >;
 typedef $$FeaturesTableTableCreateCompanionBuilder =
     FeaturesTableCompanion Function({
       required String id,
       required String featureNumber,
-      Value<String?> rubiconCode,
-      Value<String?> license,
+      Value<String?> projectId,
       Value<String?> area,
       required DateTime date,
       required DateTime createdAt,
@@ -4568,8 +5165,7 @@ typedef $$FeaturesTableTableUpdateCompanionBuilder =
     FeaturesTableCompanion Function({
       Value<String> id,
       Value<String> featureNumber,
-      Value<String?> rubiconCode,
-      Value<String?> license,
+      Value<String?> projectId,
       Value<String?> area,
       Value<DateTime> date,
       Value<DateTime> createdAt,
@@ -4739,13 +5335,8 @@ class $$FeaturesTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get rubiconCode => $composableBuilder(
-    column: $table.rubiconCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get license => $composableBuilder(
-    column: $table.license,
+  ColumnFilters<String> get projectId => $composableBuilder(
+    column: $table.projectId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4939,13 +5530,8 @@ class $$FeaturesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get rubiconCode => $composableBuilder(
-    column: $table.rubiconCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get license => $composableBuilder(
-    column: $table.license,
+  ColumnOrderings<String> get projectId => $composableBuilder(
+    column: $table.projectId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4987,13 +5573,8 @@ class $$FeaturesTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get rubiconCode => $composableBuilder(
-    column: $table.rubiconCode,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get license =>
-      $composableBuilder(column: $table.license, builder: (column) => column);
+  GeneratedColumn<String> get projectId =>
+      $composableBuilder(column: $table.projectId, builder: (column) => column);
 
   GeneratedColumn<String> get area =>
       $composableBuilder(column: $table.area, builder: (column) => column);
@@ -5196,8 +5777,7 @@ class $$FeaturesTableTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> featureNumber = const Value.absent(),
-                Value<String?> rubiconCode = const Value.absent(),
-                Value<String?> license = const Value.absent(),
+                Value<String?> projectId = const Value.absent(),
                 Value<String?> area = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5206,8 +5786,7 @@ class $$FeaturesTableTableTableManager
               }) => FeaturesTableCompanion(
                 id: id,
                 featureNumber: featureNumber,
-                rubiconCode: rubiconCode,
-                license: license,
+                projectId: projectId,
                 area: area,
                 date: date,
                 createdAt: createdAt,
@@ -5218,8 +5797,7 @@ class $$FeaturesTableTableTableManager
               ({
                 required String id,
                 required String featureNumber,
-                Value<String?> rubiconCode = const Value.absent(),
-                Value<String?> license = const Value.absent(),
+                Value<String?> projectId = const Value.absent(),
                 Value<String?> area = const Value.absent(),
                 required DateTime date,
                 required DateTime createdAt,
@@ -5228,8 +5806,7 @@ class $$FeaturesTableTableTableManager
               }) => FeaturesTableCompanion.insert(
                 id: id,
                 featureNumber: featureNumber,
-                rubiconCode: rubiconCode,
-                license: license,
+                projectId: projectId,
                 area: area,
                 date: date,
                 createdAt: createdAt,
@@ -8626,6 +9203,8 @@ typedef $$HarrisRelationsTableTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$ProjectsTableTableTableManager get projectsTable =>
+      $$ProjectsTableTableTableManager(_db, _db.projectsTable);
   $$FeaturesTableTableTableManager get featuresTable =>
       $$FeaturesTableTableTableManager(_db, _db.featuresTable);
   $$PhotosTableTableTableManager get photosTable =>
