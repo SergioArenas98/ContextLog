@@ -69,7 +69,7 @@ class FeatureListScreen extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.space12),
                   featuresAsync.when(
                     loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
                     data: (features) => Text(
                       '${features.length} UNIT${features.length == 1 ? '' : 'S'}',
                       style: TextStyle(
@@ -132,7 +132,7 @@ class FeatureListScreen extends ConsumerWidget {
           // ── Column header ─────────────────────────────────────────────────
           featuresAsync.when(
             loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-            error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            error: (_, _) => const SliverToBoxAdapter(child: SizedBox.shrink()),
             data: (features) {
               if (features.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
               return SliverToBoxAdapter(
@@ -149,7 +149,7 @@ class FeatureListScreen extends ConsumerWidget {
                       SizedBox(
                         width: 56,
                         child: Text(
-                          'CUT',
+                          'UNIT',
                           style: TextStyle(
                             fontFamily: AppTypography.monoFontFamily,
                             fontWeight: FontWeight.w700,
@@ -235,7 +235,7 @@ class FeatureListScreen extends ConsumerWidget {
 
               return SliverList.separated(
                 itemCount: features.length,
-                separatorBuilder: (_, __) => Container(
+                separatorBuilder: (_, _) => Container(
                   height: 1,
                   color: colors.rule,
                 ),

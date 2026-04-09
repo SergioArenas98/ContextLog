@@ -6,7 +6,6 @@ import '../../../../core/design/app_colors.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/design/app_typography.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
-import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
 import '../../../project/presentation/providers/project_providers.dart';
 import '../../domain/models/feature_model.dart';

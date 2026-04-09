@@ -134,6 +134,18 @@ class _StationHeader extends ConsumerWidget {
         : null;
     final project = projectAsync?.valueOrNull;
 
+    // Igual que en FeatureRosterItem
+    String? projectLine;
+    if (project != null) {
+      final parts = [
+        if (project.rubiconCode != null && project.rubiconCode!.isNotEmpty)
+          project.rubiconCode!,
+        if (project.licenceNumber != null && project.licenceNumber!.isNotEmpty)
+          project.licenceNumber!,
+      ];
+      projectLine = parts.isNotEmpty ? parts.join(' · ') : project.name;
+    }
+
     return Container(
       color: colors.s0,
       child: SafeArea(
@@ -142,20 +154,17 @@ class _StationHeader extends ConsumerWidget {
           height: 56,
           child: Row(
             children: [
-              // Back button
               IconButton(
                 icon: const Icon(Icons.arrow_back_rounded, size: 20),
                 color: colors.t1,
                 onPressed: () => context.pop(),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
               ),
-              // Feature label
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Project name row
                     if (project != null)
                       Text(
                         project.name.toUpperCase(),
@@ -179,6 +188,7 @@ class _StationHeader extends ConsumerWidget {
                           color: colors.t2,
                         ),
                       ),
+
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
@@ -196,41 +206,44 @@ class _StationHeader extends ConsumerWidget {
                         ),
                         if (area != null) ...[
                           const SizedBox(width: AppSpacing.space8),
-                          Text(
-                            area!,
-                            style: TextStyle(
-                              fontFamily: AppTypography.sansFontFamily,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: colors.t1,
-                            ),
-                          ),
-                        ],
-                        if (project?.rubiconCode != null) ...[
-                          const SizedBox(width: AppSpacing.space8),
-                          Text(
-                            project!.rubiconCode!,
-                            style: TextStyle(
-                              fontFamily: AppTypography.monoFontFamily,
-                              fontSize: 10,
-                              color: colors.t2,
-                              letterSpacing: 0.3,
+                          Flexible(
+                            child: Text(
+                              area!,
+                              style: TextStyle(
+                                fontFamily: AppTypography.sansFontFamily,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: colors.t1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ],
                     ),
+
+                    if (projectLine != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        projectLine,
+                        style: TextStyle(
+                          fontFamily: AppTypography.monoFontFamily,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                          color: colors.t2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
                 ),
               ),
-              // Full matrix view
               IconButton(
                 icon: const Icon(Icons.open_in_full_rounded, size: 18),
                 color: colors.t1,
                 tooltip: 'Expand matrix',
                 onPressed: () => context.push('/features/$featureId/matrix'),
               ),
-              // Edit feature
               IconButton(
                 icon: const Icon(Icons.edit_outlined, size: 18),
                 color: colors.t1,
