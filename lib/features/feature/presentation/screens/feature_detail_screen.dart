@@ -72,6 +72,8 @@ class _FeatureDetailScreenState extends ConsumerState<FeatureDetailScreen> {
                 featureId: widget.featureId,
                 onContextAdded: () {
                   ref.invalidate(contextsByFeatureProvider(widget.featureId));
+                  ref.invalidate(cutsByFeatureProvider(widget.featureId));
+                  ref.invalidate(fillsByFeatureProvider(widget.featureId));
                   ref.invalidate(harrisByFeatureProvider(widget.featureId));
                 },
                 onRelationAdded: () {

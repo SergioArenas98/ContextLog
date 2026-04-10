@@ -628,7 +628,11 @@ class _ContextHeader extends ConsumerWidget {
       builder: (_) => ContextFormSheet(
         featureId: featureId,
         existingContext: context_,
-        onSaved: () => ref.invalidate(contextsByFeatureProvider(featureId)),
+        onSaved: () {
+          ref.invalidate(contextsByFeatureProvider(featureId));
+          ref.invalidate(cutsByFeatureProvider(featureId));
+          ref.invalidate(fillsByFeatureProvider(featureId));
+        },
       ),
     );
   }
