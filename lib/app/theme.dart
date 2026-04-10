@@ -401,7 +401,7 @@ abstract final class AppTheme {
         ),
       );
 
-  // ── Light (minimal) ───────────────────────────────────────────────────────
+  // ── Light ────────────────────────────────────────────────────────────────
 
   static ThemeData get light => ThemeData(
         useMaterial3: true,
@@ -443,6 +443,345 @@ abstract final class AppTheme {
           scrim: Color(0xFF000000),
           shadow: Color(0xFF000000),
         ),
-        scaffoldBackgroundColor: AppColors.surfaceLight,
+
+        // ── Scaffold ────────────────────────────────────────────────────────
+        scaffoldBackgroundColor: AppColors.s0Light,
+
+        // ── AppBar ──────────────────────────────────────────────────────────
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.s0Light,
+          foregroundColor: AppColors.t0Light,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          titleTextStyle: AppTypography.textTheme.titleMedium?.copyWith(
+            color: AppColors.t0Light,
+          ),
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.dark,
+            systemNavigationBarColor: AppColors.s0Light,
+            systemNavigationBarIconBrightness: Brightness.dark,
+          ),
+          iconTheme: const IconThemeData(color: AppColors.t1Light, size: 22),
+          actionsIconTheme: const IconThemeData(color: AppColors.t1Light, size: 22),
+          surfaceTintColor: Colors.transparent,
+        ),
+
+        // ── Cards ────────────────────────────────────────────────────────────
+        cardTheme: CardThemeData(
+          color: AppColors.s1Light,
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.mdBorderRadius,
+            side: BorderSide(color: AppColors.ruleLight, width: AppBorder.thin),
+          ),
+        ),
+
+        // ── Dividers ─────────────────────────────────────────────────────────
+        dividerTheme: const DividerThemeData(
+          color: AppColors.ruleLight,
+          thickness: 1,
+          space: 1,
+        ),
+
+        // ── Inputs ───────────────────────────────────────────────────────────
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.s2Light,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space16,
+            vertical: AppSpacing.space16,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: AppRadius.smBorderRadius,
+            borderSide: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: AppRadius.smBorderRadius,
+            borderSide: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: AppRadius.smBorderRadius,
+            borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: AppRadius.smBorderRadius,
+            borderSide: const BorderSide(color: AppColors.errorLight, width: 1),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: AppRadius.smBorderRadius,
+            borderSide: const BorderSide(color: AppColors.errorLight, width: 1.5),
+          ),
+          labelStyle: TextStyle(
+            color: AppColors.t1Light,
+            fontSize: 10,
+            fontFamily: AppTypography.monoFontFamily,
+            letterSpacing: 0.8,
+          ),
+          hintStyle: TextStyle(
+            color: AppColors.t2Light,
+            fontSize: 13,
+            fontFamily: AppTypography.sansFontFamily,
+          ),
+          floatingLabelStyle: TextStyle(
+            color: AppColors.primaryLight,
+            fontSize: 10,
+            fontFamily: AppTypography.monoFontFamily,
+            letterSpacing: 0.8,
+          ),
+        ),
+
+        // ── Buttons ──────────────────────────────────────────────────────────
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primaryLight,
+            foregroundColor: AppColors.onPrimaryLight,
+            minimumSize: const Size(64, 48),
+            textStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              letterSpacing: 0.2,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: AppRadius.smBorderRadius,
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.t1Light,
+            side: const BorderSide(color: AppColors.ruleStrongLight, width: 1),
+            minimumSize: const Size(64, 44),
+            textStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: AppRadius.smBorderRadius,
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primaryLight,
+            textStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+
+        // ── FAB ──────────────────────────────────────────────────────────────
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.onPrimaryLight,
+          elevation: 0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.smBorderRadius,
+          ),
+          extendedTextStyle: TextStyle(
+            fontFamily: AppTypography.sansFontFamily,
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+            letterSpacing: 0.2,
+          ),
+        ),
+
+        // ── Icon buttons ─────────────────────────────────────────────────────
+        iconButtonTheme: IconButtonThemeData(
+          style: IconButton.styleFrom(
+            foregroundColor: AppColors.t1Light,
+            minimumSize: const Size(44, 44),
+          ),
+        ),
+
+        // ── List tiles ───────────────────────────────────────────────────────
+        listTileTheme: const ListTileThemeData(
+          tileColor: Colors.transparent,
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+          minVerticalPadding: AppSpacing.space12,
+          iconColor: AppColors.t1Light,
+          textColor: AppColors.t0Light,
+        ),
+
+        // ── Bottom sheets ────────────────────────────────────────────────────
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: AppColors.s2Light,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadius.xl),
+            ),
+          ),
+          dragHandleColor: AppColors.ruleStrongLight,
+          showDragHandle: true,
+          elevation: 0,
+        ),
+
+        // ── Dialogs ──────────────────────────────────────────────────────────
+        dialogTheme: DialogThemeData(
+          backgroundColor: AppColors.s3Light,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.lgBorderRadius,
+            side: BorderSide(color: AppColors.ruleMidLight, width: 1),
+          ),
+          titleTextStyle: AppTypography.textTheme.titleMedium?.copyWith(
+            color: AppColors.t0Light,
+          ),
+          contentTextStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+            color: AppColors.t1Light,
+          ),
+        ),
+
+        // ── Chips ────────────────────────────────────────────────────────────
+        chipTheme: ChipThemeData(
+          backgroundColor: AppColors.s2Light,
+          side: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+          labelStyle: TextStyle(
+            fontFamily: AppTypography.sansFontFamily,
+            fontSize: 12,
+            color: AppColors.t1Light,
+          ),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.smBorderRadius,
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space8,
+            vertical: AppSpacing.space4,
+          ),
+        ),
+
+        // ── Search bar ───────────────────────────────────────────────────────
+        searchBarTheme: SearchBarThemeData(
+          backgroundColor: const WidgetStatePropertyAll(AppColors.s2Light),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(0),
+          side: const WidgetStatePropertyAll(
+            BorderSide(color: AppColors.ruleMidLight, width: 1),
+          ),
+          shape: const WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: AppRadius.smBorderRadius),
+          ),
+          textStyle: WidgetStatePropertyAll(
+            AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.t0Light),
+          ),
+          hintStyle: WidgetStatePropertyAll(
+            AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.t2Light),
+          ),
+        ),
+
+        // ── Popup menu ───────────────────────────────────────────────────────
+        popupMenuTheme: PopupMenuThemeData(
+          color: AppColors.s3Light,
+          surfaceTintColor: Colors.transparent,
+          elevation: 4,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.mdBorderRadius,
+            side: BorderSide(color: AppColors.ruleMidLight, width: 1),
+          ),
+          textStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+            color: AppColors.t0Light,
+          ),
+        ),
+
+        // ── Snack bar ────────────────────────────────────────────────────────
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: AppColors.s4Light,
+          contentTextStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+            color: AppColors.t0Light,
+          ),
+          behavior: SnackBarBehavior.floating,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.smBorderRadius,
+          ),
+          elevation: 0,
+        ),
+
+        // ── Progress indicator ───────────────────────────────────────────────
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: AppColors.primaryLight,
+        ),
+
+        // ── Switch / checkbox / radio ────────────────────────────────────────
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) return AppColors.primaryLight;
+            return AppColors.t2Light;
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.primaryContainerLight;
+            }
+            return AppColors.s2Light;
+          }),
+        ),
+
+        // ── Dropdown ────────────────────────────────────────────────────────
+        dropdownMenuTheme: DropdownMenuThemeData(
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: AppColors.s2Light,
+            border: OutlineInputBorder(
+              borderRadius: AppRadius.smBorderRadius,
+              borderSide: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: AppRadius.smBorderRadius,
+              borderSide: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: AppRadius.smBorderRadius,
+              borderSide:
+                  const BorderSide(color: AppColors.primaryLight, width: 1.5),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space16,
+              vertical: AppSpacing.space16,
+            ),
+          ),
+          menuStyle: MenuStyle(
+            backgroundColor: const WidgetStatePropertyAll(AppColors.s4Light),
+            surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+            elevation: const WidgetStatePropertyAll(8),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: AppRadius.smBorderRadius,
+                side: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+              ),
+            ),
+          ),
+        ),
+
+        // ── SegmentedButton ──────────────────────────────────────────────────
+        segmentedButtonTheme: SegmentedButtonThemeData(
+          style: SegmentedButton.styleFrom(
+            backgroundColor: AppColors.s2Light,
+            selectedBackgroundColor: AppColors.primaryContainerLight,
+            selectedForegroundColor: AppColors.onPrimaryContainerLight,
+            foregroundColor: AppColors.t1Light,
+            side: const BorderSide(color: AppColors.ruleMidLight, width: 1),
+            textStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: AppRadius.smBorderRadius,
+            ),
+          ),
+        ),
+
+        // ── Scrollbar ────────────────────────────────────────────────────────
+        scrollbarTheme: const ScrollbarThemeData(
+          thumbColor: WidgetStatePropertyAll(AppColors.ruleStrongLight),
+        ),
       );
 }

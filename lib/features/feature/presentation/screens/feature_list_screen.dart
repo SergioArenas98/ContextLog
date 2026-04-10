@@ -149,7 +149,7 @@ class FeatureListScreen extends ConsumerWidget {
                       SizedBox(
                         width: 56,
                         child: Text(
-                          'UNIT',
+                          'FEATURE',
                           style: TextStyle(
                             fontFamily: AppTypography.monoFontFamily,
                             fontWeight: FontWeight.w700,
@@ -161,7 +161,7 @@ class FeatureListScreen extends ConsumerWidget {
                       ),
                       Expanded(
                         child: Text(
-                          'AREA / CODE',
+                          ' SITE INFORMATION ',
                           style: TextStyle(
                             fontFamily: AppTypography.monoFontFamily,
                             fontWeight: FontWeight.w700,

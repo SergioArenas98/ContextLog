@@ -49,32 +49,32 @@ abstract final class AppColors {
 
   // Domain: CUT
   static const Color cut = Color(0xFFA85838);
-  static const Color cutSurface = Color(0xFF180800);
+  static const Color cutSurface = Color(0xFF3A1008);
   static const Color cutText = Color(0xFFC87858);
 
   // Domain: FILL
   static const Color fill = Color(0xFF3C7850);
-  static const Color fillSurface = Color(0xFF041008);
+  static const Color fillSurface = Color(0xFF0A2014);
   static const Color fillText = Color(0xFF68A878);
 
   // Domain: FIND
   static const Color find = Color(0xFF7050B8);
-  static const Color findSurface = Color(0xFF0C0818);
+  static const Color findSurface = Color(0xFF180C2E);
   static const Color findText = Color(0xFF9880D0);
 
   // Domain: SAMPLE
   static const Color sample = Color(0xFF887040);
-  static const Color sampleSurface = Color(0xFF10100A);
+  static const Color sampleSurface = Color(0xFF22180A);
   static const Color sampleText = Color(0xFFB0986A);
 
   // Domain: DOC
   static const Color doc = Color(0xFF3870A0);
-  static const Color docSurface = Color(0xFF04101A);
+  static const Color docSurface = Color(0xFF0A1A2C);
   static const Color docText = Color(0xFF5A90C0);
 
   // Semantic
   static const Color error = Color(0xFFB83838);
-  static const Color errorSurface = Color(0xFF200606);
+  static const Color errorSurface = Color(0xFF2A0808);
   static const Color onError = Color(0xFFFFFFFF);
   static const Color onErrorContainer = Color(0xFFD87070);
   static const Color success = Color(0xFF3A8A50);
@@ -137,6 +137,19 @@ abstract final class AppColors {
   static const Color surfaceLight = Color(0xFFF4F2EE);
   static const Color onSurfaceLight = Color(0xFF141210);
   static const Color outlineVariantLight = Color(0xFFCCC8C0);
+
+  // Light surface/text/rule constants (for ThemeData.light component overrides)
+  static const Color s0Light = Color(0xFFF4F2EE);
+  static const Color s1Light = Color(0xFFECEAE6);
+  static const Color s2Light = Color(0xFFE4E2DE);
+  static const Color s3Light = Color(0xFFDCDAD6);
+  static const Color s4Light = Color(0xFFD4D2CE);
+  static const Color t0Light = Color(0xFF141210);
+  static const Color t1Light = Color(0xFF706C66);
+  static const Color t2Light = Color(0xFF9C9890);
+  static const Color ruleLight = Color(0xFFD4D2CE);
+  static const Color ruleMidLight = Color(0xFFCCC8C0);
+  static const Color ruleStrongLight = Color(0xFFBCB8B0);
 
   // ── Internal adaptive palettes ────────────────────────────────────────────
   static const _AppPalette _dark = _AppPalette(
