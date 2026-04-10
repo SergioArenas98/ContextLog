@@ -67,6 +67,7 @@ class _HarrisInteractiveMatrixState extends State<HarrisInteractiveMatrix> {
     final colors = AppColors.of(context);
 
     return InteractiveViewer(
+      constrained: false,
       boundaryMargin: const EdgeInsets.all(160),
       minScale: 0.25,
       maxScale: 4.0,

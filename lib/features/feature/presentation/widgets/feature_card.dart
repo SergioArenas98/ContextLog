@@ -42,7 +42,7 @@ class _FeatureRosterItemState extends ConsumerState<FeatureRosterItem> {
         ? firstCut.contextNumber.toString().padLeft(3, '0')
         : '—';
 
-    // Build the project code line: rubicon · licence, or project name if neither
+    // Build the project code line: site code · licence, or project name if neither
     String? projectLine;
     if (project != null) {
       final parts = [

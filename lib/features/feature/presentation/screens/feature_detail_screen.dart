@@ -136,7 +136,6 @@ class _StationHeader extends ConsumerWidget {
         : null;
     final project = projectAsync?.valueOrNull;
 
-    // Igual que en FeatureRosterItem
     String? projectLine;
     if (project != null) {
       final parts = [
@@ -167,65 +166,33 @@ class _StationHeader extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (project != null)
-                      Text(
-                        project.name.toUpperCase(),
-                        style: TextStyle(
-                          fontFamily: AppTypography.monoFontFamily,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 8,
-                          letterSpacing: 2.0,
-                          color: colors.t2,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    else
-                      Text(
-                        'FEATURE',
-                        style: TextStyle(
-                          fontFamily: AppTypography.monoFontFamily,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 8,
-                          letterSpacing: 2.0,
-                          color: colors.t2,
-                        ),
+                    Text(
+                      area ?? '—',
+                      style: TextStyle(
+                        fontFamily: AppTypography.monoFontFamily,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 8,
+                        letterSpacing: 2.0,
+                        color: colors.t2,
                       ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          featureNumber.padLeft(3, '0'),
-                          style: TextStyle(
-                            fontFamily: AppTypography.monoFontFamily,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 22,
-                            letterSpacing: -1,
-                            height: 1,
-                            color: colors.t0,
-                          ),
-                        ),
-                        if (area != null) ...[
-                          const SizedBox(width: AppSpacing.space8),
-                          Flexible(
-                            child: Text(
-                              area!,
-                              style: TextStyle(
-                                fontFamily: AppTypography.sansFontFamily,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
-                                color: colors.t1,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ],
+                      overflow: TextOverflow.ellipsis,
                     ),
-
+                    Text(
+                      project != null
+                          ? project.name.toUpperCase()
+                          : 'EXCAVATION STATION',
+                      style: TextStyle(
+                        fontFamily: AppTypography.sansFontFamily,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        letterSpacing: -0.3,
+                        height: 1.1,
+                        color: area != null ? colors.t0 : colors.t2,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     if (projectLine != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         projectLine,
                         style: TextStyle(

@@ -48,7 +48,7 @@ class FeatureSummaryTab extends StatelessWidget {
               if (project != null) ...[
                 MetadataRow(label: 'Project', value: project!.name),
                 if (project!.rubiconCode != null)
-                  MetadataRow(label: 'Rubicon Code', value: project!.rubiconCode!),
+                  MetadataRow(label: 'Site Code', value: project!.rubiconCode!),
                 if (project!.licenceNumber != null)
                   MetadataRow(label: 'Licence Number', value: project!.licenceNumber!),
               ],

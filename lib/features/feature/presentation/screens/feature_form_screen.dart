@@ -194,13 +194,15 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
         const SizedBox(height: AppSpacing.space6),
         TextFormField(
           controller: _areaCtrl,
+          keyboardType: TextInputType.text,
+          textCapitalization: TextCapitalization.none,
           style: TextStyle(
             fontFamily: AppTypography.sansFontFamily,
             fontSize: 15,
             color: colors.t0,
           ),
           decoration: InputDecoration(
-            hintText: 'e.g. North trench',
+            hintText: 'e.g. North trench, 12, or 7A',
             hintStyle: TextStyle(
               fontFamily: AppTypography.sansFontFamily,
               fontSize: 14,
@@ -435,7 +437,7 @@ class _NoProjectsPrompt extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space8),
             Text(
-              'Create a project first. Projects store site name, Rubicon code, and licence number — shared across all features.',
+              'Create a project first. Projects store site name, site code, and licence number — shared across all features.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: AppTypography.sansFontFamily,

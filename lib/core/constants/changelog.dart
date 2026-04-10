@@ -10,7 +10,7 @@ abstract final class AppChangelog {
         ChangelogItem(
           type: ChangeType.feature,
           text: 'Projects — create reusable excavation projects with site name, '
-              'Rubicon code, and licence number.',
+              'site code, and licence number.',
         ),
         ChangelogItem(
           type: ChangeType.change,

@@ -169,7 +169,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
             const SizedBox(height: AppSpacing.space16),
             _FormField(
               controller: _rubiconCtrl,
-              label: 'RUBICON CODE',
+              label: 'SITE CODE',
               hint: 'e.g. RH1234',
             ),
             const SizedBox(height: AppSpacing.space16),

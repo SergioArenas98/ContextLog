@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'project_model.freezed.dart';
 
 /// Immutable domain model for a reusable excavation project.
-/// A project stores site-level metadata (name, rubicon code, licence number)
+/// A project stores site-level metadata (name, site code, licence number)
 /// that can be shared across multiple features.
 @freezed
 abstract class ProjectModel with _$ProjectModel {
