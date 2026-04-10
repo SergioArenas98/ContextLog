@@ -86,7 +86,7 @@ class _FeatureRosterItemState extends ConsumerState<FeatureRosterItem> {
               ),
             ),
 
-            // ── Area + project code ───────────────────────────────────────
+            // ── Site Information ───────────────────────────────────────
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +94,7 @@ class _FeatureRosterItemState extends ConsumerState<FeatureRosterItem> {
                 children: [
                   if (feature.area != null)
                     Text(
-                      feature.area!,
+                      'Area ${feature.area!}',
                       style: TextStyle(
                         fontFamily: AppTypography.sansFontFamily,
                         fontWeight: FontWeight.w500,

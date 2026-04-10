@@ -167,7 +167,7 @@ class _StationHeader extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      area ?? '—',
+                      ' Area ${area ?? '—'}',
                       style: TextStyle(
                         fontFamily: AppTypography.monoFontFamily,
                         fontWeight: FontWeight.w700,
