@@ -202,7 +202,13 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
             color: colors.t0,
           ),
           decoration: InputDecoration(
-            hintText: 'e.g. North trench, 12, or 7A',
+            prefixText: 'Area ',
+            prefixStyle: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontSize: 15,
+              color: colors.t1,
+            ),
+            hintText: '12, North, or 7A',
             hintStyle: TextStyle(
               fontFamily: AppTypography.sansFontFamily,
               fontSize: 14,
