@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.contextlog.context_log"
+        applicationId = "com.contextlog.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
