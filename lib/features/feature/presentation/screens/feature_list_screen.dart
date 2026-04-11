@@ -44,9 +44,15 @@ class FeatureListScreen extends ConsumerWidget {
             pinned: true,
             titleSpacing: AppSpacing.space16,
             title: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Image.asset(
+                  'assets/logo.png',
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(width: AppSpacing.space8),
                 Text(
                   'CONTEXTLOG',
                   style: TextStyle(
