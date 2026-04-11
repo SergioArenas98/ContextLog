@@ -31,6 +31,8 @@ class ContextListTab extends ConsumerWidget {
               icon: Icons.layers_outlined,
               title: 'No contexts yet',
               message: 'Add cuts and fills. Fills must reference a parent cut.',
+              actionLabel: 'Add Context',
+              onAction: () => _showAdd(context, ref),
             );
           }
 
@@ -72,12 +74,14 @@ class ContextListTab extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'addContext',
-        onPressed: () => _showAdd(context, ref),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Context'),
-      ),
+      floatingActionButton: contextsAsync.valueOrNull?.isNotEmpty == true
+          ? FloatingActionButton.extended(
+              heroTag: 'addContext',
+              onPressed: () => _showAdd(context, ref),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add Context'),
+            )
+          : null,
     );
   }
 

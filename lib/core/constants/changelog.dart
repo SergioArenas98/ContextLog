@@ -4,6 +4,27 @@
 abstract final class AppChangelog {
   static const List<ChangelogEntry> entries = [
     ChangelogEntry(
+      version: '1.2.1',
+      date: '2026-04-11',
+      changes: [
+        ChangelogItem(
+          type: ChangeType.fix,
+          text: 'Fixed RenderFlex overflow when the feature list is empty and '
+              'the search keyboard is open.',
+        ),
+        ChangelogItem(
+          type: ChangeType.fix,
+          text: 'Tapping outside the search field now dismisses focus and '
+              'hides the keyboard.',
+        ),
+        ChangelogItem(
+          type: ChangeType.change,
+          text: 'Empty states no longer show a duplicate create button alongside '
+              'the FAB. The FAB now appears only once at least one item exists.',
+        ),
+      ],
+    ),
+    ChangelogEntry(
       version: '1.2.0',
       date: '2026-04-09',
       changes: [

@@ -73,12 +73,14 @@ class MatrixTab extends ConsumerWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAdd(context, ref),
-        tooltip: 'Add stratigraphic relation',
-        icon: const Icon(Icons.add_link_rounded),
-        label: const Text('Add Relation'),
-      ),
+      floatingActionButton: relationsAsync.valueOrNull?.isNotEmpty == true
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAdd(context, ref),
+              tooltip: 'Add stratigraphic relation',
+              icon: const Icon(Icons.add_link_rounded),
+              label: const Text('Add Relation'),
+            )
+          : null,
     );
   }
 

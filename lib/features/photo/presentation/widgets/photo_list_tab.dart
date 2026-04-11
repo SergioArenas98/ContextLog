@@ -73,11 +73,13 @@ class PhotoListTab extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddPhoto(context, ref),
-        icon: const Icon(Icons.add_a_photo_rounded),
-        label: const Text('Add Photo'),
-      ),
+      floatingActionButton: photosAsync.valueOrNull?.isNotEmpty == true
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddPhoto(context, ref),
+              icon: const Icon(Icons.add_a_photo_rounded),
+              label: const Text('Add Photo'),
+            )
+          : null,
     );
   }
 

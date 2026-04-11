@@ -72,21 +72,23 @@ class ProjectListScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/projects/new'),
-        backgroundColor: colors.primary,
-        foregroundColor: colors.s0,
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: Text(
-          'NEW PROJECT',
-          style: TextStyle(
-            fontFamily: AppTypography.monoFontFamily,
-            fontWeight: FontWeight.w700,
-            fontSize: 10,
-            letterSpacing: 1.5,
-          ),
-        ),
-      ),
+      floatingActionButton: projectsAsync.valueOrNull?.isNotEmpty == true
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/projects/new'),
+              backgroundColor: colors.primary,
+              foregroundColor: colors.s0,
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: Text(
+                'NEW PROJECT',
+                style: TextStyle(
+                  fontFamily: AppTypography.monoFontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

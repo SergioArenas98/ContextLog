@@ -52,11 +52,13 @@ class SampleListTab extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAdd(context, ref),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Sample'),
-      ),
+      floatingActionButton: samplesAsync.valueOrNull?.isNotEmpty == true
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAdd(context, ref),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add Sample'),
+            )
+          : null,
     );
   }
 

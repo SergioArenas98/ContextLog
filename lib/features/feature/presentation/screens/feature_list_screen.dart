@@ -32,8 +32,11 @@ class FeatureListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colors.base,
-      body: CustomScrollView(
-        slivers: [
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: CustomScrollView(
+          slivers: [
           // ── Station header ────────────────────────────────────────────────
           SliverAppBar(
             backgroundColor: colors.s0,
@@ -217,6 +220,7 @@ class FeatureListScreen extends ConsumerWidget {
             data: (features) {
               if (features.isEmpty) {
                 return SliverFillRemaining(
+                  hasScrollBody: false,
                   child: EmptyStateWidget(
                     icon: Icons.terrain_outlined,
                     title: searchQuery.isEmpty
@@ -250,8 +254,11 @@ class FeatureListScreen extends ConsumerWidget {
             child: SizedBox(height: AppSpacing.space80 + 24),
           ),
         ],
+        ),
       ),
-      floatingActionButton: _AddFeatureFab(),
+      floatingActionButton: featuresAsync.valueOrNull?.isNotEmpty == true
+          ? _AddFeatureFab()
+          : null,
     );
   }
 }
