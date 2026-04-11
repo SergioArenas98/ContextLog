@@ -42,8 +42,38 @@ class FeatureListScreen extends ConsumerWidget {
             backgroundColor: colors.s0,
             surfaceTintColor: Colors.transparent,
             pinned: true,
-            expandedHeight: 104,
-            collapsedHeight: 56,
+            titleSpacing: AppSpacing.space16,
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  'CONTEXTLOG',
+                  style: TextStyle(
+                    fontFamily: AppTypography.monoFontFamily,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 17,
+                    letterSpacing: 2.0,
+                    color: colors.primary,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space12),
+                featuresAsync.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                  data: (features) => Text(
+                    '${features.length} FEATURE${features.length == 1 ? '' : 'S'}',
+                    style: TextStyle(
+                      fontFamily: AppTypography.monoFontFamily,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      letterSpacing: 0.5,
+                      color: colors.t2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.settings_outlined, size: 20),
@@ -52,62 +82,6 @@ class FeatureListScreen extends ConsumerWidget {
                 onPressed: () => context.push('/settings'),
               ),
             ],
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.fromLTRB(
-                AppSpacing.space16, 0, AppSpacing.space16, 16,
-              ),
-              title: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'CONTEXTLOG',
-                    style: TextStyle(
-                      fontFamily: AppTypography.monoFontFamily,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 11,
-                      letterSpacing: 2.8,
-                      color: colors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space12),
-                  featuresAsync.when(
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, _) => const SizedBox.shrink(),
-                    data: (features) => Text(
-                      '${features.length} UNIT${features.length == 1 ? '' : 'S'}',
-                      style: TextStyle(
-                        fontFamily: AppTypography.monoFontFamily,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 10,
-                        letterSpacing: 1.5,
-                        color: colors.t2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              background: Container(
-                color: colors.s0,
-                alignment: Alignment.bottomLeft,
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.space16,
-                  0,
-                  AppSpacing.space16,
-                  44.0,
-                ),
-                child: Text(
-                  'Field Station',
-                  style: TextStyle(
-                    fontFamily: AppTypography.sansFontFamily,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 22,
-                    letterSpacing: -0.5,
-                    color: colors.t0.withValues(alpha: 0.6),
-                    height: 1,
-                  ),
-                ),
-              ),
-            ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1),
               child: Container(height: 1, color: colors.rule),
