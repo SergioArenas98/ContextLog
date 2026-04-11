@@ -64,6 +64,11 @@ class AppDatabase extends _$AppDatabase {
             // rubicon_code and license columns remain in SQLite but are no longer
             // part of the Drift table class — they become inert dead columns.
           }
+          if (from < 4) {
+            // v3→v4: Drawings table: added referenceImagePath for optional
+            // per-drawing reference images stored as local file paths.
+            await m.addColumn(drawingsTable, drawingsTable.referenceImagePath);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

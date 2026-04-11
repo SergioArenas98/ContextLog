@@ -1575,6 +1575,17 @@ class $DrawingsTableTable extends DrawingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _referenceImagePathMeta =
+      const VerificationMeta('referenceImagePath');
+  @override
+  late final GeneratedColumn<String> referenceImagePath =
+      GeneratedColumn<String>(
+        'reference_image_path',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1606,6 +1617,7 @@ class $DrawingsTableTable extends DrawingsTable
     drawingType,
     facing,
     notes,
+    referenceImagePath,
     createdAt,
     updatedAt,
   ];
@@ -1658,6 +1670,15 @@ class $DrawingsTableTable extends DrawingsTable
       context.handle(
         _notesMeta,
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('reference_image_path')) {
+      context.handle(
+        _referenceImagePathMeta,
+        referenceImagePath.isAcceptableOrUnknown(
+          data['reference_image_path']!,
+          _referenceImagePathMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -1717,6 +1738,10 @@ class $DrawingsTableTable extends DrawingsTable
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       ),
+      referenceImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reference_image_path'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1748,6 +1773,7 @@ class DrawingsTableData extends DataClass
   final DrawingType? drawingType;
   final CardinalOrientation facing;
   final String? notes;
+  final String? referenceImagePath;
   final DateTime createdAt;
   final DateTime updatedAt;
   const DrawingsTableData({
@@ -1758,6 +1784,7 @@ class DrawingsTableData extends DataClass
     this.drawingType,
     required this.facing,
     this.notes,
+    this.referenceImagePath,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -1783,6 +1810,9 @@ class DrawingsTableData extends DataClass
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
+    if (!nullToAbsent || referenceImagePath != null) {
+      map['reference_image_path'] = Variable<String>(referenceImagePath);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -1803,6 +1833,9 @@ class DrawingsTableData extends DataClass
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
+      referenceImagePath: referenceImagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceImagePath),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1821,6 +1854,9 @@ class DrawingsTableData extends DataClass
       drawingType: serializer.fromJson<DrawingType?>(json['drawingType']),
       facing: serializer.fromJson<CardinalOrientation>(json['facing']),
       notes: serializer.fromJson<String?>(json['notes']),
+      referenceImagePath: serializer.fromJson<String?>(
+        json['referenceImagePath'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1836,6 +1872,7 @@ class DrawingsTableData extends DataClass
       'drawingType': serializer.toJson<DrawingType?>(drawingType),
       'facing': serializer.toJson<CardinalOrientation>(facing),
       'notes': serializer.toJson<String?>(notes),
+      'referenceImagePath': serializer.toJson<String?>(referenceImagePath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1849,6 +1886,7 @@ class DrawingsTableData extends DataClass
     Value<DrawingType?> drawingType = const Value.absent(),
     CardinalOrientation? facing,
     Value<String?> notes = const Value.absent(),
+    Value<String?> referenceImagePath = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => DrawingsTableData(
@@ -1859,6 +1897,9 @@ class DrawingsTableData extends DataClass
     drawingType: drawingType.present ? drawingType.value : this.drawingType,
     facing: facing ?? this.facing,
     notes: notes.present ? notes.value : this.notes,
+    referenceImagePath: referenceImagePath.present
+        ? referenceImagePath.value
+        : this.referenceImagePath,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -1877,6 +1918,9 @@ class DrawingsTableData extends DataClass
           : this.drawingType,
       facing: data.facing.present ? data.facing.value : this.facing,
       notes: data.notes.present ? data.notes.value : this.notes,
+      referenceImagePath: data.referenceImagePath.present
+          ? data.referenceImagePath.value
+          : this.referenceImagePath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1892,6 +1936,7 @@ class DrawingsTableData extends DataClass
           ..write('drawingType: $drawingType, ')
           ..write('facing: $facing, ')
           ..write('notes: $notes, ')
+          ..write('referenceImagePath: $referenceImagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1907,6 +1952,7 @@ class DrawingsTableData extends DataClass
     drawingType,
     facing,
     notes,
+    referenceImagePath,
     createdAt,
     updatedAt,
   );
@@ -1921,6 +1967,7 @@ class DrawingsTableData extends DataClass
           other.drawingType == this.drawingType &&
           other.facing == this.facing &&
           other.notes == this.notes &&
+          other.referenceImagePath == this.referenceImagePath &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1933,6 +1980,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
   final Value<DrawingType?> drawingType;
   final Value<CardinalOrientation> facing;
   final Value<String?> notes;
+  final Value<String?> referenceImagePath;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -1944,6 +1992,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     this.drawingType = const Value.absent(),
     this.facing = const Value.absent(),
     this.notes = const Value.absent(),
+    this.referenceImagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1956,6 +2005,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     this.drawingType = const Value.absent(),
     this.facing = const Value.absent(),
     this.notes = const Value.absent(),
+    this.referenceImagePath = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -1972,6 +2022,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     Expression<String>? drawingType,
     Expression<String>? facing,
     Expression<String>? notes,
+    Expression<String>? referenceImagePath,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -1984,6 +2035,8 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
       if (drawingType != null) 'drawing_type': drawingType,
       if (facing != null) 'facing': facing,
       if (notes != null) 'notes': notes,
+      if (referenceImagePath != null)
+        'reference_image_path': referenceImagePath,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1998,6 +2051,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     Value<DrawingType?>? drawingType,
     Value<CardinalOrientation>? facing,
     Value<String?>? notes,
+    Value<String?>? referenceImagePath,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -2010,6 +2064,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
       drawingType: drawingType ?? this.drawingType,
       facing: facing ?? this.facing,
       notes: notes ?? this.notes,
+      referenceImagePath: referenceImagePath ?? this.referenceImagePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -2044,6 +2099,9 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (referenceImagePath.present) {
+      map['reference_image_path'] = Variable<String>(referenceImagePath.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2066,6 +2124,7 @@ class DrawingsTableCompanion extends UpdateCompanion<DrawingsTableData> {
           ..write('drawingType: $drawingType, ')
           ..write('facing: $facing, ')
           ..write('notes: $notes, ')
+          ..write('referenceImagePath: $referenceImagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -6417,6 +6476,7 @@ typedef $$DrawingsTableTableCreateCompanionBuilder =
       Value<DrawingType?> drawingType,
       Value<CardinalOrientation> facing,
       Value<String?> notes,
+      Value<String?> referenceImagePath,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -6430,6 +6490,7 @@ typedef $$DrawingsTableTableUpdateCompanionBuilder =
       Value<DrawingType?> drawingType,
       Value<CardinalOrientation> facing,
       Value<String?> notes,
+      Value<String?> referenceImagePath,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -6509,6 +6570,11 @@ class $$DrawingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get referenceImagePath => $composableBuilder(
+    column: $table.referenceImagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -6582,6 +6648,11 @@ class $$DrawingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get referenceImagePath => $composableBuilder(
+    column: $table.referenceImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -6650,6 +6721,11 @@ class $$DrawingsTableTableAnnotationComposer
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
+  GeneratedColumn<String> get referenceImagePath => $composableBuilder(
+    column: $table.referenceImagePath,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -6715,6 +6791,7 @@ class $$DrawingsTableTableTableManager
                 Value<DrawingType?> drawingType = const Value.absent(),
                 Value<CardinalOrientation> facing = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> referenceImagePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -6726,6 +6803,7 @@ class $$DrawingsTableTableTableManager
                 drawingType: drawingType,
                 facing: facing,
                 notes: notes,
+                referenceImagePath: referenceImagePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -6739,6 +6817,7 @@ class $$DrawingsTableTableTableManager
                 Value<DrawingType?> drawingType = const Value.absent(),
                 Value<CardinalOrientation> facing = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> referenceImagePath = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -6750,6 +6829,7 @@ class $$DrawingsTableTableTableManager
                 drawingType: drawingType,
                 facing: facing,
                 notes: notes,
+                referenceImagePath: referenceImagePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

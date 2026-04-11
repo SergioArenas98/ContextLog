@@ -21,15 +21,16 @@ Traditional site recording uses handwritten notebooks that are later transcribed
 ## Key domain entities and how they relate
 
 ```
-Feature (site, trench, area, featureNumber, excavator, date)
-  ├── Photo (stage, manualCameraPhotoNumber, orientation, localImagePath?)
-  ├── Drawing (drawingNumber, boardNumber?)
-  ├── ContextModel [sealed]
-  │     ├── CutModel (contextNumber, cutType, h/w/d)
-  │     └── FillModel (contextNumber, parentCutId → CutModel, composition, color, compaction, inclusions)
-  ├── FindModel (findNumber, fillId → FillModel, materialType, quantity)
-  ├── SampleModel (sampleNumber, fillId → FillModel, cutId → CutModel, sampleType, storageType, liters?)
-  └── HarrisRelationModel (fromContextId, toContextId, relationType)
+ProjectModel (name, rubiconCode?, licenceNumber?)
+  └── Feature (featureNumber [auto], projectId → Project, area?, date)
+        ├── Photo (stage, manualCameraPhotoNumber, orientation, localImagePath?)
+        ├── Drawing (drawingNumber, boardNumber?, drawingType?, facing, referenceImagePath?)
+        ├── ContextModel [sealed]
+        │     ├── CutModel (contextNumber, cutType, h/w/d)
+        │     └── FillModel (contextNumber, parentCutId → CutModel, composition, color, compaction, inclusions)
+        ├── FindModel (findNumber, fillId → FillModel, materialType, quantity)
+        ├── SampleModel (sampleNumber, fillId → FillModel, cutId → CutModel, sampleType, storageType, liters?)
+        └── HarrisRelationModel (fromContextId, toContextId, relationType)
 ```
 
 **Critical relationships:**
@@ -49,9 +50,9 @@ Feature (site, trench, area, featureNumber, excavator, date)
 | Platform | Android (v1 only) |
 | State | Riverpod 2 — `Provider`, `FutureProvider.family`, `AsyncNotifierProvider`, `StateProvider` |
 | Database | Drift 2.28 (type-safe SQLite ORM) — single file `context_log.db` |
-| Navigation | GoRouter 14 — 4 routes total |
+| Navigation | GoRouter 14 — 16 routes total |
 | Models | Freezed — all domain models are immutable |
-| Fonts | Google Fonts — Barlow Condensed (headings), Inter (body) |
+| Fonts | Google Fonts — JetBrains Mono (identifiers/numbers), Space Grotesk (UI text/forms) |
 | Images | `image_picker` + `ImageStorage` utility (copies to `reference_photos/` dir) |
 
 ---
@@ -64,7 +65,7 @@ Feature (site, trench, area, featureNumber, excavator, date)
 - **Validation pattern**: validators return a sealed `ValidationResult` (Valid/Warning/Invalid); Warning requires user confirmation via dialog before proceeding
 - **Single DB instance**: `databaseProvider` (Riverpod) creates one `AppDatabase` per app lifetime
 - **All sub-entity forms are bottom sheets** (not separate routes); mutations call `ref.invalidate()` to refresh providers
-- **GoRouter** has 4 routes: list, create, detail, edit
+- **GoRouter** has 16 routes: splash, feature list/create/detail/edit/matrix/context-detail/4×evidence, project list/create/edit, settings/changelog
 
 ---
 
@@ -73,19 +74,20 @@ Feature (site, trench, area, featureNumber, excavator, date)
 | File | Why |
 |---|---|
 | `lib/core/constants/enums.dart` | All domain enums — defines the vocabulary of the app |
-| `lib/core/database/app_database.dart` | DB declaration — all 7 tables registered |
+| `lib/core/database/app_database.dart` | DB declaration — all 8 tables registered; migration history v1→v4 |
 | `lib/core/utils/validation_result.dart` | Sealed validation type used everywhere |
 | `lib/features/context/domain/models/context_model.dart` | Sealed `ContextModel` (CutModel/FillModel) — the trickiest model |
-| `lib/features/feature/domain/models/feature_model.dart` | Top-level entity |
-| `lib/app/router.dart` | All routes |
-| `lib/features/feature/presentation/screens/feature_detail_screen.dart` | 7-tab hub for all feature data |
+| `lib/features/feature/domain/models/feature_model.dart` | Top-level entity (featureNumber, projectId, area, date) |
+| `lib/features/project/domain/models/project_model.dart` | Site-level container (name, rubiconCode, licenceNumber) |
+| `lib/app/router.dart` | All 16 routes |
+| `lib/features/feature/presentation/screens/feature_detail_screen.dart` | Feature hub — station-based layout |
 | `lib/features/harris_matrix/presentation/widgets/harris_matrix_painter.dart` | Harris Matrix layout algorithm |
 
 ---
 
 ## Most important business rules
 
-1. **Feature uniqueness**: combination of (site + trench + area + featureNumber) must be unique — hard block
+1. **Feature number is auto-assigned**: `FeatureRepository.create()` assigns the next zero-padded global sequence number ("001", "002", …); users never type it; `FeatureValidator` always returns Valid
 2. **Context numbers are per-feature**: duplicate context number within a feature is a **warning** (user can override), not a hard block
 3. **Sample numbers are globally unique**: across all features — duplicate is a **warning** (user can override)
 4. **Fill requires a cut**: a fill cannot be created until at least one cut exists in the feature
@@ -121,8 +123,8 @@ When creating a sample, the form fetches the fill's `parentCutId` from the repos
 
 - Android only; no iOS, web, or desktop
 - Single-device, single-user; no cloud sync or data export
-- Schema version is 1 with no upgrade migration implemented yet
-- `graphview: ^1.2.0` is listed as a dependency but is not used — Harris Matrix uses a custom painter
+- Schema version 4; migrations exist for all transitions v1→v4
+- `graphview: ^1.2.0` may still be listed as a dependency but is not used — Harris Matrix uses a custom painter
 - `localImagePath` stores absolute device paths (brittle across reinstalls)
 - No automatic find number deduplication warning (unlike context/sample numbers)
 - No global context number uniqueness — only per-feature

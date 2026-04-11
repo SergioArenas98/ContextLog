@@ -25,17 +25,18 @@ Each feature module is self-contained. Cross-feature dependencies are declared e
 
 Entry point infrastructure:
 - `main.dart` — creates `ProviderScope`, runs `ContextLogApp`
-- `app.dart` — `MaterialApp.router` with theme and router config; `ThemeMode.dark` by default
-- `router.dart` — GoRouter with 4 named routes
+- `app.dart` — `MaterialApp.router` with theme and router config; theme mode controlled by `ThemeNotifier` (persisted via `shared_preferences`)
+- `router.dart` — GoRouter with 16 named routes
 - `theme.dart` — full `ThemeData` (light + dark) using the custom design system
 
 ### `core/`
 
 Shared code that features depend on:
 
-- `core/constants/` — `AppConstants` (DB filename, version, validation messages) and `enums.dart` (all domain enums)
+- `core/constants/` — `AppConstants` (DB filename, version, validation messages), `enums.dart` (all domain enums), `changelog.dart` (app changelog entries)
 - `core/database/` — `AppDatabase` (Drift database class), `database_provider.dart` (Riverpod provider), `converters/` (enum ↔ string type converters)
-- `core/design/` — `AppColors`, `AppTokens` (spacing, radius, elevation), `AppTypography`, `AppThemeExtension`, `AppAnimations`
+- `core/design/` — `AppColors` (adaptive palette via `AppColors.of(context)`), `AppTokens` (spacing, radius, elevation), `AppTypography` (JetBrains Mono for identifiers/numbers, Space Grotesk for UI text), `AppThemeExtension`, `AppAnimations`
+- `core/preferences/` — `ThemePreferences` (reads/writes `shared_preferences`), `ThemeNotifier` (Riverpod notifier for persisted theme mode)
 - `core/utils/` — `ValidationResult` sealed type, `ImageStorage` utility
 - `core/widgets/` — shared UI components: `SurfaceCard`, `SectionHeader`, `StatusBadge`, `MetadataRow`, `AppSheetHeader`, `EmptyStateWidget`, `ConfirmDeleteDialog`, `DuplicateWarningDialog`
 
@@ -79,22 +80,34 @@ Shared code that features depend on:
 - Foreign keys: enabled via `PRAGMA foreign_keys = ON` in `beforeOpen`
 - Cascade delete: all child tables reference `FeaturesTable.id` with `onDelete: KeyAction.cascade`
 - Enums: stored as strings using `TypeConverter` subclasses
-- Schema version: 1; no upgrade migrations defined yet
+- Schema version: 4; migrations defined for v1→v2, v2→v3, and v3→v4
 
 ---
 
 ## Navigation
 
-**GoRouter 14** with 3 top-level `GoRoute` objects (one of which has a nested sub-route for edit), providing 4 addressable paths total:
+**GoRouter 14** with 16 addressable paths:
 
 | Route | Widget | Purpose |
 |---|---|---|
+| `/` | `SplashScreen` | App entry / loading |
 | `/features` | `FeatureListScreen` | Home — searchable list |
 | `/features/new` | `FeatureFormScreen()` | Create new feature |
-| `/features/:id` | `FeatureDetailScreen(featureId)` | 7-tab detail view |
+| `/features/:id` | `FeatureDetailScreen(featureId)` | Feature hub (station-based layout) |
 | `/features/:id/edit` | `FeatureFormScreen(featureId)` | Edit existing feature |
+| `/features/:id/matrix` | `MatrixFullScreen(featureId)` | Full-screen interactive Harris Matrix |
+| `/features/:id/contexts/:cid` | `ContextFocusScreen` | Context detail / edit |
+| `/features/:id/evidence/photos` | `_EvidenceShell → PhotoListTab` | Full-page photo list |
+| `/features/:id/evidence/drawings` | `_EvidenceShell → DrawingListTab` | Full-page drawing list |
+| `/features/:id/evidence/finds` | `_EvidenceShell → FindListTab` | Full-page finds list |
+| `/features/:id/evidence/samples` | `_EvidenceShell → SampleListTab` | Full-page samples list |
+| `/projects` | `ProjectListScreen` | Project list |
+| `/projects/new` | `ProjectFormScreen()` | Create new project |
+| `/projects/:id/edit` | `ProjectFormScreen(projectId)` | Edit existing project |
+| `/settings` | `SettingsScreen` | App settings (theme toggle) |
+| `/settings/changelog` | `ChangelogScreen` | App changelog |
 
-Sub-entity actions (add/edit context, find, sample, photo, drawing, Harris relation) use `showModalBottomSheet()` within the feature detail screen. They are not separate routes.
+Form sheets (add/edit context, find, sample, photo, drawing, Harris relation) use `showModalBottomSheet()` and are not separate routes.
 
 ---
 
@@ -103,7 +116,7 @@ Sub-entity actions (add/edit context, find, sample, photo, drawing, Harris relat
 Custom Material 3 design system defined in `lib/core/design/`:
 - `AppColors` — explicit color constants for dark and light themes (no `ColorScheme.fromSeed`)
 - `AppTokens` — spacing (8-point grid), border radius, elevation shadow lists
-- `AppTypography` — Google Fonts (Barlow Condensed for display/headline/title, Inter for body/label)
+- `AppTypography` — Google Fonts (JetBrains Mono for display/headline/label — identifiers, codes, numbers; Space Grotesk for title/body — UI text, forms)
 - `AppThemeExtension` — `ThemeExtension` for custom semantic colors (cut node, fill node, badge colors)
 - `AppAnimations` — duration and curve constants
 

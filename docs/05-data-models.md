@@ -4,6 +4,24 @@ All domain models are defined using `@freezed` (immutable, value-equal, with `.c
 
 ---
 
+## ProjectModel
+
+**File**: `lib/features/project/domain/models/project_model.dart`
+**DB table**: `projects`
+
+| Field | Type | Nullable | Notes |
+|---|---|---|---|
+| `id` | `String` | No | UUID v4 |
+| `name` | `String` | No | Site or project name (e.g. "Southwick 2024") |
+| `rubiconCode` | `String?` | Yes | Site code from Rubicon register |
+| `licenceNumber` | `String?` | Yes | Excavation licence number |
+| `createdAt` | `DateTime` | No | App-generated |
+| `updatedAt` | `DateTime` | No | Updated on every write |
+
+A `ProjectModel` is a reusable site-level container. Multiple features share one project. Site metadata (name, code, licence) is entered once here rather than repeated on every feature.
+
+---
+
 ## FeatureModel
 
 **File**: `lib/features/feature/domain/models/feature_model.dart`
@@ -12,17 +30,14 @@ All domain models are defined using `@freezed` (immutable, value-equal, with `.c
 | Field | Type | Nullable | Notes |
 |---|---|---|---|
 | `id` | `String` | No | UUID v4 |
-| `site` | `String` | No | Free text (e.g. "Southwick") |
-| `trench` | `String` | No | Free text (e.g. "T1") |
-| `area` | `String` | No | Free text (e.g. "A") |
-| `featureNumber` | `String` | No | Free text (site assigns; e.g. "F12") |
-| `excavator` | `String` | No | Name of recorder |
-| `date` | `DateTime` | No | Date of excavation |
-| `notes` | `String?` | Yes | General notes |
+| `featureNumber` | `String` | No | Auto-generated zero-padded sequence: "001", "002", … (3 digits, globally sequential across all features) |
+| `projectId` | `String?` | Yes | FK → `projects.id`; nullable to support legacy features created before projects existed |
+| `area` | `String?` | Yes | Optional area identifier, stored as raw value (e.g. "12", "North", "7A"); displayed with "Area " prefix in UI |
+| `date` | `DateTime` | No | Date of excavation (defaults to today on create) |
 | `createdAt` | `DateTime` | No | App-generated |
 | `updatedAt` | `DateTime` | No | Updated on every write |
 
-**DB constraint**: `UNIQUE (site, trench, area, feature_number)` — enforced at DB level.
+**Note**: `site`, `trench`, `excavator`, and `notes` were present in schema v1 and removed in v2. They are no longer part of the model or table. The `featureNumber` is assigned automatically by the repository (`max + 1`, zero-padded to 3 digits); users cannot type a free-text number.
 
 ---
 
@@ -103,7 +118,10 @@ Provides `.contextType` and `.displayLabel` helpers on any `ContextModel`.
 | `featureId` | `String` | No | FK → `features.id` CASCADE |
 | `drawingNumber` | `String` | No | From site drawing register |
 | `boardNumber` | `String?` | Yes | Drawing board identifier |
+| `drawingType` | `DrawingType?` | Yes | Enum: plan/section/elevation/detail/sketch; added in schema v2 |
+| `facing` | `CardinalOrientation` | No | Default: `unknown`; direction the drawing faces; added in schema v2 |
 | `notes` | `String?` | Yes | |
+| `referenceImagePath` | `String?` | Yes | Absolute path to an optional local reference image (not an official excavation photo); added in schema v4 |
 | `createdAt` | `DateTime` | No | |
 | `updatedAt` | `DateTime` | No | |
 

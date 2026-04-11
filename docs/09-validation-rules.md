@@ -28,16 +28,15 @@ Validators are injected with repositories (for async lookups) and accessed via R
 
 **File**: `lib/features/feature/domain/validators/feature_validator.dart`
 
+`FeatureValidator` currently has **no rules** and always returns `ValidationValid`.
+
+All previously validated fields (`site`, `trench`, `area`, `featureNumber`, `excavator`) were removed from the `FeatureModel` in schema v2. The `featureNumber` is now auto-assigned by the repository, and `area` is optional. Project selection is validated at the form level (Flutter `Form` validator), not in the domain validator.
+
 | Rule | Result | Condition |
 |---|---|---|
-| Site is required | `ValidationInvalid` | `site.trim().isEmpty` |
-| Trench is required | `ValidationInvalid` | `trench.trim().isEmpty` |
-| Area is required | `ValidationInvalid` | `area.trim().isEmpty` |
-| Feature number is required | `ValidationInvalid` | `featureNumber.trim().isEmpty` |
-| Excavator is required | `ValidationInvalid` | `excavator.trim().isEmpty` |
-| Feature already exists | `ValidationInvalid` | Combination (site + trench + area + featureNumber) exists in DB |
+| No project selected | `ValidationInvalid` (form-level) | `projectId == null` — checked in `FeatureFormScreen` before calling the validator |
 
-The uniqueness check uses case-insensitive comparison (`lower()`). When editing, the current feature's ID is excluded from the check.
+There is no uniqueness check on features.
 
 ---
 
@@ -124,8 +123,9 @@ Form validation runs via `_formKey.currentState!.validate()` before domain valid
 Centralised in `AppConstants` / `ValidationMessages`:
 
 ```dart
-// lib/core/constants/app_constants.dart
-static const featureExists = 'A feature with this site, trench, area, and number already exists';
+// lib/core/constants/app_constants.dart (ValidationMessages)
+static const required = 'This field is required';
+static const featureExists = 'A feature with this number already exists';
 static const contextNumberExists = 'This context number already exists in this feature';
 static const sampleNumberExists = 'This sample number is already in use';
 static const fillNoCuts = 'No cuts exist in this feature. Create a cut first';
@@ -133,6 +133,8 @@ static const findNoFills = 'No fills exist in this feature. Create a fill first'
 static const sampleNoFills = 'No fills exist in this feature. Create a fill first';
 static const selfLoopRelation = 'A context cannot have a stratigraphic relation with itself';
 static const duplicateRelation = 'This stratigraphic relation already exists';
+static const noProjectSelected = 'Please select a project';
+static const noProjectsExist = 'Create a project first before adding a feature';
 ```
 
 ---
@@ -142,7 +144,8 @@ static const duplicateRelation = 'This stratigraphic relation already exists';
 | Scenario | Type |
 |---|---|
 | Missing required field | Hard block (form validator) |
-| Duplicate feature identity | Hard block |
+| No project selected for feature | Hard block (form validator) |
+| No projects exist (create feature) | Hard block |
 | Invalid context number (≤0) | Hard block |
 | Parent cut not found | Hard block |
 | No fills for find/sample | Hard block |

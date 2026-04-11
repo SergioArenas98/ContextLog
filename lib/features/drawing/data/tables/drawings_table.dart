@@ -19,6 +19,7 @@ class DrawingsTable extends Table {
       .withDefault(const Constant('unknown'))
       .map(const CardinalOrientationConverter())();
   TextColumn get notes => text().nullable()();
+  TextColumn get referenceImagePath => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

@@ -15,6 +15,9 @@ abstract class DrawingModel with _$DrawingModel {
     DrawingType? drawingType,
     required CardinalOrientation facing,
     String? notes,
+    /// Local filesystem path to an optional reference image for this drawing.
+    /// Not an official excavation photo — just a visual aid stored locally.
+    String? referenceImagePath,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _DrawingModel;

@@ -207,7 +207,7 @@ class _FeatureActionsSheet extends StatelessWidget {
                 if (feature.area != null) ...[
                   const SizedBox(width: AppSpacing.space8),
                   Text(
-                    feature.area!,
+                    'Area ${feature.area!}',
                     style: TextStyle(
                       fontFamily: AppTypography.sansFontFamily,
                       fontSize: 14,

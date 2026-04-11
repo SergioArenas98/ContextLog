@@ -3,11 +3,19 @@
 ## Navigation structure
 
 ```
-FeatureListScreen       /features
-  └── FeatureFormScreen /features/new          (create)
-  └── FeatureDetailScreen /features/:id        (7 tabs)
-        └── FeatureFormScreen /features/:id/edit (edit)
-        └── [bottom sheets for all sub-entities]
+SplashScreen                 /
+FeatureListScreen            /features
+  └── FeatureFormScreen      /features/new               (create)
+  └── FeatureDetailScreen    /features/:id               (station-based hub)
+        └── FeatureFormScreen /features/:id/edit         (edit)
+        └── MatrixFullScreen  /features/:id/matrix       (full-screen matrix)
+        └── ContextFocusScreen /features/:id/contexts/:cid
+        └── EvidenceShell     /features/:id/evidence/{photos,drawings,finds,samples}
+ProjectListScreen            /projects
+  └── ProjectFormScreen      /projects/new               (create)
+  └── ProjectFormScreen      /projects/:id/edit          (edit)
+SettingsScreen               /settings
+  └── ChangelogScreen        /settings/changelog
 ```
 
 ---
@@ -34,8 +42,8 @@ The app home. Shows all features sorted by most-recently-updated. Displays a sea
 
 Summary card for a single feature shown in the list.
 
-**Displays**: feature number (StatusBadge), site/trench/area breadcrumb, excavator, date
-**Actions**: tap → navigate to detail; long-press/more-menu → edit or delete (with confirmation)
+**Displays**: feature number badge, project name, area (shown as "Area X" if set), date
+**Actions**: tap → navigate to detail; more-menu → edit or delete (with confirmation)
 **Animation**: `AnimatedScale` on press (0.97 scale)
 
 **File**: `lib/features/feature/presentation/widgets/feature_card.dart`
@@ -46,8 +54,9 @@ Summary card for a single feature shown in the list.
 
 Full-page form for creating or editing a feature.
 
-**Fields**: site, trench, area, feature number, excavator, date (date picker), notes
-**Validation**: runs on save via `FeatureValidator`
+**Fields**: project (dropdown, required), area (optional; displayed with "Area " visual prefix — stored raw), date (date picker, defaults today)
+**Note**: feature number is auto-assigned by the repository; users do not enter it
+**Validation**: runs on save via `FeatureValidator` (currently always returns Valid — all fields are optional or auto-assigned)
 **Save button**: in AppBar actions; shows loading spinner
 
 **File**: `lib/features/feature/presentation/screens/feature_form_screen.dart`
@@ -56,33 +65,74 @@ Full-page form for creating or editing a feature.
 
 ### FeatureDetailScreen (`/features/:id`)
 
-Hub screen for all data associated with a feature. Contains a `DefaultTabController` with 7 tabs.
+Hub screen for all data associated with a feature. Uses a station-panel layout rather than a classic tab controller.
 
-**Tab order**:
-1. **Summary** — `FeatureSummaryTab`
-2. **Photos** — `PhotoListTab`
-3. **Drawings** — `DrawingListTab`
-4. **Contexts** — `ContextListTab`
-5. **Finds** — `FindListTab`
-6. **Samples** — `SampleListTab`
-7. **Matrix** — `MatrixTab`
+**Key panels**:
+- `ContextStationPanel` — overlay panel showing cut/fill contexts; accessed via long-press or dedicated button
+- Evidence links — tappable cards navigating to `/features/:id/evidence/{photos,drawings,finds,samples}`
+- Matrix link — navigates to `/features/:id/matrix`
 
-**AppBar**: feature number headline + site/trench/area subtitle + scrollable tabs
-**Shimmer loading** while feature loads
+**AppBar**: feature number + project/area eyebrow
 
 **File**: `lib/features/feature/presentation/screens/feature_detail_screen.dart`
 
 ---
 
-## Feature detail tabs
+### ProjectListScreen (`/projects`)
 
-### FeatureSummaryTab
+Lists all projects. Each row shows project name and optional Rubicon code. Tap → project detail/features filtered by project.
 
-Displays all feature metadata in a readable layout using `SectionHeader` and `MetadataRow` components. Shows site, trench, area, feature number, excavator, date, and notes.
+**FAB**: "Add Project" → `ProjectFormScreen`
 
-**File**: `lib/features/feature/presentation/screens/feature_summary_tab.dart`
+**File**: `lib/features/project/presentation/screens/project_list_screen.dart`
 
 ---
+
+### ProjectFormScreen (`/projects/new`, `/projects/:id/edit`)
+
+Full-page form for creating or editing a project.
+
+**Fields**: name (required), Rubicon code (optional), licence number (optional)
+
+**File**: `lib/features/project/presentation/screens/project_form_screen.dart`
+
+---
+
+### SettingsScreen (`/settings`)
+
+App settings. Currently exposes the **theme toggle** (light / dark / system) powered by `ThemeNotifier` + `shared_preferences`.
+
+**File**: `lib/features/settings/presentation/screens/settings_screen.dart`
+
+---
+
+### MatrixFullScreen (`/features/:id/matrix`)
+
+Full-screen interactive Harris Matrix for a feature. Uses `HarrisInteractiveMatrix` (`InteractiveViewer` + `HarrisMatrixPainter`). Supports pinch-zoom, pan, and fullscreen expand/close.
+
+**File**: `lib/features/harris_matrix/presentation/screens/matrix_full_screen.dart`
+
+---
+
+### ContextFocusScreen (`/features/:id/contexts/:cid`)
+
+Dedicated detail/edit screen for a single context (cut or fill). Reached by tapping "expand" from the `ContextStationPanel` overlay, not via the matrix or roster directly.
+
+**File**: `lib/features/context/presentation/screens/context_focus_screen.dart`
+
+---
+
+### SplashScreen (`/`)
+
+App loading screen — shown at launch while the database initializes. Navigates to `/features` once ready.
+
+**File**: `lib/features/splash/splash_screen.dart`
+
+---
+
+## Feature detail tabs / evidence screens
+
+
 
 ### PhotoListTab
 
@@ -101,7 +151,7 @@ Lists all photo records for the feature. Each `_PhotoTile` shows:
 
 ### DrawingListTab
 
-Lists all drawing records. Each tile shows drawing number, board number, and notes. Inline edit/delete.
+Lists all drawing records. Each `_DrawingTile` shows: drawing number badge, drawing type + facing direction (if set), board number, notes, and a 100px reference image thumbnail (if one exists). Tapping the thumbnail or the image icon opens a full-screen `_ImagePreviewDialog` (`InteractiveViewer`, zoom up to 4×). Inline edit/delete.
 
 **FAB**: "Add Drawing" → `DrawingFormSheet`
 
@@ -144,19 +194,19 @@ Lists all samples sorted by sample number. Shows: sample number badge (tertiary)
 
 ---
 
-### MatrixTab
+### MatrixTab (inline) / MatrixFullScreen (full-page)
 
-Hosts the Harris Matrix visualization. Uses `InteractiveViewer` for zoom/pan.
+The matrix is available both embedded in the feature detail screen and as a full-page view at `/features/:id/matrix`.
 
 **Components**:
-- `_RelationInfoBar` — shows relation count; "Show list" button opens `_RelationsListSheet`
-- `_HarrisMatrixView` — contains `CustomPaint` with `HarrisMatrixPainter`
+- `HarrisInteractiveMatrix` — `InteractiveViewer` wrapping `HarrisMatrixPainter` (`CustomPainter`)
+- `_RelationInfoBar` — relation count; "Show list" button opens `_RelationsListSheet`
 - `_RelationsListSheet` — scrollable list of relations with delete buttons
-- `EmptyStateWidget` — if no contexts (can't show matrix) or no relations yet
+- `EmptyStateWidget` — if no contexts or no relations yet
 
 **FAB**: "Add Relation" → `RelationFormSheet`
 
-**File**: `lib/features/harris_matrix/presentation/widgets/matrix_tab.dart`
+**Files**: `lib/features/harris_matrix/presentation/widgets/matrix_tab.dart`, `lib/features/harris_matrix/presentation/screens/matrix_full_screen.dart`
 
 ---
 

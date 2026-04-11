@@ -9,20 +9,14 @@ Practical next-step improvements, ordered roughly by value and effort. Separated
 ### Fix unused dependency
 Remove `graphview: ^1.2.0` from `pubspec.yaml`. It is not used — the Harris Matrix is implemented with a custom `CustomPainter`. No functional change required.
 
-### Add DB migration infrastructure
-Implement `onUpgrade` in `AppDatabase.migration`. Even if no schema changes are planned immediately, having the pattern established prevents a future data-loss incident.
-
 ### Fix orphaned image files on feature delete
-When a feature (or a photo record) is deleted, delete the corresponding image files from `reference_photos/`. This requires iterating `PhotoModel.localImagePath` values before the DB cascade runs.
+When a feature is deleted, delete the corresponding image files from `reference_photos/` for all its photos and drawings. This requires iterating `localImagePath`/`referenceImagePath` values before the DB cascade runs. (Single-record deletion already works correctly.)
 
 ### Add find number duplicate warning
 Apply the same `ValidationWarning` pattern used for context and sample numbers to find numbers. Prevents accidental duplication without blocking the user.
 
 ### Add drawing/photo number duplicate warning
 Same pattern for drawing numbers and manual camera photo numbers.
-
-### Remove `graphview` package
-See "Fix unused dependency" above.
 
 ---
 
@@ -31,9 +25,9 @@ See "Fix unused dependency" above.
 ### Test coverage
 Current coverage is low. Priority areas:
 - Unit tests for `FindValidator`, `SampleValidator`, `HarrisRelationValidator`
-- Repository tests for `FindRepository`, `SampleRepository`, `PhotoRepository`
+- Repository tests for `FindRepository`, `SampleRepository`, `PhotoRepository` (feature, drawing, project, and context repos already have tests)
 - Widget tests for `ContextFormSheet`, `FindFormSheet`, `SampleFormSheet`
-- Integration test: create feature → add contexts → add finds → verify data persistence
+- Integration test: create project → create feature → add contexts → add finds → verify data persistence
 
 ### CSV / JSON export
 Allow exporting a feature's complete record as CSV or JSON. This is essential for handing data to a lab or archive. The relational structure maps naturally to a nested JSON document.

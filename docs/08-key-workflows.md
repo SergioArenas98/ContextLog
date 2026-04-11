@@ -8,13 +8,15 @@ End-to-end description of the most important user flows.
 
 **Entry**: FeatureListScreen → FAB "+"
 
+**Precondition**: at least one project must exist. If no projects exist, a `ValidationInvalid` ("Create a project first") is shown and the user is directed to create a project.
+
 **Steps**:
 1. User taps FAB → navigates to `/features/new`
-2. `FeatureFormScreen` renders empty form: site, trench, area, feature number, excavator, date (defaults to today), notes
-3. User fills fields and taps "Save" in AppBar
-4. `FeatureValidator.validateForCreate()` checks required fields and uniqueness (site + trench + area + featureNumber)
-5. If `ValidationInvalid`: SnackBar shown; form stays open
-6. If `ValidationValid`: `FeatureRepository.create()` called; returns new `FeatureModel`
+2. `FeatureFormScreen` renders form: project dropdown (required), area field (optional — shown with "Area " visual prefix; only the raw value is stored), date picker (defaults to today)
+3. Feature number is **not shown** — it is auto-assigned by the repository as a zero-padded sequence ("001", "002", …)
+4. User selects a project, optionally fills area and date, taps "Save" in AppBar
+5. `FeatureValidator.validateForCreate()` is called — currently always returns `ValidationValid` (no uniqueness check needed since feature numbers are auto-assigned)
+6. `FeatureRepository.create(projectId: ..., area: ..., date: ...)` is called; returns new `FeatureModel` with auto-assigned `featureNumber`
 7. `ref.invalidate(featureListProvider)` + `filteredFeatureListProvider`
 8. `Navigator.pop()` → back to FeatureListScreen; new feature appears at top
 
@@ -161,7 +163,7 @@ End-to-end description of the most important user flows.
 1. User types in the `SearchBar`
 2. Widget updates `featureSearchQueryProvider.notifier.state`
 3. `filteredFeatureListProvider` re-runs; calls `FeatureRepository.search(query)`
-4. Search matches on: site, trench, area, featureNumber, excavator (case-insensitive LIKE)
+4. Search matches on: featureNumber, area (case-insensitive LIKE)
 5. Results refresh in place; empty state shows if no matches
 
 ---

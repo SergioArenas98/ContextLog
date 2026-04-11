@@ -57,6 +57,22 @@ void main() {
       expect(feature.area, 'North trench');
     });
 
+    test('area stores only the raw value without prefix', () async {
+      final project = await projectRepo.create(name: 'Site');
+      // Numeric area — no "Area " prefix should be stored
+      final f1 = await repo.create(projectId: project.id, area: '12');
+      expect(f1.area, '12');
+      expect(f1.area, isNot(contains('Area')));
+
+      // Alphanumeric area
+      final f2 = await repo.create(projectId: project.id, area: '7A');
+      expect(f2.area, '7A');
+
+      // Text area
+      final f3 = await repo.create(projectId: project.id, area: 'North');
+      expect(f3.area, 'North');
+    });
+
     test('getAll returns features sorted by featureNumber asc', () async {
       final project = await projectRepo.create(name: 'Site');
       await repo.create(projectId: project.id, area: 'A');

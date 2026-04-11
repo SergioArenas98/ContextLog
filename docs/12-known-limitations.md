@@ -23,7 +23,9 @@
 ## Data integrity limitations
 
 ### Image files not cleaned up on cascade delete
-When a feature is deleted, its child photo DB records are removed via cascade, but the image files stored under `reference_photos/` are **not deleted**. This means orphaned images accumulate on the device indefinitely. There is no cleanup mechanism.
+When a feature is deleted, its child photo and drawing DB records are removed via cascade, but the image files stored under `reference_photos/` are **not deleted**. This means orphaned images accumulate on the device indefinitely. There is no cleanup mechanism.
+
+(Single-record deletion does clean up: `PhotoRepository.delete()` and `DrawingRepository.delete()` both call `ImageStorage.deleteIfExists()` before removing the DB row.)
 
 ### `parentCutId` FK not enforced at DB level
 The `parentCutId` column in the `contexts` table has no Drift FK declaration (intentionally — to avoid a self-referential FK issue). If a cut is deleted directly, any fills referencing it via `parentCutId` will have a dangling ID. The app layer validates this on creation but not on deletion.
@@ -36,8 +38,6 @@ Photo file paths are stored as absolute device paths. These become invalid after
 
 There is no path-resolution or repair logic.
 
-### No schema migration
-The database schema is at version 1 with an empty `onUpgrade` handler. Any future schema change (new column, new table) will require writing migration SQL. Until then, existing installs cannot be upgraded without a data loss or manual workaround.
 
 ---
 
@@ -80,5 +80,6 @@ Users have no in-app way to back up their data. Device backup (e.g., Google Driv
 
 - No widget tests beyond `widget_test.dart` (smoke test only)
 - No integration tests
-- No tests for photo/drawing/find/sample/harris validators or repositories
+- Repository tests exist for: `FeatureRepository`, `DrawingRepository`, `ProjectRepository`, `ContextRepository`
+- No tests for photo/find/sample/harris validators or repositories
 - No E2E tests for any workflow

@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/enums.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/utils/image_storage.dart';
 import '../../domain/models/drawing_model.dart';
 
 class DrawingRepository {
@@ -33,6 +34,7 @@ class DrawingRepository {
     DrawingType? drawingType,
     CardinalOrientation facing = CardinalOrientation.unknown,
     String? notes,
+    String? referenceImagePath,
   }) async {
     final now = DateTime.now();
     final id = _uuid.v4();
@@ -45,6 +47,7 @@ class DrawingRepository {
             drawingType: Value(drawingType),
             facing: Value(facing),
             notes: Value(notes),
+            referenceImagePath: Value(referenceImagePath),
             createdAt: now,
             updatedAt: now,
           ),
@@ -59,6 +62,7 @@ class DrawingRepository {
     DrawingType? drawingType,
     CardinalOrientation facing = CardinalOrientation.unknown,
     String? notes,
+    String? referenceImagePath,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.drawingsTable)..where((t) => t.id.equals(id))).write(
@@ -68,13 +72,17 @@ class DrawingRepository {
         drawingType: Value(drawingType),
         facing: Value(facing),
         notes: Value(notes),
+        referenceImagePath: Value(referenceImagePath),
         updatedAt: Value(now),
       ),
     );
     return (await getById(id))!;
   }
 
+  /// Deletes the drawing record and removes any associated reference image file.
   Future<void> delete(String id) async {
+    final drawing = await getById(id);
+    await ImageStorage.deleteIfExists(drawing?.referenceImagePath);
     await (_db.delete(_db.drawingsTable)..where((t) => t.id.equals(id))).go();
   }
 
@@ -86,6 +94,7 @@ class DrawingRepository {
         drawingType: row.drawingType,
         facing: row.facing,
         notes: row.notes,
+        referenceImagePath: row.referenceImagePath,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );

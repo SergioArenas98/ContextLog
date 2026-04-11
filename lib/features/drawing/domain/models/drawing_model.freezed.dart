@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DrawingModel {
 
- String get id; String get featureId; String get drawingNumber; String? get boardNumber; DrawingType? get drawingType; CardinalOrientation get facing; String? get notes; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get featureId; String get drawingNumber; String? get boardNumber; DrawingType? get drawingType; CardinalOrientation get facing; String? get notes;/// Local filesystem path to an optional reference image for this drawing.
+/// Not an official excavation photo — just a visual aid stored locally.
+ String? get referenceImagePath; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of DrawingModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $DrawingModelCopyWith<DrawingModel> get copyWith => _$DrawingModelCopyWithImpl<D
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DrawingModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.drawingNumber, drawingNumber) || other.drawingNumber == drawingNumber)&&(identical(other.boardNumber, boardNumber) || other.boardNumber == boardNumber)&&(identical(other.drawingType, drawingType) || other.drawingType == drawingType)&&(identical(other.facing, facing) || other.facing == facing)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DrawingModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.drawingNumber, drawingNumber) || other.drawingNumber == drawingNumber)&&(identical(other.boardNumber, boardNumber) || other.boardNumber == boardNumber)&&(identical(other.drawingType, drawingType) || other.drawingType == drawingType)&&(identical(other.facing, facing) || other.facing == facing)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.referenceImagePath, referenceImagePath) || other.referenceImagePath == referenceImagePath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,drawingNumber,boardNumber,drawingType,facing,notes,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,drawingNumber,boardNumber,drawingType,facing,notes,referenceImagePath,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'DrawingModel(id: $id, featureId: $featureId, drawingNumber: $drawingNumber, boardNumber: $boardNumber, drawingType: $drawingType, facing: $facing, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'DrawingModel(id: $id, featureId: $featureId, drawingNumber: $drawingNumber, boardNumber: $boardNumber, drawingType: $drawingType, facing: $facing, notes: $notes, referenceImagePath: $referenceImagePath, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -45,7 +47,7 @@ abstract mixin class $DrawingModelCopyWith<$Res>  {
   factory $DrawingModelCopyWith(DrawingModel value, $Res Function(DrawingModel) _then) = _$DrawingModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String featureId, String drawingNumber, String? boardNumber, DrawingType? drawingType, CardinalOrientation facing, String? notes, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String drawingNumber, String? boardNumber, DrawingType? drawingType, CardinalOrientation facing, String? notes, String? referenceImagePath, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -62,7 +64,7 @@ class _$DrawingModelCopyWithImpl<$Res>
 
 /// Create a copy of DrawingModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? drawingNumber = null,Object? boardNumber = freezed,Object? drawingType = freezed,Object? facing = null,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? drawingNumber = null,Object? boardNumber = freezed,Object? drawingType = freezed,Object? facing = null,Object? notes = freezed,Object? referenceImagePath = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -71,6 +73,7 @@ as String,boardNumber: freezed == boardNumber ? _self.boardNumber : boardNumber 
 as String?,drawingType: freezed == drawingType ? _self.drawingType : drawingType // ignore: cast_nullable_to_non_nullable
 as DrawingType?,facing: null == facing ? _self.facing : facing // ignore: cast_nullable_to_non_nullable
 as CardinalOrientation,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,referenceImagePath: freezed == referenceImagePath ? _self.referenceImagePath : referenceImagePath // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -158,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  String? referenceImagePath,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DrawingModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.referenceImagePath,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -179,10 +182,10 @@ return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  String? referenceImagePath,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _DrawingModel():
-return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.referenceImagePath,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +202,10 @@ return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String drawingNumber,  String? boardNumber,  DrawingType? drawingType,  CardinalOrientation facing,  String? notes,  String? referenceImagePath,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DrawingModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_that.drawingType,_that.facing,_that.notes,_that.referenceImagePath,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -214,7 +217,7 @@ return $default(_that.id,_that.featureId,_that.drawingNumber,_that.boardNumber,_
 
 
 class _DrawingModel implements DrawingModel {
-  const _DrawingModel({required this.id, required this.featureId, required this.drawingNumber, this.boardNumber, this.drawingType, required this.facing, this.notes, required this.createdAt, required this.updatedAt});
+  const _DrawingModel({required this.id, required this.featureId, required this.drawingNumber, this.boardNumber, this.drawingType, required this.facing, this.notes, this.referenceImagePath, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
@@ -224,6 +227,9 @@ class _DrawingModel implements DrawingModel {
 @override final  DrawingType? drawingType;
 @override final  CardinalOrientation facing;
 @override final  String? notes;
+/// Local filesystem path to an optional reference image for this drawing.
+/// Not an official excavation photo — just a visual aid stored locally.
+@override final  String? referenceImagePath;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
 
@@ -237,16 +243,16 @@ _$DrawingModelCopyWith<_DrawingModel> get copyWith => __$DrawingModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DrawingModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.drawingNumber, drawingNumber) || other.drawingNumber == drawingNumber)&&(identical(other.boardNumber, boardNumber) || other.boardNumber == boardNumber)&&(identical(other.drawingType, drawingType) || other.drawingType == drawingType)&&(identical(other.facing, facing) || other.facing == facing)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DrawingModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.drawingNumber, drawingNumber) || other.drawingNumber == drawingNumber)&&(identical(other.boardNumber, boardNumber) || other.boardNumber == boardNumber)&&(identical(other.drawingType, drawingType) || other.drawingType == drawingType)&&(identical(other.facing, facing) || other.facing == facing)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.referenceImagePath, referenceImagePath) || other.referenceImagePath == referenceImagePath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,drawingNumber,boardNumber,drawingType,facing,notes,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,drawingNumber,boardNumber,drawingType,facing,notes,referenceImagePath,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'DrawingModel(id: $id, featureId: $featureId, drawingNumber: $drawingNumber, boardNumber: $boardNumber, drawingType: $drawingType, facing: $facing, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'DrawingModel(id: $id, featureId: $featureId, drawingNumber: $drawingNumber, boardNumber: $boardNumber, drawingType: $drawingType, facing: $facing, notes: $notes, referenceImagePath: $referenceImagePath, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -257,7 +263,7 @@ abstract mixin class _$DrawingModelCopyWith<$Res> implements $DrawingModelCopyWi
   factory _$DrawingModelCopyWith(_DrawingModel value, $Res Function(_DrawingModel) _then) = __$DrawingModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String featureId, String drawingNumber, String? boardNumber, DrawingType? drawingType, CardinalOrientation facing, String? notes, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String drawingNumber, String? boardNumber, DrawingType? drawingType, CardinalOrientation facing, String? notes, String? referenceImagePath, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -274,7 +280,7 @@ class __$DrawingModelCopyWithImpl<$Res>
 
 /// Create a copy of DrawingModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? drawingNumber = null,Object? boardNumber = freezed,Object? drawingType = freezed,Object? facing = null,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? drawingNumber = null,Object? boardNumber = freezed,Object? drawingType = freezed,Object? facing = null,Object? notes = freezed,Object? referenceImagePath = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_DrawingModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -283,6 +289,7 @@ as String,boardNumber: freezed == boardNumber ? _self.boardNumber : boardNumber 
 as String?,drawingType: freezed == drawingType ? _self.drawingType : drawingType // ignore: cast_nullable_to_non_nullable
 as DrawingType?,facing: null == facing ? _self.facing : facing // ignore: cast_nullable_to_non_nullable
 as CardinalOrientation,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,referenceImagePath: freezed == referenceImagePath ? _self.referenceImagePath : referenceImagePath // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,

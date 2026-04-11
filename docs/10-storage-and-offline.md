@@ -9,7 +9,8 @@
 
 **Database class**: `lib/core/database/app_database.dart`
 
-**Tables** (7):
+**Tables** (8):
+- `projects`
 - `features`
 - `contexts`
 - `photos`
@@ -18,7 +19,7 @@
 - `samples`
 - `harris_relations`
 
-**Schema version**: 1 — defined in `AppConstants.databaseVersion`
+**Schema version**: 4 — defined in `AppConstants.databaseVersion`
 
 **Foreign keys**: enabled at DB open time via `PRAGMA foreign_keys = ON`
 
@@ -47,11 +48,11 @@ Photos taken on the device are stored differently from the SQLite database.
 **Where images go**: copied into `<app_documents_dir>/reference_photos/<uuid>.<ext>`
 
 **How it works**:
-1. User taps "Take / Pick Photo" in `PhotoFormSheet`
+1. User taps "Take / Pick Photo" (camera or gallery) in `PhotoFormSheet` or `DrawingFormSheet`
 2. `image_picker` opens device camera or gallery
 3. The selected file is at a temporary path
 4. `ImageStorage.copyToAppStorage(sourcePath)` copies it to the permanent `reference_photos/` directory with a UUID filename
-5. The permanent path is stored in `PhotoModel.localImagePath`
+5. The permanent path is stored in `PhotoModel.localImagePath` or `DrawingModel.referenceImagePath`
 
 **`ImageStorage` utility** (`lib/core/utils/image_storage.dart`):
 ```dart
@@ -59,7 +60,7 @@ static Future<String> copyToAppStorage(String sourcePath)
 static Future<void> deleteIfExists(String? path)
 ```
 
-**Image deletion**: when a photo record is deleted (or its image is replaced), `ImageStorage.deleteIfExists()` deletes the file. However, if a feature is deleted via cascade, the child photo DB records are deleted but **the image files are not deleted**. This is a known limitation.
+**Image deletion**: when a photo or drawing record is deleted (or its image is replaced), `ImageStorage.deleteIfExists()` deletes the file. However, if a feature is deleted via cascade, the child photo/drawing DB records are deleted but **the image files are not deleted**. This is a known limitation.
 
 ---
 
@@ -72,9 +73,30 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
+  int get schemaVersion => AppConstants.databaseVersion; // 4
+
+  @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async => m.createAll(),
-    onUpgrade: (m, from, to) async { /* future migrations */ },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        // v1→v2: Features redesigned (removed site/trench/excavator/notes).
+        // Drawings: added drawingType and facing columns.
+        await m.drop(featuresTable);
+        await m.createTable(featuresTable);
+        await m.addColumn(drawingsTable, drawingsTable.drawingType);
+        await m.addColumn(drawingsTable, drawingsTable.facing);
+      }
+      if (from < 3) {
+        // v2→v3: Projects table introduced. Features got projectId FK.
+        await m.createTable(projectsTable);
+        await m.addColumn(featuresTable, featuresTable.projectId);
+      }
+      if (from < 4) {
+        // v3→v4: Drawings got optional referenceImagePath.
+        await m.addColumn(drawingsTable, drawingsTable.referenceImagePath);
+      }
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
@@ -82,7 +104,7 @@ class AppDatabase extends _$AppDatabase {
 }
 ```
 
-On first install, `onCreate` creates all 7 tables. On upgrade, `onUpgrade` is a no-op (no migrations defined yet).
+On first install, `onCreate` creates all 8 tables. Upgrade migrations are implemented for all transitions from v1 to v4.
 
 ---
 
@@ -118,7 +140,7 @@ One `AppDatabase` instance lives for the full app session. It is closed when the
 | Device runs out of storage | Not handled; SQLite writes will fail silently if disk is full |
 | App reinstall / device change | `localImagePath` becomes invalid (absolute path); images are orphaned |
 | DB file corruption | Not handled; no backup or recovery mechanism |
-| Schema version mismatch (future upgrade) | `onUpgrade` is empty; would require manual migration code |
+| Schema version mismatch (future upgrade) | Migrations exist for v1–v4; new schema changes require a new migration block |
 | Concurrent writes | Not applicable (single user, no background workers) |
 
 ---
