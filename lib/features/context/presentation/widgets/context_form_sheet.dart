@@ -273,7 +273,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
         const SizedBox(height: AppSpacing.space8),
         Row(
           children: [
-            Expanded(child: _dimensionField(_heightCtrl, 'Height')),
+            Expanded(child: _dimensionField(_heightCtrl, 'Longitude')),
             const SizedBox(width: AppSpacing.space8),
             Expanded(child: _dimensionField(_widthCtrl, 'Width')),
             const SizedBox(width: AppSpacing.space8),

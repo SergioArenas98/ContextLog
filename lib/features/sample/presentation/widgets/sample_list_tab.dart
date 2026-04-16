@@ -186,9 +186,15 @@ class _SampleTile extends StatelessWidget {
   }
 
   String _storageLabel(SampleModel s) {
-    final countPart = s.storageCount > 1 ? '${s.storageCount} × ' : '';
-    final typePart = s.storageType.displayName;
+    final singular = switch (s.storageType) {
+      StorageType.bag => 'bag',
+      StorageType.bucket => 'bucket',
+      StorageType.jar => 'jar',
+      StorageType.other => 'unit',
+    };
+    final label = s.storageCount == 1 ? singular : '${singular}s';
+    final countPart = '${s.storageCount} $label';
     final litersPart = s.liters != null ? '  ·  ${s.liters}L' : '';
-    return '$countPart$typePart$litersPart';
+    return '$countPart$litersPart';
   }
 }

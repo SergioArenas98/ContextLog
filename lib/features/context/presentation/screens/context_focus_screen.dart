@@ -117,7 +117,7 @@ class _CutFocusScaffold extends StatelessWidget {
               if (cut.cutType != null)
                 _PropRow('Type', cut.cutType!.displayName),
               if (cut.height != null)
-                _PropRow('Height', '${cut.height!.toStringAsFixed(2)} m'),
+                _PropRow('Longitude', '${cut.height!.toStringAsFixed(2)} m'),
               if (cut.width != null)
                 _PropRow('Width', '${cut.width!.toStringAsFixed(2)} m'),
               if (cut.depth != null)

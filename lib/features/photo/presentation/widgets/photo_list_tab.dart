@@ -125,6 +125,14 @@ class _PhotoTile extends ConsumerWidget {
   final String featureId;
   final VoidCallback onDelete;
 
+  void _showImagePreview(BuildContext context, String imagePath) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (_) => _ImagePreviewDialog(imagePath: imagePath),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -134,7 +142,12 @@ class _PhotoTile extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Image thumbnail
-          _Thumbnail(path: photo.localImagePath),
+          _Thumbnail(
+            path: photo.localImagePath,
+            onTap: photo.localImagePath != null
+                ? () => _showImagePreview(context, photo.localImagePath!)
+                : null,
+          ),
           const SizedBox(width: AppSpacing.space12),
           // Metadata
           Expanded(
@@ -225,22 +238,26 @@ class _PhotoTile extends ConsumerWidget {
 }
 
 class _Thumbnail extends StatelessWidget {
-  const _Thumbnail({required this.path});
+  const _Thumbnail({required this.path, this.onTap});
 
   final String? path;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (path != null) {
-      return ClipRRect(
-        borderRadius: AppRadius.smBorderRadius,
-        child: Image.file(
-          File(path!),
-          width: 64,
-          height: 64,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(theme),
+      return GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: AppRadius.smBorderRadius,
+          child: Image.file(
+            File(path!),
+            width: 64,
+            height: 64,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _placeholder(theme),
+          ),
         ),
       );
     }
@@ -259,6 +276,48 @@ class _Thumbnail extends StatelessWidget {
         Icons.photo_outlined,
         color: theme.colorScheme.outline,
         size: 28,
+      ),
+    );
+  }
+}
+
+// ── Full-screen image preview dialog ─────────────────────────────────────────
+
+class _ImagePreviewDialog extends StatelessWidget {
+  const _ImagePreviewDialog({required this.imagePath});
+
+  final String imagePath;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      backgroundColor: Colors.black,
+      child: Stack(
+        children: [
+          Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.broken_image,
+                  color: Colors.white54,
+                  size: 64,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.close_rounded, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ],
       ),
     );
   }

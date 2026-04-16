@@ -91,6 +91,14 @@ class _FindTile extends StatelessWidget {
   final String featureId;
   final WidgetRef ref;
 
+  void _showImagePreview(BuildContext context, String imagePath) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (_) => _ImagePreviewDialog(imagePath: imagePath),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -111,17 +119,20 @@ class _FindTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (hasPhoto) ...[
-            ClipRRect(
-              borderRadius: AppRadius.smBorderRadius,
-              child: Image.file(
-                File(find.localImagePath!),
-                width: double.infinity,
-                height: 120,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+            GestureDetector(
+              onTap: () => _showImagePreview(context, find.localImagePath!),
+              child: ClipRRect(
+                borderRadius: AppRadius.smBorderRadius,
+                child: Image.file(
+                  File(find.localImagePath!),
+                  width: double.infinity,
                   height: 120,
-                  color: theme.colorScheme.surfaceContainerHigh,
-                  child: const Icon(Icons.broken_image),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 120,
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    child: const Icon(Icons.broken_image),
+                  ),
                 ),
               ),
             ),
@@ -229,6 +240,48 @@ class _FindTile extends StatelessWidget {
           ),
         ],
       ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Full-screen image preview dialog ─────────────────────────────────────────
+
+class _ImagePreviewDialog extends StatelessWidget {
+  const _ImagePreviewDialog({required this.imagePath});
+
+  final String imagePath;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      backgroundColor: Colors.black,
+      child: Stack(
+        children: [
+          Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.broken_image,
+                  color: Colors.white54,
+                  size: 64,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.close_rounded, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
         ],
       ),
     );

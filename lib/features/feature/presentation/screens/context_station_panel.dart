@@ -318,7 +318,7 @@ class _CutPanel extends StatelessWidget {
         children: [
           _PropertiesBlock(rows: [
             if (cut.cutType != null) _PropEntry('Type', cut.cutType!.displayName),
-            if (cut.height != null) _PropEntry('Height', '${cut.height!.toStringAsFixed(2)} m'),
+            if (cut.height != null) _PropEntry('Longitude', '${cut.height!.toStringAsFixed(2)} m'),
             if (cut.width != null) _PropEntry('Width', '${cut.width!.toStringAsFixed(2)} m'),
             if (cut.depth != null) _PropEntry('Depth', '${cut.depth!.toStringAsFixed(2)} m'),
             if (cut.notes != null) _PropEntry('Notes', cut.notes!),
