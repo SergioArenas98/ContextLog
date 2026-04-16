@@ -96,7 +96,7 @@ class _PhotoFormSheetState extends ConsumerState<PhotoFormSheet> {
             TextFormField(
               controller: _photoNumberCtrl,
               decoration: const InputDecoration(
-                labelText: 'Camera photo number',
+                labelText: 'Photo number',
                 hintText: 'Manual roll/frame number',
               ),
               keyboardType: TextInputType.text,
