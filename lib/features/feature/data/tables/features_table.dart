@@ -14,6 +14,8 @@ class FeaturesTable extends Table {
   TextColumn get featureNumber => text()();
   TextColumn get projectId => text().nullable()();
   TextColumn get area => text().nullable()();
+  BoolColumn get isNonArchaeological =>
+      boolean().withDefault(const Constant(false))();
   DateTimeColumn get date => dateTime()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

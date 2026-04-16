@@ -80,6 +80,12 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(findsTable, findsTable.localImagePath);
             await m.addColumn(samplesTable, samplesTable.storageCount);
           }
+          if (from < 6) {
+            // v5→v6: Features: added isNonArchaeological (BOOLEAN DEFAULT FALSE).
+            // Existing rows default to false (archaeological).
+            await m.addColumn(
+                featuresTable, featuresTable.isNonArchaeological);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

@@ -13,6 +13,7 @@ abstract class FeatureModel with _$FeatureModel {
     required String featureNumber,
     String? projectId,
     String? area,
+    @Default(false) bool isNonArchaeological,
     required DateTime date,
     required DateTime createdAt,
     required DateTime updatedAt,

@@ -24,6 +24,7 @@ class FeatureFormScreen extends ConsumerStatefulWidget {
 class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
   final _areaCtrl = TextEditingController();
   String? _selectedProjectId;
+  bool _isNonArchaeological = false;
   bool _loading = false;
   bool _initialized = false;
 
@@ -60,6 +61,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
           if (feature != null && !_initialized) {
             _areaCtrl.text = feature.area ?? '';
             _selectedProjectId = feature.projectId;
+            _isNonArchaeological = feature.isNonArchaeological;
             _initialized = true;
           }
           return _buildScaffold(context, projectsAsync);
@@ -235,6 +237,37 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
           ),
         ),
 
+        const SizedBox(height: AppSpacing.space16),
+        Container(height: 1, color: colors.rule),
+        const SizedBox(height: AppSpacing.space4),
+
+        // ── Non-archaeological marker ──────────────────────────────────
+        SwitchListTile(
+          value: _isNonArchaeological,
+          onChanged: (v) => setState(() => _isNonArchaeological = v),
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            'NON-ARCHAEOLOGICAL',
+            style: TextStyle(
+              fontFamily: AppTypography.monoFontFamily,
+              fontWeight: FontWeight.w700,
+              fontSize: 9,
+              letterSpacing: 1.5,
+              color: colors.t2,
+            ),
+          ),
+          subtitle: Text(
+            'Mark this feature as non-archaeological (e.g. modern intrusion, natural deposit)',
+            style: TextStyle(
+              fontFamily: AppTypography.sansFontFamily,
+              fontSize: 12,
+              color: colors.t2,
+              height: 1.4,
+            ),
+          ),
+          activeColor: colors.primary,
+        ),
+
         const SizedBox(height: AppSpacing.space80),
       ],
     );
@@ -259,6 +292,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
           id: widget.featureId!,
           projectId: _selectedProjectId!,
           area: area,
+          isNonArchaeological: _isNonArchaeological,
         );
         ref.invalidate(featureDetailProvider(updated.id));
         ref.invalidate(featureListProvider);
@@ -268,6 +302,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
         final created = await repo.create(
           projectId: _selectedProjectId!,
           area: area,
+          isNonArchaeological: _isNonArchaeological,
         );
         ref.invalidate(featureListProvider);
         ref.invalidate(filteredFeatureListProvider);

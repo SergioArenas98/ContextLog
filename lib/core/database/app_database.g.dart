@@ -472,6 +472,20 @@ class $FeaturesTableTable extends FeaturesTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isNonArchaeologicalMeta =
+      const VerificationMeta('isNonArchaeological');
+  @override
+  late final GeneratedColumn<bool> isNonArchaeological = GeneratedColumn<bool>(
+    'is_non_archaeological',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_non_archaeological" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
@@ -509,6 +523,7 @@ class $FeaturesTableTable extends FeaturesTable
     featureNumber,
     projectId,
     area,
+    isNonArchaeological,
     date,
     createdAt,
     updatedAt,
@@ -551,6 +566,15 @@ class $FeaturesTableTable extends FeaturesTable
       context.handle(
         _areaMeta,
         area.isAcceptableOrUnknown(data['area']!, _areaMeta),
+      );
+    }
+    if (data.containsKey('is_non_archaeological')) {
+      context.handle(
+        _isNonArchaeologicalMeta,
+        isNonArchaeological.isAcceptableOrUnknown(
+          data['is_non_archaeological']!,
+          _isNonArchaeologicalMeta,
+        ),
       );
     }
     if (data.containsKey('date')) {
@@ -602,6 +626,10 @@ class $FeaturesTableTable extends FeaturesTable
         DriftSqlType.string,
         data['${effectivePrefix}area'],
       ),
+      isNonArchaeological: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_non_archaeological'],
+      )!,
       date: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}date'],
@@ -629,6 +657,7 @@ class FeaturesTableData extends DataClass
   final String featureNumber;
   final String? projectId;
   final String? area;
+  final bool isNonArchaeological;
   final DateTime date;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -637,6 +666,7 @@ class FeaturesTableData extends DataClass
     required this.featureNumber,
     this.projectId,
     this.area,
+    required this.isNonArchaeological,
     required this.date,
     required this.createdAt,
     required this.updatedAt,
@@ -652,6 +682,7 @@ class FeaturesTableData extends DataClass
     if (!nullToAbsent || area != null) {
       map['area'] = Variable<String>(area);
     }
+    map['is_non_archaeological'] = Variable<bool>(isNonArchaeological);
     map['date'] = Variable<DateTime>(date);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -666,6 +697,7 @@ class FeaturesTableData extends DataClass
           ? const Value.absent()
           : Value(projectId),
       area: area == null && nullToAbsent ? const Value.absent() : Value(area),
+      isNonArchaeological: Value(isNonArchaeological),
       date: Value(date),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -682,6 +714,9 @@ class FeaturesTableData extends DataClass
       featureNumber: serializer.fromJson<String>(json['featureNumber']),
       projectId: serializer.fromJson<String?>(json['projectId']),
       area: serializer.fromJson<String?>(json['area']),
+      isNonArchaeological: serializer.fromJson<bool>(
+        json['isNonArchaeological'],
+      ),
       date: serializer.fromJson<DateTime>(json['date']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -695,6 +730,7 @@ class FeaturesTableData extends DataClass
       'featureNumber': serializer.toJson<String>(featureNumber),
       'projectId': serializer.toJson<String?>(projectId),
       'area': serializer.toJson<String?>(area),
+      'isNonArchaeological': serializer.toJson<bool>(isNonArchaeological),
       'date': serializer.toJson<DateTime>(date),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -706,6 +742,7 @@ class FeaturesTableData extends DataClass
     String? featureNumber,
     Value<String?> projectId = const Value.absent(),
     Value<String?> area = const Value.absent(),
+    bool? isNonArchaeological,
     DateTime? date,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -714,6 +751,7 @@ class FeaturesTableData extends DataClass
     featureNumber: featureNumber ?? this.featureNumber,
     projectId: projectId.present ? projectId.value : this.projectId,
     area: area.present ? area.value : this.area,
+    isNonArchaeological: isNonArchaeological ?? this.isNonArchaeological,
     date: date ?? this.date,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -726,6 +764,9 @@ class FeaturesTableData extends DataClass
           : this.featureNumber,
       projectId: data.projectId.present ? data.projectId.value : this.projectId,
       area: data.area.present ? data.area.value : this.area,
+      isNonArchaeological: data.isNonArchaeological.present
+          ? data.isNonArchaeological.value
+          : this.isNonArchaeological,
       date: data.date.present ? data.date.value : this.date,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -739,6 +780,7 @@ class FeaturesTableData extends DataClass
           ..write('featureNumber: $featureNumber, ')
           ..write('projectId: $projectId, ')
           ..write('area: $area, ')
+          ..write('isNonArchaeological: $isNonArchaeological, ')
           ..write('date: $date, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -752,6 +794,7 @@ class FeaturesTableData extends DataClass
     featureNumber,
     projectId,
     area,
+    isNonArchaeological,
     date,
     createdAt,
     updatedAt,
@@ -764,6 +807,7 @@ class FeaturesTableData extends DataClass
           other.featureNumber == this.featureNumber &&
           other.projectId == this.projectId &&
           other.area == this.area &&
+          other.isNonArchaeological == this.isNonArchaeological &&
           other.date == this.date &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -774,6 +818,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
   final Value<String> featureNumber;
   final Value<String?> projectId;
   final Value<String?> area;
+  final Value<bool> isNonArchaeological;
   final Value<DateTime> date;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -783,6 +828,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     this.featureNumber = const Value.absent(),
     this.projectId = const Value.absent(),
     this.area = const Value.absent(),
+    this.isNonArchaeological = const Value.absent(),
     this.date = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -793,6 +839,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     required String featureNumber,
     this.projectId = const Value.absent(),
     this.area = const Value.absent(),
+    this.isNonArchaeological = const Value.absent(),
     required DateTime date,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -807,6 +854,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     Expression<String>? featureNumber,
     Expression<String>? projectId,
     Expression<String>? area,
+    Expression<bool>? isNonArchaeological,
     Expression<DateTime>? date,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -817,6 +865,8 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
       if (featureNumber != null) 'feature_number': featureNumber,
       if (projectId != null) 'project_id': projectId,
       if (area != null) 'area': area,
+      if (isNonArchaeological != null)
+        'is_non_archaeological': isNonArchaeological,
       if (date != null) 'date': date,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -829,6 +879,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     Value<String>? featureNumber,
     Value<String?>? projectId,
     Value<String?>? area,
+    Value<bool>? isNonArchaeological,
     Value<DateTime>? date,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -839,6 +890,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
       featureNumber: featureNumber ?? this.featureNumber,
       projectId: projectId ?? this.projectId,
       area: area ?? this.area,
+      isNonArchaeological: isNonArchaeological ?? this.isNonArchaeological,
       date: date ?? this.date,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -860,6 +912,9 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
     }
     if (area.present) {
       map['area'] = Variable<String>(area.value);
+    }
+    if (isNonArchaeological.present) {
+      map['is_non_archaeological'] = Variable<bool>(isNonArchaeological.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -883,6 +938,7 @@ class FeaturesTableCompanion extends UpdateCompanion<FeaturesTableData> {
           ..write('featureNumber: $featureNumber, ')
           ..write('projectId: $projectId, ')
           ..write('area: $area, ')
+          ..write('isNonArchaeological: $isNonArchaeological, ')
           ..write('date: $date, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -5319,6 +5375,7 @@ typedef $$FeaturesTableTableCreateCompanionBuilder =
       required String featureNumber,
       Value<String?> projectId,
       Value<String?> area,
+      Value<bool> isNonArchaeological,
       required DateTime date,
       required DateTime createdAt,
       required DateTime updatedAt,
@@ -5330,6 +5387,7 @@ typedef $$FeaturesTableTableUpdateCompanionBuilder =
       Value<String> featureNumber,
       Value<String?> projectId,
       Value<String?> area,
+      Value<bool> isNonArchaeological,
       Value<DateTime> date,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -5505,6 +5563,11 @@ class $$FeaturesTableTableFilterComposer
 
   ColumnFilters<String> get area => $composableBuilder(
     column: $table.area,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isNonArchaeological => $composableBuilder(
+    column: $table.isNonArchaeological,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5703,6 +5766,11 @@ class $$FeaturesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isNonArchaeological => $composableBuilder(
+    column: $table.isNonArchaeological,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get date => $composableBuilder(
     column: $table.date,
     builder: (column) => ColumnOrderings(column),
@@ -5741,6 +5809,11 @@ class $$FeaturesTableTableAnnotationComposer
 
   GeneratedColumn<String> get area =>
       $composableBuilder(column: $table.area, builder: (column) => column);
+
+  GeneratedColumn<bool> get isNonArchaeological => $composableBuilder(
+    column: $table.isNonArchaeological,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
@@ -5942,6 +6015,7 @@ class $$FeaturesTableTableTableManager
                 Value<String> featureNumber = const Value.absent(),
                 Value<String?> projectId = const Value.absent(),
                 Value<String?> area = const Value.absent(),
+                Value<bool> isNonArchaeological = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -5951,6 +6025,7 @@ class $$FeaturesTableTableTableManager
                 featureNumber: featureNumber,
                 projectId: projectId,
                 area: area,
+                isNonArchaeological: isNonArchaeological,
                 date: date,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -5962,6 +6037,7 @@ class $$FeaturesTableTableTableManager
                 required String featureNumber,
                 Value<String?> projectId = const Value.absent(),
                 Value<String?> area = const Value.absent(),
+                Value<bool> isNonArchaeological = const Value.absent(),
                 required DateTime date,
                 required DateTime createdAt,
                 required DateTime updatedAt,
@@ -5971,6 +6047,7 @@ class $$FeaturesTableTableTableManager
                 featureNumber: featureNumber,
                 projectId: projectId,
                 area: area,
+                isNonArchaeological: isNonArchaeological,
                 date: date,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

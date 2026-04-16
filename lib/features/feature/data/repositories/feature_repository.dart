@@ -68,6 +68,7 @@ class FeatureRepository {
   Future<FeatureModel> create({
     required String projectId,
     String? area,
+    bool isNonArchaeological = false,
   }) async {
     final now = DateTime.now();
     final id = _uuid.v4();
@@ -77,6 +78,7 @@ class FeatureRepository {
       featureNumber: featureNumber,
       projectId: Value(projectId),
       area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
+      isNonArchaeological: Value(isNonArchaeological),
       date: now,
       createdAt: now,
       updatedAt: now,
@@ -90,12 +92,14 @@ class FeatureRepository {
     required String id,
     required String projectId,
     String? area,
+    bool isNonArchaeological = false,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id))).write(
       FeaturesTableCompanion(
         projectId: Value(projectId),
         area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
+        isNonArchaeological: Value(isNonArchaeological),
         updatedAt: Value(now),
       ),
     );
@@ -112,6 +116,7 @@ class FeatureRepository {
         featureNumber: row.featureNumber,
         projectId: row.projectId,
         area: row.area,
+        isNonArchaeological: row.isNonArchaeological,
         date: row.date,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
