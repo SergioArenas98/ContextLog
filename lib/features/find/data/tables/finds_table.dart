@@ -22,6 +22,7 @@ class FindsTable extends Table {
   TextColumn get customMaterialText => text().nullable()();
   IntColumn get quantity => integer().withDefault(const Constant(1))();
   TextColumn get description => text().nullable()();
+  TextColumn get localImagePath => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

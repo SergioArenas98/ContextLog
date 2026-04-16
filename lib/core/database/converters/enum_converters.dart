@@ -108,6 +108,42 @@ class NullableDrawingTypeConverter
   String? toSql(DrawingType? value) => value?.name;
 }
 
+class NullableFillCompositionConverter
+    extends TypeConverter<FillComposition?, String?> {
+  const NullableFillCompositionConverter();
+
+  @override
+  FillComposition? fromSql(String? fromDb) {
+    if (fromDb == null) return null;
+    try {
+      return FillComposition.values.firstWhere((e) => e.name == fromDb);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  String? toSql(FillComposition? value) => value?.name;
+}
+
+class NullableFillCompactionConverter
+    extends TypeConverter<FillCompaction?, String?> {
+  const NullableFillCompactionConverter();
+
+  @override
+  FillCompaction? fromSql(String? fromDb) {
+    if (fromDb == null) return null;
+    try {
+      return FillCompaction.values.firstWhere((e) => e.name == fromDb);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  String? toSql(FillCompaction? value) => value?.name;
+}
+
 class HarrisRelationTypeConverter
     extends TypeConverter<HarrisRelationType, String> {
   const HarrisRelationTypeConverter();

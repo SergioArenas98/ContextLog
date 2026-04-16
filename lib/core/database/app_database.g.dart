@@ -2241,17 +2241,15 @@ class $ContextsTableTable extends ContextsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _compositionMeta = const VerificationMeta(
-    'composition',
-  );
   @override
-  late final GeneratedColumn<String> composition = GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<FillComposition?, String>
+  composition = GeneratedColumn<String>(
     'composition',
     aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-  );
+  ).withConverter<FillComposition?>($ContextsTableTable.$convertercomposition);
   static const VerificationMeta _colorMeta = const VerificationMeta('color');
   @override
   late final GeneratedColumn<String> color = GeneratedColumn<String>(
@@ -2261,17 +2259,15 @@ class $ContextsTableTable extends ContextsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _compactionMeta = const VerificationMeta(
-    'compaction',
-  );
   @override
-  late final GeneratedColumn<String> compaction = GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<FillCompaction?, String>
+  compaction = GeneratedColumn<String>(
     'compaction',
     aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-  );
+  ).withConverter<FillCompaction?>($ContextsTableTable.$convertercompaction);
   static const VerificationMeta _inclusionsMeta = const VerificationMeta(
     'inclusions',
   );
@@ -2406,25 +2402,10 @@ class $ContextsTableTable extends ContextsTable
         ),
       );
     }
-    if (data.containsKey('composition')) {
-      context.handle(
-        _compositionMeta,
-        composition.isAcceptableOrUnknown(
-          data['composition']!,
-          _compositionMeta,
-        ),
-      );
-    }
     if (data.containsKey('color')) {
       context.handle(
         _colorMeta,
         color.isAcceptableOrUnknown(data['color']!, _colorMeta),
-      );
-    }
-    if (data.containsKey('compaction')) {
-      context.handle(
-        _compactionMeta,
-        compaction.isAcceptableOrUnknown(data['compaction']!, _compactionMeta),
       );
     }
     if (data.containsKey('inclusions')) {
@@ -2508,17 +2489,21 @@ class $ContextsTableTable extends ContextsTable
         DriftSqlType.string,
         data['${effectivePrefix}parent_cut_id'],
       ),
-      composition: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}composition'],
+      composition: $ContextsTableTable.$convertercomposition.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}composition'],
+        ),
       ),
       color: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}color'],
       ),
-      compaction: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}compaction'],
+      compaction: $ContextsTableTable.$convertercompaction.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}compaction'],
+        ),
       ),
       inclusions: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -2550,6 +2535,10 @@ class $ContextsTableTable extends ContextsTable
       const CutTypeConverter();
   static TypeConverter<CutType?, String?> $convertercutTypen =
       NullAwareTypeConverter.wrap($convertercutType);
+  static TypeConverter<FillComposition?, String?> $convertercomposition =
+      const NullableFillCompositionConverter();
+  static TypeConverter<FillCompaction?, String?> $convertercompaction =
+      const NullableFillCompactionConverter();
 }
 
 class ContextsTableData extends DataClass
@@ -2564,9 +2553,9 @@ class ContextsTableData extends DataClass
   final double? width;
   final double? depth;
   final String? parentCutId;
-  final String? composition;
+  final FillComposition? composition;
   final String? color;
-  final String? compaction;
+  final FillCompaction? compaction;
   final String? inclusions;
   final String? notes;
   final DateTime createdAt;
@@ -2622,13 +2611,17 @@ class ContextsTableData extends DataClass
       map['parent_cut_id'] = Variable<String>(parentCutId);
     }
     if (!nullToAbsent || composition != null) {
-      map['composition'] = Variable<String>(composition);
+      map['composition'] = Variable<String>(
+        $ContextsTableTable.$convertercomposition.toSql(composition),
+      );
     }
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<String>(color);
     }
     if (!nullToAbsent || compaction != null) {
-      map['compaction'] = Variable<String>(compaction);
+      map['compaction'] = Variable<String>(
+        $ContextsTableTable.$convertercompaction.toSql(compaction),
+      );
     }
     if (!nullToAbsent || inclusions != null) {
       map['inclusions'] = Variable<String>(inclusions);
@@ -2703,9 +2696,9 @@ class ContextsTableData extends DataClass
       width: serializer.fromJson<double?>(json['width']),
       depth: serializer.fromJson<double?>(json['depth']),
       parentCutId: serializer.fromJson<String?>(json['parentCutId']),
-      composition: serializer.fromJson<String?>(json['composition']),
+      composition: serializer.fromJson<FillComposition?>(json['composition']),
       color: serializer.fromJson<String?>(json['color']),
-      compaction: serializer.fromJson<String?>(json['compaction']),
+      compaction: serializer.fromJson<FillCompaction?>(json['compaction']),
       inclusions: serializer.fromJson<String?>(json['inclusions']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -2726,9 +2719,9 @@ class ContextsTableData extends DataClass
       'width': serializer.toJson<double?>(width),
       'depth': serializer.toJson<double?>(depth),
       'parentCutId': serializer.toJson<String?>(parentCutId),
-      'composition': serializer.toJson<String?>(composition),
+      'composition': serializer.toJson<FillComposition?>(composition),
       'color': serializer.toJson<String?>(color),
-      'compaction': serializer.toJson<String?>(compaction),
+      'compaction': serializer.toJson<FillCompaction?>(compaction),
       'inclusions': serializer.toJson<String?>(inclusions),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -2747,9 +2740,9 @@ class ContextsTableData extends DataClass
     Value<double?> width = const Value.absent(),
     Value<double?> depth = const Value.absent(),
     Value<String?> parentCutId = const Value.absent(),
-    Value<String?> composition = const Value.absent(),
+    Value<FillComposition?> composition = const Value.absent(),
     Value<String?> color = const Value.absent(),
-    Value<String?> compaction = const Value.absent(),
+    Value<FillCompaction?> compaction = const Value.absent(),
     Value<String?> inclusions = const Value.absent(),
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
@@ -2889,9 +2882,9 @@ class ContextsTableCompanion extends UpdateCompanion<ContextsTableData> {
   final Value<double?> width;
   final Value<double?> depth;
   final Value<String?> parentCutId;
-  final Value<String?> composition;
+  final Value<FillComposition?> composition;
   final Value<String?> color;
-  final Value<String?> compaction;
+  final Value<FillCompaction?> compaction;
   final Value<String?> inclusions;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
@@ -2995,9 +2988,9 @@ class ContextsTableCompanion extends UpdateCompanion<ContextsTableData> {
     Value<double?>? width,
     Value<double?>? depth,
     Value<String?>? parentCutId,
-    Value<String?>? composition,
+    Value<FillComposition?>? composition,
     Value<String?>? color,
-    Value<String?>? compaction,
+    Value<FillCompaction?>? compaction,
     Value<String?>? inclusions,
     Value<String?>? notes,
     Value<DateTime>? createdAt,
@@ -3064,13 +3057,17 @@ class ContextsTableCompanion extends UpdateCompanion<ContextsTableData> {
       map['parent_cut_id'] = Variable<String>(parentCutId.value);
     }
     if (composition.present) {
-      map['composition'] = Variable<String>(composition.value);
+      map['composition'] = Variable<String>(
+        $ContextsTableTable.$convertercomposition.toSql(composition.value),
+      );
     }
     if (color.present) {
       map['color'] = Variable<String>(color.value);
     }
     if (compaction.present) {
-      map['compaction'] = Variable<String>(compaction.value);
+      map['compaction'] = Variable<String>(
+        $ContextsTableTable.$convertercompaction.toSql(compaction.value),
+      );
     }
     if (inclusions.present) {
       map['inclusions'] = Variable<String>(inclusions.value);
@@ -3211,6 +3208,17 @@ class $FindsTableTable extends FindsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _localImagePathMeta = const VerificationMeta(
+    'localImagePath',
+  );
+  @override
+  late final GeneratedColumn<String> localImagePath = GeneratedColumn<String>(
+    'local_image_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -3243,6 +3251,7 @@ class $FindsTableTable extends FindsTable
     customMaterialText,
     quantity,
     description,
+    localImagePath,
     createdAt,
     updatedAt,
   ];
@@ -3311,6 +3320,15 @@ class $FindsTableTable extends FindsTable
         ),
       );
     }
+    if (data.containsKey('local_image_path')) {
+      context.handle(
+        _localImagePathMeta,
+        localImagePath.isAcceptableOrUnknown(
+          data['local_image_path']!,
+          _localImagePathMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -3370,6 +3388,10 @@ class $FindsTableTable extends FindsTable
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
+      localImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_image_path'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3399,6 +3421,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
   final String? customMaterialText;
   final int quantity;
   final String? description;
+  final String? localImagePath;
   final DateTime createdAt;
   final DateTime updatedAt;
   const FindsTableData({
@@ -3410,6 +3433,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
     this.customMaterialText,
     required this.quantity,
     this.description,
+    this.localImagePath,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -3432,6 +3456,9 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    if (!nullToAbsent || localImagePath != null) {
+      map['local_image_path'] = Variable<String>(localImagePath);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -3451,6 +3478,9 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      localImagePath: localImagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localImagePath),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3472,6 +3502,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
       ),
       quantity: serializer.fromJson<int>(json['quantity']),
       description: serializer.fromJson<String?>(json['description']),
+      localImagePath: serializer.fromJson<String?>(json['localImagePath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3488,6 +3519,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
       'customMaterialText': serializer.toJson<String?>(customMaterialText),
       'quantity': serializer.toJson<int>(quantity),
       'description': serializer.toJson<String?>(description),
+      'localImagePath': serializer.toJson<String?>(localImagePath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3502,6 +3534,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
     Value<String?> customMaterialText = const Value.absent(),
     int? quantity,
     Value<String?> description = const Value.absent(),
+    Value<String?> localImagePath = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => FindsTableData(
@@ -3515,6 +3548,9 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
         : this.customMaterialText,
     quantity: quantity ?? this.quantity,
     description: description.present ? description.value : this.description,
+    localImagePath: localImagePath.present
+        ? localImagePath.value
+        : this.localImagePath,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -3536,6 +3572,9 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
       description: data.description.present
           ? data.description.value
           : this.description,
+      localImagePath: data.localImagePath.present
+          ? data.localImagePath.value
+          : this.localImagePath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3552,6 +3591,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
           ..write('customMaterialText: $customMaterialText, ')
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
+          ..write('localImagePath: $localImagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3568,6 +3608,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
     customMaterialText,
     quantity,
     description,
+    localImagePath,
     createdAt,
     updatedAt,
   );
@@ -3583,6 +3624,7 @@ class FindsTableData extends DataClass implements Insertable<FindsTableData> {
           other.customMaterialText == this.customMaterialText &&
           other.quantity == this.quantity &&
           other.description == this.description &&
+          other.localImagePath == this.localImagePath &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -3596,6 +3638,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
   final Value<String?> customMaterialText;
   final Value<int> quantity;
   final Value<String?> description;
+  final Value<String?> localImagePath;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -3608,6 +3651,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
     this.customMaterialText = const Value.absent(),
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
+    this.localImagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3621,6 +3665,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
     this.customMaterialText = const Value.absent(),
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
+    this.localImagePath = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -3640,6 +3685,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
     Expression<String>? customMaterialText,
     Expression<int>? quantity,
     Expression<String>? description,
+    Expression<String>? localImagePath,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -3654,6 +3700,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
         'custom_material_text': customMaterialText,
       if (quantity != null) 'quantity': quantity,
       if (description != null) 'description': description,
+      if (localImagePath != null) 'local_image_path': localImagePath,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -3669,6 +3716,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
     Value<String?>? customMaterialText,
     Value<int>? quantity,
     Value<String?>? description,
+    Value<String?>? localImagePath,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -3682,6 +3730,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
       customMaterialText: customMaterialText ?? this.customMaterialText,
       quantity: quantity ?? this.quantity,
       description: description ?? this.description,
+      localImagePath: localImagePath ?? this.localImagePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -3717,6 +3766,9 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (localImagePath.present) {
+      map['local_image_path'] = Variable<String>(localImagePath.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3740,6 +3792,7 @@ class FindsTableCompanion extends UpdateCompanion<FindsTableData> {
           ..write('customMaterialText: $customMaterialText, ')
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
+          ..write('localImagePath: $localImagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -3838,6 +3891,18 @@ class $SamplesTableTable extends SamplesTable
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       ).withConverter<StorageType>($SamplesTableTable.$converterstorageType);
+  static const VerificationMeta _storageCountMeta = const VerificationMeta(
+    'storageCount',
+  );
+  @override
+  late final GeneratedColumn<int> storageCount = GeneratedColumn<int>(
+    'storage_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _litersMeta = const VerificationMeta('liters');
   @override
   late final GeneratedColumn<double> liters = GeneratedColumn<double>(
@@ -3879,6 +3944,7 @@ class $SamplesTableTable extends SamplesTable
     sampleType,
     customSampleTypeText,
     storageType,
+    storageCount,
     liters,
     createdAt,
     updatedAt,
@@ -3941,6 +4007,15 @@ class $SamplesTableTable extends SamplesTable
         customSampleTypeText.isAcceptableOrUnknown(
           data['custom_sample_type_text']!,
           _customSampleTypeTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('storage_count')) {
+      context.handle(
+        _storageCountMeta,
+        storageCount.isAcceptableOrUnknown(
+          data['storage_count']!,
+          _storageCountMeta,
         ),
       );
     }
@@ -4011,6 +4086,10 @@ class $SamplesTableTable extends SamplesTable
           data['${effectivePrefix}storage_type'],
         )!,
       ),
+      storageCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}storage_count'],
+      )!,
       liters: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}liters'],
@@ -4047,6 +4126,7 @@ class SamplesTableData extends DataClass
   final SampleType sampleType;
   final String? customSampleTypeText;
   final StorageType storageType;
+  final int storageCount;
   final double? liters;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -4059,6 +4139,7 @@ class SamplesTableData extends DataClass
     required this.sampleType,
     this.customSampleTypeText,
     required this.storageType,
+    required this.storageCount,
     this.liters,
     required this.createdAt,
     required this.updatedAt,
@@ -4084,6 +4165,7 @@ class SamplesTableData extends DataClass
         $SamplesTableTable.$converterstorageType.toSql(storageType),
       );
     }
+    map['storage_count'] = Variable<int>(storageCount);
     if (!nullToAbsent || liters != null) {
       map['liters'] = Variable<double>(liters);
     }
@@ -4104,6 +4186,7 @@ class SamplesTableData extends DataClass
           ? const Value.absent()
           : Value(customSampleTypeText),
       storageType: Value(storageType),
+      storageCount: Value(storageCount),
       liters: liters == null && nullToAbsent
           ? const Value.absent()
           : Value(liters),
@@ -4128,6 +4211,7 @@ class SamplesTableData extends DataClass
         json['customSampleTypeText'],
       ),
       storageType: serializer.fromJson<StorageType>(json['storageType']),
+      storageCount: serializer.fromJson<int>(json['storageCount']),
       liters: serializer.fromJson<double?>(json['liters']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -4145,6 +4229,7 @@ class SamplesTableData extends DataClass
       'sampleType': serializer.toJson<SampleType>(sampleType),
       'customSampleTypeText': serializer.toJson<String?>(customSampleTypeText),
       'storageType': serializer.toJson<StorageType>(storageType),
+      'storageCount': serializer.toJson<int>(storageCount),
       'liters': serializer.toJson<double?>(liters),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -4160,6 +4245,7 @@ class SamplesTableData extends DataClass
     SampleType? sampleType,
     Value<String?> customSampleTypeText = const Value.absent(),
     StorageType? storageType,
+    int? storageCount,
     Value<double?> liters = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -4174,6 +4260,7 @@ class SamplesTableData extends DataClass
         ? customSampleTypeText.value
         : this.customSampleTypeText,
     storageType: storageType ?? this.storageType,
+    storageCount: storageCount ?? this.storageCount,
     liters: liters.present ? liters.value : this.liters,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -4196,6 +4283,9 @@ class SamplesTableData extends DataClass
       storageType: data.storageType.present
           ? data.storageType.value
           : this.storageType,
+      storageCount: data.storageCount.present
+          ? data.storageCount.value
+          : this.storageCount,
       liters: data.liters.present ? data.liters.value : this.liters,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -4213,6 +4303,7 @@ class SamplesTableData extends DataClass
           ..write('sampleType: $sampleType, ')
           ..write('customSampleTypeText: $customSampleTypeText, ')
           ..write('storageType: $storageType, ')
+          ..write('storageCount: $storageCount, ')
           ..write('liters: $liters, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -4230,6 +4321,7 @@ class SamplesTableData extends DataClass
     sampleType,
     customSampleTypeText,
     storageType,
+    storageCount,
     liters,
     createdAt,
     updatedAt,
@@ -4246,6 +4338,7 @@ class SamplesTableData extends DataClass
           other.sampleType == this.sampleType &&
           other.customSampleTypeText == this.customSampleTypeText &&
           other.storageType == this.storageType &&
+          other.storageCount == this.storageCount &&
           other.liters == this.liters &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -4260,6 +4353,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
   final Value<SampleType> sampleType;
   final Value<String?> customSampleTypeText;
   final Value<StorageType> storageType;
+  final Value<int> storageCount;
   final Value<double?> liters;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -4273,6 +4367,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
     this.sampleType = const Value.absent(),
     this.customSampleTypeText = const Value.absent(),
     this.storageType = const Value.absent(),
+    this.storageCount = const Value.absent(),
     this.liters = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -4287,6 +4382,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
     required SampleType sampleType,
     this.customSampleTypeText = const Value.absent(),
     required StorageType storageType,
+    this.storageCount = const Value.absent(),
     this.liters = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -4309,6 +4405,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
     Expression<String>? sampleType,
     Expression<String>? customSampleTypeText,
     Expression<String>? storageType,
+    Expression<int>? storageCount,
     Expression<double>? liters,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -4324,6 +4421,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
       if (customSampleTypeText != null)
         'custom_sample_type_text': customSampleTypeText,
       if (storageType != null) 'storage_type': storageType,
+      if (storageCount != null) 'storage_count': storageCount,
       if (liters != null) 'liters': liters,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -4340,6 +4438,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
     Value<SampleType>? sampleType,
     Value<String?>? customSampleTypeText,
     Value<StorageType>? storageType,
+    Value<int>? storageCount,
     Value<double?>? liters,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -4354,6 +4453,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
       sampleType: sampleType ?? this.sampleType,
       customSampleTypeText: customSampleTypeText ?? this.customSampleTypeText,
       storageType: storageType ?? this.storageType,
+      storageCount: storageCount ?? this.storageCount,
       liters: liters ?? this.liters,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -4394,6 +4494,9 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
         $SamplesTableTable.$converterstorageType.toSql(storageType.value),
       );
     }
+    if (storageCount.present) {
+      map['storage_count'] = Variable<int>(storageCount.value);
+    }
     if (liters.present) {
       map['liters'] = Variable<double>(liters.value);
     }
@@ -4420,6 +4523,7 @@ class SamplesTableCompanion extends UpdateCompanion<SamplesTableData> {
           ..write('sampleType: $sampleType, ')
           ..write('customSampleTypeText: $customSampleTypeText, ')
           ..write('storageType: $storageType, ')
+          ..write('storageCount: $storageCount, ')
           ..write('liters: $liters, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -6913,9 +7017,9 @@ typedef $$ContextsTableTableCreateCompanionBuilder =
       Value<double?> width,
       Value<double?> depth,
       Value<String?> parentCutId,
-      Value<String?> composition,
+      Value<FillComposition?> composition,
       Value<String?> color,
-      Value<String?> compaction,
+      Value<FillCompaction?> compaction,
       Value<String?> inclusions,
       Value<String?> notes,
       required DateTime createdAt,
@@ -6934,9 +7038,9 @@ typedef $$ContextsTableTableUpdateCompanionBuilder =
       Value<double?> width,
       Value<double?> depth,
       Value<String?> parentCutId,
-      Value<String?> composition,
+      Value<FillComposition?> composition,
       Value<String?> color,
-      Value<String?> compaction,
+      Value<FillCompaction?> compaction,
       Value<String?> inclusions,
       Value<String?> notes,
       Value<DateTime> createdAt,
@@ -7068,9 +7172,10 @@ class $$ContextsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get composition => $composableBuilder(
+  ColumnWithTypeConverterFilters<FillComposition?, FillComposition, String>
+  get composition => $composableBuilder(
     column: $table.composition,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get color => $composableBuilder(
@@ -7078,9 +7183,10 @@ class $$ContextsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get compaction => $composableBuilder(
+  ColumnWithTypeConverterFilters<FillCompaction?, FillCompaction, String>
+  get compaction => $composableBuilder(
     column: $table.compaction,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get inclusions => $composableBuilder(
@@ -7335,18 +7441,20 @@ class $$ContextsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get composition => $composableBuilder(
-    column: $table.composition,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<FillComposition?, String> get composition =>
+      $composableBuilder(
+        column: $table.composition,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
-  GeneratedColumn<String> get compaction => $composableBuilder(
-    column: $table.compaction,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<FillCompaction?, String> get compaction =>
+      $composableBuilder(
+        column: $table.compaction,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get inclusions => $composableBuilder(
     column: $table.inclusions,
@@ -7478,9 +7586,9 @@ class $$ContextsTableTableTableManager
                 Value<double?> width = const Value.absent(),
                 Value<double?> depth = const Value.absent(),
                 Value<String?> parentCutId = const Value.absent(),
-                Value<String?> composition = const Value.absent(),
+                Value<FillComposition?> composition = const Value.absent(),
                 Value<String?> color = const Value.absent(),
-                Value<String?> compaction = const Value.absent(),
+                Value<FillCompaction?> compaction = const Value.absent(),
                 Value<String?> inclusions = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -7518,9 +7626,9 @@ class $$ContextsTableTableTableManager
                 Value<double?> width = const Value.absent(),
                 Value<double?> depth = const Value.absent(),
                 Value<String?> parentCutId = const Value.absent(),
-                Value<String?> composition = const Value.absent(),
+                Value<FillComposition?> composition = const Value.absent(),
                 Value<String?> color = const Value.absent(),
-                Value<String?> compaction = const Value.absent(),
+                Value<FillCompaction?> compaction = const Value.absent(),
                 Value<String?> inclusions = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
@@ -7680,6 +7788,7 @@ typedef $$FindsTableTableCreateCompanionBuilder =
       Value<String?> customMaterialText,
       Value<int> quantity,
       Value<String?> description,
+      Value<String?> localImagePath,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -7694,6 +7803,7 @@ typedef $$FindsTableTableUpdateCompanionBuilder =
       Value<String?> customMaterialText,
       Value<int> quantity,
       Value<String?> description,
+      Value<String?> localImagePath,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -7779,6 +7889,11 @@ class $$FindsTableTableFilterComposer
 
   ColumnFilters<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localImagePath => $composableBuilder(
+    column: $table.localImagePath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7878,6 +7993,11 @@ class $$FindsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get localImagePath => $composableBuilder(
+    column: $table.localImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -7971,6 +8091,11 @@ class $$FindsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get localImagePath => $composableBuilder(
+    column: $table.localImagePath,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -8060,6 +8185,7 @@ class $$FindsTableTableTableManager
                 Value<String?> customMaterialText = const Value.absent(),
                 Value<int> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
+                Value<String?> localImagePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -8072,6 +8198,7 @@ class $$FindsTableTableTableManager
                 customMaterialText: customMaterialText,
                 quantity: quantity,
                 description: description,
+                localImagePath: localImagePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -8086,6 +8213,7 @@ class $$FindsTableTableTableManager
                 Value<String?> customMaterialText = const Value.absent(),
                 Value<int> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
+                Value<String?> localImagePath = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -8098,6 +8226,7 @@ class $$FindsTableTableTableManager
                 customMaterialText: customMaterialText,
                 quantity: quantity,
                 description: description,
+                localImagePath: localImagePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -8192,6 +8321,7 @@ typedef $$SamplesTableTableCreateCompanionBuilder =
       required SampleType sampleType,
       Value<String?> customSampleTypeText,
       required StorageType storageType,
+      Value<int> storageCount,
       Value<double?> liters,
       required DateTime createdAt,
       required DateTime updatedAt,
@@ -8207,6 +8337,7 @@ typedef $$SamplesTableTableUpdateCompanionBuilder =
       Value<SampleType> sampleType,
       Value<String?> customSampleTypeText,
       Value<StorageType> storageType,
+      Value<int> storageCount,
       Value<double?> liters,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -8296,6 +8427,11 @@ class $$SamplesTableTableFilterComposer
   get storageType => $composableBuilder(
     column: $table.storageType,
     builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get storageCount => $composableBuilder(
+    column: $table.storageCount,
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<double> get liters => $composableBuilder(
@@ -8399,6 +8535,11 @@ class $$SamplesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get storageCount => $composableBuilder(
+    column: $table.storageCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get liters => $composableBuilder(
     column: $table.liters,
     builder: (column) => ColumnOrderings(column),
@@ -8498,6 +8639,11 @@ class $$SamplesTableTableAnnotationComposer
         builder: (column) => column,
       );
 
+  GeneratedColumn<int> get storageCount => $composableBuilder(
+    column: $table.storageCount,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get liters =>
       $composableBuilder(column: $table.liters, builder: (column) => column);
 
@@ -8590,6 +8736,7 @@ class $$SamplesTableTableTableManager
                 Value<SampleType> sampleType = const Value.absent(),
                 Value<String?> customSampleTypeText = const Value.absent(),
                 Value<StorageType> storageType = const Value.absent(),
+                Value<int> storageCount = const Value.absent(),
                 Value<double?> liters = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -8603,6 +8750,7 @@ class $$SamplesTableTableTableManager
                 sampleType: sampleType,
                 customSampleTypeText: customSampleTypeText,
                 storageType: storageType,
+                storageCount: storageCount,
                 liters: liters,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -8618,6 +8766,7 @@ class $$SamplesTableTableTableManager
                 required SampleType sampleType,
                 Value<String?> customSampleTypeText = const Value.absent(),
                 required StorageType storageType,
+                Value<int> storageCount = const Value.absent(),
                 Value<double?> liters = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
@@ -8631,6 +8780,7 @@ class $$SamplesTableTableTableManager
                 sampleType: sampleType,
                 customSampleTypeText: customSampleTypeText,
                 storageType: storageType,
+                storageCount: storageCount,
                 liters: liters,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

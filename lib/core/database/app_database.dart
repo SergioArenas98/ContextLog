@@ -69,6 +69,17 @@ class AppDatabase extends _$AppDatabase {
             // per-drawing reference images stored as local file paths.
             await m.addColumn(drawingsTable, drawingsTable.referenceImagePath);
           }
+          if (from < 5) {
+            // v4→v5:
+            // Finds: added optional localImagePath for attaching a photo.
+            // Samples: added storageCount (default 1) to record units stored.
+            // Contexts: composition and compaction are now stored as enum
+            //   names (FillComposition / FillCompaction). The columns remain
+            //   TEXT; existing NULL values stay NULL; any legacy free-text
+            //   values are silently returned as null by the converter.
+            await m.addColumn(findsTable, findsTable.localImagePath);
+            await m.addColumn(samplesTable, samplesTable.storageCount);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

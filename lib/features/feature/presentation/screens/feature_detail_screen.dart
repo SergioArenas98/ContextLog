@@ -540,7 +540,7 @@ class _ContextManifestRowState extends State<_ContextManifestRow> {
     if (ctx is CutModel && ctx.cutType != null) {
       subtitle = ctx.cutType!.displayName;
     } else if (ctx is FillModel && ctx.composition != null) {
-      subtitle = ctx.composition;
+      subtitle = ctx.composition!.displayName;
     }
 
     return GestureDetector(

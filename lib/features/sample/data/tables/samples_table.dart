@@ -24,6 +24,7 @@ class SamplesTable extends Table {
   TextColumn get customSampleTypeText => text().nullable()();
   TextColumn get storageType =>
       text().map(const StorageTypeConverter())();
+  IntColumn get storageCount => integer().withDefault(const Constant(1))();
   RealColumn get liters => real().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

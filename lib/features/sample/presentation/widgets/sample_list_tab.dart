@@ -121,9 +121,7 @@ class _SampleTile extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  sample.liters != null
-                      ? '${sample.storageType.displayName}  ·  ${sample.liters}L'
-                      : sample.storageType.displayName,
+                  _storageLabel(sample),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -185,5 +183,12 @@ class _SampleTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _storageLabel(SampleModel s) {
+    final countPart = s.storageCount > 1 ? '${s.storageCount} × ' : '';
+    final typePart = s.storageType.displayName;
+    final litersPart = s.liters != null ? '  ·  ${s.liters}L' : '';
+    return '$countPart$typePart$litersPart';
   }
 }

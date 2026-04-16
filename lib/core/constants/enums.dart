@@ -134,6 +134,46 @@ enum DrawingType {
       };
 }
 
+enum FillComposition {
+  siltyClay,
+  sandyClay,
+  silt,
+  clay,
+  clayeySilt,
+  sandySilt,
+  clayeySand,
+  siltySand,
+  sand;
+
+  String get displayName => switch (this) {
+        FillComposition.siltyClay => 'Silty Clay',
+        FillComposition.sandyClay => 'Sandy Clay',
+        FillComposition.silt => 'Silt',
+        FillComposition.clay => 'Clay',
+        FillComposition.clayeySilt => 'Clayey Silt',
+        FillComposition.sandySilt => 'Sandy Silt',
+        FillComposition.clayeySand => 'Clayey Sand',
+        FillComposition.siltySand => 'Silty Sand',
+        FillComposition.sand => 'Sand',
+      };
+}
+
+enum FillCompaction {
+  loose,
+  friable,
+  firm,
+  hard,
+  plastic;
+
+  String get displayName => switch (this) {
+        FillCompaction.loose => 'Loose',
+        FillCompaction.friable => 'Friable',
+        FillCompaction.firm => 'Firm',
+        FillCompaction.hard => 'Hard',
+        FillCompaction.plastic => 'Plastic',
+      };
+}
+
 enum HarrisRelationType {
   above,
   below,

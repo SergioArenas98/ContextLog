@@ -416,9 +416,9 @@ class _FillPanel extends ConsumerWidget {
           ),
 
           _PropertiesBlock(rows: [
-            if (fill.composition != null) _PropEntry('Composition', fill.composition!),
+            if (fill.composition != null) _PropEntry('Composition', fill.composition!.displayName),
             if (fill.color != null) _PropEntry('Color', fill.color!),
-            if (fill.compaction != null) _PropEntry('Compaction', fill.compaction!),
+            if (fill.compaction != null) _PropEntry('Compaction', fill.compaction!.displayName),
             if (fill.inclusions != null) _PropEntry('Inclusions', fill.inclusions!),
             if (fill.notes != null) _PropEntry('Notes', fill.notes!),
           ]),
@@ -633,7 +633,7 @@ class _FillChip extends StatelessWidget {
                 ),
                 if (fill.composition != null)
                   Text(
-                    fill.composition!,
+                    fill.composition!.displayName,
                     style: TextStyle(
                       fontFamily: AppTypography.sansFontFamily,
                       fontSize: 11,

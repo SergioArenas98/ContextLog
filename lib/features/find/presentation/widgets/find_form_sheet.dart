@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/enums.dart';
 import '../../../../core/design/app_tokens.dart';
+import '../../../../core/utils/image_storage.dart';
 import '../../../../core/widgets/app_sheet_header.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../context/domain/models/context_model.dart';
@@ -34,6 +38,7 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
   final _customMaterialCtrl = TextEditingController();
   FindMaterialType _materialType = FindMaterialType.flint;
   String? _fillId;
+  String? _localImagePath;
   bool _saving = false;
   bool _suggestedNumber = false;
 
@@ -48,6 +53,7 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
       _materialType = f.materialType;
       _customMaterialCtrl.text = f.customMaterialText ?? '';
       _fillId = f.fillId;
+      _localImagePath = f.localImagePath;
     }
   }
 
@@ -230,6 +236,14 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
+            const SizedBox(height: AppSpacing.space16),
+            SectionHeader(label: 'Photo'),
+            const SizedBox(height: AppSpacing.space8),
+            _FindPhotoButton(
+              imagePath: _localImagePath,
+              onPickImage: _pickImage,
+              onRemove: _removeImage,
+            ),
             const SizedBox(height: AppSpacing.space24),
             SafeArea(
               top: false,
@@ -258,6 +272,21 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final xFile = await picker.pickImage(source: source, imageQuality: 80);
+    if (xFile != null && mounted) {
+      final permanentPath = await ImageStorage.copyToAppStorage(xFile.path);
+      await ImageStorage.deleteIfExists(_localImagePath);
+      setState(() => _localImagePath = permanentPath);
+    }
+  }
+
+  Future<void> _removeImage() async {
+    await ImageStorage.deleteIfExists(_localImagePath);
+    setState(() => _localImagePath = null);
   }
 
   Widget _noFillsWarning(BuildContext context) {
@@ -303,6 +332,7 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
           description: _descriptionCtrl.text.trim().isEmpty
               ? null
               : _descriptionCtrl.text.trim(),
+          localImagePath: _localImagePath,
         );
       } else {
         await repo.create(
@@ -316,6 +346,7 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
           description: _descriptionCtrl.text.trim().isEmpty
               ? null
               : _descriptionCtrl.text.trim(),
+          localImagePath: _localImagePath,
         );
       }
       widget.onSaved();
@@ -329,5 +360,129 @@ class _FindFormSheetState extends ConsumerState<FindFormSheet> {
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+}
+
+// ── Photo attachment button ───────────────────────────────────────────────────
+
+class _FindPhotoButton extends StatelessWidget {
+  const _FindPhotoButton({
+    required this.imagePath,
+    required this.onPickImage,
+    required this.onRemove,
+  });
+
+  final String? imagePath;
+  final Future<void> Function(ImageSource source) onPickImage;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final path = imagePath;
+
+    if (path != null) {
+      return Stack(
+        children: [
+          ClipRRect(
+            borderRadius: AppRadius.mdBorderRadius,
+            child: Image.file(
+              File(path),
+              width: double.infinity,
+              height: 160,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 160,
+                color: theme.colorScheme.surfaceContainerHigh,
+                child: const Icon(Icons.broken_image, size: 40),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: theme.colorScheme.surfaceContainerHighest.withAlpha(220),
+              borderRadius: AppRadius.fullBorderRadius,
+              child: InkWell(
+                borderRadius: AppRadius.fullBorderRadius,
+                onTap: onRemove,
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(Icons.close_rounded, size: 18),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: _SourceButton(
+            icon: Icons.camera_alt_rounded,
+            label: 'Camera',
+            onTap: () => onPickImage(ImageSource.camera),
+            theme: theme,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space8),
+        Expanded(
+          child: _SourceButton(
+            icon: Icons.photo_library_outlined,
+            label: 'Gallery',
+            onTap: () => onPickImage(ImageSource.gallery),
+            theme: theme,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SourceButton extends StatelessWidget {
+  const _SourceButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.theme,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppRadius.mdBorderRadius,
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          borderRadius: AppRadius.mdBorderRadius,
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: theme.colorScheme.onSurfaceVariant),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

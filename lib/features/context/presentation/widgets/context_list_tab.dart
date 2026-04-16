@@ -288,8 +288,7 @@ class _ContextTile extends StatelessWidget {
         ].join(' · ').nullIfEmpty,
       FillModel(:final color, :final composition, :final notes) => [
           if (color != null && color.isNotEmpty) 'Color: $color',
-          if (composition != null && composition.isNotEmpty)
-            'Comp: $composition',
+          if (composition != null) 'Comp: ${composition.displayName}',
           if (notes != null && notes.isNotEmpty) notes,
         ].join(' · ').nullIfEmpty,
     };

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -98,57 +100,79 @@ class _FindTile extends StatelessWidget {
             ? find.customMaterialText!
             : find.materialType.displayName;
 
+    final hasPhoto = find.localImagePath != null;
+
     return SurfaceCard(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space16,
         vertical: AppSpacing.space12,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Badge
-          StatusBadge(
-            label: 'F${find.findNumber}',
-            backgroundColor: theme.colorScheme.secondaryContainer,
-            foregroundColor: theme.colorScheme.onSecondaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.space12),
-          // Metadata
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          if (hasPhoto) ...[
+            ClipRRect(
+              borderRadius: AppRadius.smBorderRadius,
+              child: Image.file(
+                File(find.localImagePath!),
+                width: double.infinity,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 120,
+                  color: theme.colorScheme.surfaceContainerHigh,
+                  child: const Icon(Icons.broken_image),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space8),
+          ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Badge
+              StatusBadge(
+                label: 'F${find.findNumber}',
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                foregroundColor: theme.colorScheme.onSecondaryContainer,
+              ),
+              const SizedBox(width: AppSpacing.space12),
+              // Metadata
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        materialLabel,
-                        style: theme.textTheme.titleSmall,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            materialLabel,
+                            style: theme.textTheme.titleSmall,
+                          ),
+                        ),
+                        Text(
+                          '× ${find.quantity}',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      '× ${find.quantity}',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                    if (find.description != null &&
+                        find.description!.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.space2),
+                      Text(
+                        find.description!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
+                    ],
                   ],
                 ),
-                if (find.description != null &&
-                    find.description!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.space2),
-                  Text(
-                    find.description!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
+              ),
           // Actions
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -203,6 +227,8 @@ class _FindTile extends StatelessWidget {
               ),
             ],
           ),
+        ],
+      ),
         ],
       ),
     );

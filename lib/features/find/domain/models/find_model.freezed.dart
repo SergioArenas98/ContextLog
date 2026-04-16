@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FindModel {
 
- String get id; String get featureId; String get fillId; int get findNumber; FindMaterialType get materialType; String? get customMaterialText; int get quantity; String? get description; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get featureId; String get fillId; int get findNumber; FindMaterialType get materialType; String? get customMaterialText; int get quantity; String? get description; String? get localImagePath; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of FindModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FindModelCopyWith<FindModel> get copyWith => _$FindModelCopyWithImpl<FindModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FindModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.findNumber, findNumber) || other.findNumber == findNumber)&&(identical(other.materialType, materialType) || other.materialType == materialType)&&(identical(other.customMaterialText, customMaterialText) || other.customMaterialText == customMaterialText)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FindModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.findNumber, findNumber) || other.findNumber == findNumber)&&(identical(other.materialType, materialType) || other.materialType == materialType)&&(identical(other.customMaterialText, customMaterialText) || other.customMaterialText == customMaterialText)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.description, description) || other.description == description)&&(identical(other.localImagePath, localImagePath) || other.localImagePath == localImagePath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,fillId,findNumber,materialType,customMaterialText,quantity,description,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,fillId,findNumber,materialType,customMaterialText,quantity,description,localImagePath,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FindModel(id: $id, featureId: $featureId, fillId: $fillId, findNumber: $findNumber, materialType: $materialType, customMaterialText: $customMaterialText, quantity: $quantity, description: $description, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FindModel(id: $id, featureId: $featureId, fillId: $fillId, findNumber: $findNumber, materialType: $materialType, customMaterialText: $customMaterialText, quantity: $quantity, description: $description, localImagePath: $localImagePath, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FindModelCopyWith<$Res>  {
   factory $FindModelCopyWith(FindModel value, $Res Function(FindModel) _then) = _$FindModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String featureId, String fillId, int findNumber, FindMaterialType materialType, String? customMaterialText, int quantity, String? description, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String fillId, int findNumber, FindMaterialType materialType, String? customMaterialText, int quantity, String? description, String? localImagePath, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -62,7 +62,7 @@ class _$FindModelCopyWithImpl<$Res>
 
 /// Create a copy of FindModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? findNumber = null,Object? materialType = null,Object? customMaterialText = freezed,Object? quantity = null,Object? description = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? findNumber = null,Object? materialType = null,Object? customMaterialText = freezed,Object? quantity = null,Object? description = freezed,Object? localImagePath = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -72,6 +72,7 @@ as int,materialType: null == materialType ? _self.materialType : materialType //
 as FindMaterialType,customMaterialText: freezed == customMaterialText ? _self.customMaterialText : customMaterialText // ignore: cast_nullable_to_non_nullable
 as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,localImagePath: freezed == localImagePath ? _self.localImagePath : localImagePath // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -159,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  String? localImagePath,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FindModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.localImagePath,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -180,10 +181,10 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.mat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  String? localImagePath,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FindModel():
-return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.localImagePath,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +201,10 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.mat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String fillId,  int findNumber,  FindMaterialType materialType,  String? customMaterialText,  int quantity,  String? description,  String? localImagePath,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FindModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.materialType,_that.customMaterialText,_that.quantity,_that.description,_that.localImagePath,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -215,7 +216,7 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.findNumber,_that.mat
 
 
 class _FindModel implements FindModel {
-  const _FindModel({required this.id, required this.featureId, required this.fillId, required this.findNumber, required this.materialType, this.customMaterialText, required this.quantity, this.description, required this.createdAt, required this.updatedAt});
+  const _FindModel({required this.id, required this.featureId, required this.fillId, required this.findNumber, required this.materialType, this.customMaterialText, required this.quantity, this.description, this.localImagePath, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
@@ -226,6 +227,7 @@ class _FindModel implements FindModel {
 @override final  String? customMaterialText;
 @override final  int quantity;
 @override final  String? description;
+@override final  String? localImagePath;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
 
@@ -239,16 +241,16 @@ _$FindModelCopyWith<_FindModel> get copyWith => __$FindModelCopyWithImpl<_FindMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FindModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.findNumber, findNumber) || other.findNumber == findNumber)&&(identical(other.materialType, materialType) || other.materialType == materialType)&&(identical(other.customMaterialText, customMaterialText) || other.customMaterialText == customMaterialText)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.description, description) || other.description == description)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FindModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.findNumber, findNumber) || other.findNumber == findNumber)&&(identical(other.materialType, materialType) || other.materialType == materialType)&&(identical(other.customMaterialText, customMaterialText) || other.customMaterialText == customMaterialText)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.description, description) || other.description == description)&&(identical(other.localImagePath, localImagePath) || other.localImagePath == localImagePath)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,fillId,findNumber,materialType,customMaterialText,quantity,description,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,fillId,findNumber,materialType,customMaterialText,quantity,description,localImagePath,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FindModel(id: $id, featureId: $featureId, fillId: $fillId, findNumber: $findNumber, materialType: $materialType, customMaterialText: $customMaterialText, quantity: $quantity, description: $description, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FindModel(id: $id, featureId: $featureId, fillId: $fillId, findNumber: $findNumber, materialType: $materialType, customMaterialText: $customMaterialText, quantity: $quantity, description: $description, localImagePath: $localImagePath, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$FindModelCopyWith<$Res> implements $FindModelCopyWith<$Re
   factory _$FindModelCopyWith(_FindModel value, $Res Function(_FindModel) _then) = __$FindModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String featureId, String fillId, int findNumber, FindMaterialType materialType, String? customMaterialText, int quantity, String? description, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String fillId, int findNumber, FindMaterialType materialType, String? customMaterialText, int quantity, String? description, String? localImagePath, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -276,7 +278,7 @@ class __$FindModelCopyWithImpl<$Res>
 
 /// Create a copy of FindModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? findNumber = null,Object? materialType = null,Object? customMaterialText = freezed,Object? quantity = null,Object? description = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? findNumber = null,Object? materialType = null,Object? customMaterialText = freezed,Object? quantity = null,Object? description = freezed,Object? localImagePath = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_FindModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -286,6 +288,7 @@ as int,materialType: null == materialType ? _self.materialType : materialType //
 as FindMaterialType,customMaterialText: freezed == customMaterialText ? _self.customMaterialText : customMaterialText // ignore: cast_nullable_to_non_nullable
 as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,localImagePath: freezed == localImagePath ? _self.localImagePath : localImagePath // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,

@@ -35,6 +35,7 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
   final _customTypeCtrl = TextEditingController();
   SampleType _sampleType = SampleType.soil;
   StorageType _storageType = StorageType.bag;
+  int _storageCount = 1;
   String? _fillId;
   bool _saving = false;
 
@@ -48,6 +49,7 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
       _sampleType = s.sampleType;
       _customTypeCtrl.text = s.customSampleTypeText ?? '';
       _storageType = s.storageType;
+      _storageCount = s.storageCount;
       _fillId = s.fillId;
     }
   }
@@ -191,6 +193,43 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
               },
             ),
             const SizedBox(height: AppSpacing.space12),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_rounded),
+                  onPressed: _storageCount > 1
+                      ? () => setState(() => _storageCount--)
+                      : null,
+                  style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        '$_storageCount',
+                        style: Theme.of(context).textTheme.titleMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'units',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  onPressed: () => setState(() => _storageCount++),
+                  style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space12),
             TextFormField(
               controller: _litersCtrl,
               decoration: const InputDecoration(
@@ -293,6 +332,7 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
           customSampleTypeText:
               _sampleType == SampleType.other ? _customTypeCtrl.text.trim() : null,
           storageType: _storageType,
+          storageCount: _storageCount,
           liters: _litersCtrl.text.trim().isEmpty
               ? null
               : double.parse(_litersCtrl.text.trim()),
@@ -307,6 +347,7 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
           customSampleTypeText:
               _sampleType == SampleType.other ? _customTypeCtrl.text.trim() : null,
           storageType: _storageType,
+          storageCount: _storageCount,
           liters: _litersCtrl.text.trim().isEmpty
               ? null
               : double.parse(_litersCtrl.text.trim()),

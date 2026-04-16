@@ -17,6 +17,7 @@ abstract class FindModel with _$FindModel {
     String? customMaterialText,
     required int quantity,
     String? description,
+    String? localImagePath,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _FindModel;

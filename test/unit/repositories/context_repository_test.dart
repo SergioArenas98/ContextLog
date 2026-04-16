@@ -119,7 +119,7 @@ void main() {
         contextNumber: 101,
         parentCutId: cutId,
         color: 'Mid brown',
-        composition: 'Silty loam',
+        composition: FillComposition.siltyClay,
       );
 
       expect(fill, isA<FillModel>());
@@ -127,6 +127,7 @@ void main() {
       expect(f.contextNumber, 101);
       expect(f.parentCutId, cutId);
       expect(f.color, 'Mid brown');
+      expect(f.composition, FillComposition.siltyClay);
     });
 
     test('getFillsByCutId returns fills for that cut', () async {

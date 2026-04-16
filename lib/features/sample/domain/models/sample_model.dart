@@ -17,6 +17,7 @@ abstract class SampleModel with _$SampleModel {
     required SampleType sampleType,
     String? customSampleTypeText,
     required StorageType storageType,
+    @Default(1) int storageCount,
     double? liters,
     required DateTime createdAt,
     required DateTime updatedAt,

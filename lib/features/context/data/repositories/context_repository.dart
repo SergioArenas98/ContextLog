@@ -112,9 +112,9 @@ class ContextRepository {
     required String featureId,
     required int contextNumber,
     required String parentCutId,
-    String? composition,
+    FillComposition? composition,
     String? color,
-    String? compaction,
+    FillCompaction? compaction,
     String? inclusions,
     String? notes,
   }) async {
@@ -169,9 +169,9 @@ class ContextRepository {
     required String id,
     required int contextNumber,
     required String parentCutId,
-    String? composition,
+    FillComposition? composition,
     String? color,
-    String? compaction,
+    FillCompaction? compaction,
     String? inclusions,
     String? notes,
   }) async {

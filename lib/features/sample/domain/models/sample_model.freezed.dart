@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SampleModel {
 
- String get id; String get featureId; String get fillId; String get cutId; int get sampleNumber; SampleType get sampleType; String? get customSampleTypeText; StorageType get storageType; double? get liters; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get featureId; String get fillId; String get cutId; int get sampleNumber; SampleType get sampleType; String? get customSampleTypeText; StorageType get storageType; int get storageCount; double? get liters; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of SampleModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SampleModelCopyWith<SampleModel> get copyWith => _$SampleModelCopyWithImpl<Samp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SampleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.cutId, cutId) || other.cutId == cutId)&&(identical(other.sampleNumber, sampleNumber) || other.sampleNumber == sampleNumber)&&(identical(other.sampleType, sampleType) || other.sampleType == sampleType)&&(identical(other.customSampleTypeText, customSampleTypeText) || other.customSampleTypeText == customSampleTypeText)&&(identical(other.storageType, storageType) || other.storageType == storageType)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SampleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.cutId, cutId) || other.cutId == cutId)&&(identical(other.sampleNumber, sampleNumber) || other.sampleNumber == sampleNumber)&&(identical(other.sampleType, sampleType) || other.sampleType == sampleType)&&(identical(other.customSampleTypeText, customSampleTypeText) || other.customSampleTypeText == customSampleTypeText)&&(identical(other.storageType, storageType) || other.storageType == storageType)&&(identical(other.storageCount, storageCount) || other.storageCount == storageCount)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,fillId,cutId,sampleNumber,sampleType,customSampleTypeText,storageType,liters,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,fillId,cutId,sampleNumber,sampleType,customSampleTypeText,storageType,storageCount,liters,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'SampleModel(id: $id, featureId: $featureId, fillId: $fillId, cutId: $cutId, sampleNumber: $sampleNumber, sampleType: $sampleType, customSampleTypeText: $customSampleTypeText, storageType: $storageType, liters: $liters, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'SampleModel(id: $id, featureId: $featureId, fillId: $fillId, cutId: $cutId, sampleNumber: $sampleNumber, sampleType: $sampleType, customSampleTypeText: $customSampleTypeText, storageType: $storageType, storageCount: $storageCount, liters: $liters, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SampleModelCopyWith<$Res>  {
   factory $SampleModelCopyWith(SampleModel value, $Res Function(SampleModel) _then) = _$SampleModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String featureId, String fillId, String cutId, int sampleNumber, SampleType sampleType, String? customSampleTypeText, StorageType storageType, double? liters, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String fillId, String cutId, int sampleNumber, SampleType sampleType, String? customSampleTypeText, StorageType storageType, int storageCount, double? liters, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -62,7 +62,7 @@ class _$SampleModelCopyWithImpl<$Res>
 
 /// Create a copy of SampleModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? cutId = null,Object? sampleNumber = null,Object? sampleType = null,Object? customSampleTypeText = freezed,Object? storageType = null,Object? liters = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? cutId = null,Object? sampleNumber = null,Object? sampleType = null,Object? customSampleTypeText = freezed,Object? storageType = null,Object? storageCount = null,Object? liters = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -72,7 +72,8 @@ as String,sampleNumber: null == sampleNumber ? _self.sampleNumber : sampleNumber
 as int,sampleType: null == sampleType ? _self.sampleType : sampleType // ignore: cast_nullable_to_non_nullable
 as SampleType,customSampleTypeText: freezed == customSampleTypeText ? _self.customSampleTypeText : customSampleTypeText // ignore: cast_nullable_to_non_nullable
 as String?,storageType: null == storageType ? _self.storageType : storageType // ignore: cast_nullable_to_non_nullable
-as StorageType,liters: freezed == liters ? _self.liters : liters // ignore: cast_nullable_to_non_nullable
+as StorageType,storageCount: null == storageCount ? _self.storageCount : storageCount // ignore: cast_nullable_to_non_nullable
+as int,liters: freezed == liters ? _self.liters : liters // ignore: cast_nullable_to_non_nullable
 as double?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  double? liters,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  int storageCount,  double? liters,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SampleModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.liters,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.storageCount,_that.liters,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  double? liters,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  int storageCount,  double? liters,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _SampleModel():
-return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.liters,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.storageCount,_that.liters,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  double? liters,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureId,  String fillId,  String cutId,  int sampleNumber,  SampleType sampleType,  String? customSampleTypeText,  StorageType storageType,  int storageCount,  double? liters,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _SampleModel() when $default != null:
-return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.liters,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNumber,_that.sampleType,_that.customSampleTypeText,_that.storageType,_that.storageCount,_that.liters,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.id,_that.featureId,_that.fillId,_that.cutId,_that.sampleNu
 
 
 class _SampleModel implements SampleModel {
-  const _SampleModel({required this.id, required this.featureId, required this.fillId, required this.cutId, required this.sampleNumber, required this.sampleType, this.customSampleTypeText, required this.storageType, this.liters, required this.createdAt, required this.updatedAt});
+  const _SampleModel({required this.id, required this.featureId, required this.fillId, required this.cutId, required this.sampleNumber, required this.sampleType, this.customSampleTypeText, required this.storageType, this.storageCount = 1, this.liters, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
@@ -227,6 +228,7 @@ class _SampleModel implements SampleModel {
 @override final  SampleType sampleType;
 @override final  String? customSampleTypeText;
 @override final  StorageType storageType;
+@override@JsonKey() final  int storageCount;
 @override final  double? liters;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
@@ -241,16 +243,16 @@ _$SampleModelCopyWith<_SampleModel> get copyWith => __$SampleModelCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SampleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.cutId, cutId) || other.cutId == cutId)&&(identical(other.sampleNumber, sampleNumber) || other.sampleNumber == sampleNumber)&&(identical(other.sampleType, sampleType) || other.sampleType == sampleType)&&(identical(other.customSampleTypeText, customSampleTypeText) || other.customSampleTypeText == customSampleTypeText)&&(identical(other.storageType, storageType) || other.storageType == storageType)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SampleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureId, featureId) || other.featureId == featureId)&&(identical(other.fillId, fillId) || other.fillId == fillId)&&(identical(other.cutId, cutId) || other.cutId == cutId)&&(identical(other.sampleNumber, sampleNumber) || other.sampleNumber == sampleNumber)&&(identical(other.sampleType, sampleType) || other.sampleType == sampleType)&&(identical(other.customSampleTypeText, customSampleTypeText) || other.customSampleTypeText == customSampleTypeText)&&(identical(other.storageType, storageType) || other.storageType == storageType)&&(identical(other.storageCount, storageCount) || other.storageCount == storageCount)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureId,fillId,cutId,sampleNumber,sampleType,customSampleTypeText,storageType,liters,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureId,fillId,cutId,sampleNumber,sampleType,customSampleTypeText,storageType,storageCount,liters,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'SampleModel(id: $id, featureId: $featureId, fillId: $fillId, cutId: $cutId, sampleNumber: $sampleNumber, sampleType: $sampleType, customSampleTypeText: $customSampleTypeText, storageType: $storageType, liters: $liters, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'SampleModel(id: $id, featureId: $featureId, fillId: $fillId, cutId: $cutId, sampleNumber: $sampleNumber, sampleType: $sampleType, customSampleTypeText: $customSampleTypeText, storageType: $storageType, storageCount: $storageCount, liters: $liters, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$SampleModelCopyWith<$Res> implements $SampleModelCopyWith
   factory _$SampleModelCopyWith(_SampleModel value, $Res Function(_SampleModel) _then) = __$SampleModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String featureId, String fillId, String cutId, int sampleNumber, SampleType sampleType, String? customSampleTypeText, StorageType storageType, double? liters, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, String fillId, String cutId, int sampleNumber, SampleType sampleType, String? customSampleTypeText, StorageType storageType, int storageCount, double? liters, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -278,7 +280,7 @@ class __$SampleModelCopyWithImpl<$Res>
 
 /// Create a copy of SampleModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? cutId = null,Object? sampleNumber = null,Object? sampleType = null,Object? customSampleTypeText = freezed,Object? storageType = null,Object? liters = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? fillId = null,Object? cutId = null,Object? sampleNumber = null,Object? sampleType = null,Object? customSampleTypeText = freezed,Object? storageType = null,Object? storageCount = null,Object? liters = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_SampleModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
@@ -288,7 +290,8 @@ as String,sampleNumber: null == sampleNumber ? _self.sampleNumber : sampleNumber
 as int,sampleType: null == sampleType ? _self.sampleType : sampleType // ignore: cast_nullable_to_non_nullable
 as SampleType,customSampleTypeText: freezed == customSampleTypeText ? _self.customSampleTypeText : customSampleTypeText // ignore: cast_nullable_to_non_nullable
 as String?,storageType: null == storageType ? _self.storageType : storageType // ignore: cast_nullable_to_non_nullable
-as StorageType,liters: freezed == liters ? _self.liters : liters // ignore: cast_nullable_to_non_nullable
+as StorageType,storageCount: null == storageCount ? _self.storageCount : storageCount // ignore: cast_nullable_to_non_nullable
+as int,liters: freezed == liters ? _self.liters : liters // ignore: cast_nullable_to_non_nullable
 as double?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,

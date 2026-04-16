@@ -32,9 +32,11 @@ class ContextsTable extends Table {
   // No drift .references() used here to avoid circular FK issues;
   // enforced at application layer.
   TextColumn get parentCutId => text().nullable()();
-  TextColumn get composition => text().nullable()();
+  TextColumn get composition =>
+      text().map(const NullableFillCompositionConverter()).nullable()();
   TextColumn get color => text().nullable()();
-  TextColumn get compaction => text().nullable()();
+  TextColumn get compaction =>
+      text().map(const NullableFillCompactionConverter()).nullable()();
   TextColumn get inclusions => text().nullable()();
 
   // --- Common ---

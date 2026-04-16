@@ -42,9 +42,9 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
 
   // Fill fields
   String? _parentCutId;
-  final _compositionCtrl = TextEditingController();
+  FillComposition? _composition;
   final _colorCtrl = TextEditingController();
-  final _compactionCtrl = TextEditingController();
+  FillCompaction? _compaction;
   final _inclusionsCtrl = TextEditingController();
 
   late ContextType _type;
@@ -82,9 +82,9 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
               :final inclusions
             ):
           _parentCutId = parentCutId;
-          _compositionCtrl.text = composition ?? '';
+          _composition = composition;
           _colorCtrl.text = color ?? '';
-          _compactionCtrl.text = compaction ?? '';
+          _compaction = compaction;
           _inclusionsCtrl.text = inclusions ?? '';
       }
     } else {
@@ -100,9 +100,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
     _heightCtrl.dispose();
     _widthCtrl.dispose();
     _depthCtrl.dispose();
-    _compositionCtrl.dispose();
     _colorCtrl.dispose();
-    _compactionCtrl.dispose();
     _inclusionsCtrl.dispose();
     super.dispose();
   }
@@ -295,10 +293,16 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
         },
       ),
       const SizedBox(height: AppSpacing.space12),
-      TextFormField(
-        controller: _compositionCtrl,
+      DropdownButtonFormField<FillComposition?>(
+        value: _composition,
         decoration: const InputDecoration(labelText: 'Composition'),
-        textCapitalization: TextCapitalization.sentences,
+        items: [
+          const DropdownMenuItem(value: null, child: Text('— unspecified —')),
+          ...FillComposition.values.map(
+            (c) => DropdownMenuItem(value: c, child: Text(c.displayName)),
+          ),
+        ],
+        onChanged: (v) => setState(() => _composition = v),
       ),
       const SizedBox(height: AppSpacing.space12),
       TextFormField(
@@ -310,10 +314,16 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
         textCapitalization: TextCapitalization.sentences,
       ),
       const SizedBox(height: AppSpacing.space12),
-      TextFormField(
-        controller: _compactionCtrl,
+      DropdownButtonFormField<FillCompaction?>(
+        value: _compaction,
         decoration: const InputDecoration(labelText: 'Compaction'),
-        textCapitalization: TextCapitalization.sentences,
+        items: [
+          const DropdownMenuItem(value: null, child: Text('— unspecified —')),
+          ...FillCompaction.values.map(
+            (c) => DropdownMenuItem(value: c, child: Text(c.displayName)),
+          ),
+        ],
+        onChanged: (v) => setState(() => _compaction = v),
       ),
       const SizedBox(height: AppSpacing.space12),
       TextFormField(
@@ -414,15 +424,11 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
             id: widget.existingContext!.id,
             contextNumber: contextNumber,
             parentCutId: _parentCutId!,
-            composition: _compositionCtrl.text.trim().isEmpty
-                ? null
-                : _compositionCtrl.text.trim(),
+            composition: _composition,
             color: _colorCtrl.text.trim().isEmpty
                 ? null
                 : _colorCtrl.text.trim(),
-            compaction: _compactionCtrl.text.trim().isEmpty
-                ? null
-                : _compactionCtrl.text.trim(),
+            compaction: _compaction,
             inclusions: _inclusionsCtrl.text.trim().isEmpty
                 ? null
                 : _inclusionsCtrl.text.trim(),
@@ -435,15 +441,11 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
             featureId: widget.featureId,
             contextNumber: contextNumber,
             parentCutId: _parentCutId!,
-            composition: _compositionCtrl.text.trim().isEmpty
-                ? null
-                : _compositionCtrl.text.trim(),
+            composition: _composition,
             color: _colorCtrl.text.trim().isEmpty
                 ? null
                 : _colorCtrl.text.trim(),
-            compaction: _compactionCtrl.text.trim().isEmpty
-                ? null
-                : _compactionCtrl.text.trim(),
+            compaction: _compaction,
             inclusions: _inclusionsCtrl.text.trim().isEmpty
                 ? null
                 : _inclusionsCtrl.text.trim(),

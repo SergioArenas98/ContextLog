@@ -56,6 +56,7 @@ class FindRepository {
     String? customMaterialText,
     required int quantity,
     String? description,
+    String? localImagePath,
   }) async {
     final now = DateTime.now();
     final id = _uuid.v4();
@@ -69,6 +70,7 @@ class FindRepository {
             customMaterialText: Value(customMaterialText),
             quantity: Value(quantity),
             description: Value(description),
+            localImagePath: Value(localImagePath),
             createdAt: now,
             updatedAt: now,
           ),
@@ -84,6 +86,7 @@ class FindRepository {
     String? customMaterialText,
     required int quantity,
     String? description,
+    String? localImagePath,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.findsTable)..where((t) => t.id.equals(id))).write(
@@ -94,6 +97,7 @@ class FindRepository {
         customMaterialText: Value(customMaterialText),
         quantity: Value(quantity),
         description: Value(description),
+        localImagePath: Value(localImagePath),
         updatedAt: Value(now),
       ),
     );
@@ -113,6 +117,7 @@ class FindRepository {
         customMaterialText: row.customMaterialText,
         quantity: row.quantity,
         description: row.description,
+        localImagePath: row.localImagePath,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );

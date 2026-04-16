@@ -48,6 +48,7 @@ class SampleRepository {
     required SampleType sampleType,
     String? customSampleTypeText,
     required StorageType storageType,
+    int storageCount = 1,
     double? liters,
   }) async {
     final now = DateTime.now();
@@ -62,6 +63,7 @@ class SampleRepository {
             sampleType: sampleType,
             customSampleTypeText: Value(customSampleTypeText),
             storageType: storageType,
+            storageCount: Value(storageCount),
             liters: Value(liters),
             createdAt: now,
             updatedAt: now,
@@ -78,6 +80,7 @@ class SampleRepository {
     required SampleType sampleType,
     String? customSampleTypeText,
     required StorageType storageType,
+    int storageCount = 1,
     double? liters,
   }) async {
     final now = DateTime.now();
@@ -89,6 +92,7 @@ class SampleRepository {
         sampleType: Value(sampleType),
         customSampleTypeText: Value(customSampleTypeText),
         storageType: Value(storageType),
+        storageCount: Value(storageCount),
         liters: Value(liters),
         updatedAt: Value(now),
       ),
@@ -109,6 +113,7 @@ class SampleRepository {
         sampleType: row.sampleType,
         customSampleTypeText: row.customSampleTypeText,
         storageType: row.storageType,
+        storageCount: row.storageCount,
         liters: row.liters,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,

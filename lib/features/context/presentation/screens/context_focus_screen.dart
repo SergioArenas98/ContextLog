@@ -198,7 +198,7 @@ class _FillRow extends StatelessWidget {
                   ),
                   if (fill.composition != null)
                     Text(
-                      fill.composition!,
+                      fill.composition!.displayName,
                       style: TextStyle(
                         fontFamily: AppTypography.sansFontFamily,
                         fontSize: 12,
@@ -262,10 +262,10 @@ class _FillFocusScaffold extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: _PropertiesSection(rows: [
                   if (fill.composition != null)
-                    _PropRow('Composition', fill.composition!),
+                    _PropRow('Composition', fill.composition!.displayName),
                   if (fill.color != null) _PropRow('Color', fill.color!),
                   if (fill.compaction != null)
-                    _PropRow('Compaction', fill.compaction!),
+                    _PropRow('Compaction', fill.compaction!.displayName),
                   if (fill.inclusions != null)
                     _PropRow('Inclusions', fill.inclusions!),
                   if (fill.notes != null) _PropRow('Notes', fill.notes!),
