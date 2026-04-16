@@ -31,10 +31,12 @@ class ContextValidator {
     return const ValidationValid();
   }
 
+  /// Validates a fill for a standard feature (cut required).
+  /// When [parentCutId] is null the parent-cut check is skipped (spread fills).
   Future<ValidationResult> validateFill({
     required String featureId,
     required int contextNumber,
-    required String parentCutId,
+    String? parentCutId,
     String? excludeId,
   }) async {
     // Check context number
@@ -45,12 +47,15 @@ class ContextValidator {
     );
     if (numberResult is ValidationInvalid) return numberResult;
 
-    // Validate parent cut exists in same feature
-    final cut = await _repository.getById(parentCutId);
-    if (cut == null || cut.featureId != featureId) {
-      return const ValidationInvalid(
-        'Parent cut must exist within the same feature',
-      );
+    // Validate parent cut only when one is provided (standard features).
+    // Spread features pass null and skip this check.
+    if (parentCutId != null) {
+      final cut = await _repository.getById(parentCutId);
+      if (cut == null || cut.featureId != featureId) {
+        return const ValidationInvalid(
+          'Parent cut must exist within the same feature',
+        );
+      }
     }
 
     return numberResult; // May be ValidationWarning or ValidationValid

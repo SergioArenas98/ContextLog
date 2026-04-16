@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/enums.dart';
 import '../../../../core/design/app_colors.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/design/app_typography.dart';
@@ -25,6 +26,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
   final _areaCtrl = TextEditingController();
   String? _selectedProjectId;
   bool _isNonArchaeological = false;
+  FeatureType _featureType = FeatureType.standard;
   bool _loading = false;
   bool _initialized = false;
 
@@ -62,6 +64,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
             _areaCtrl.text = feature.area ?? '';
             _selectedProjectId = feature.projectId;
             _isNonArchaeological = feature.isNonArchaeological;
+            _featureType = feature.featureType;
             _initialized = true;
           }
           return _buildScaffold(context, projectsAsync);
@@ -191,6 +194,21 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
         Container(height: 1, color: colors.rule),
         const SizedBox(height: AppSpacing.space16),
 
+        // ── Feature type ───────────────────────────────────────────────
+        _FieldLabel(label: 'TYPE'),
+        const SizedBox(height: AppSpacing.space6),
+        ...FeatureType.values.map(
+          (t) => _FeatureTypeOption(
+            featureType: t,
+            selected: t == _featureType,
+            onTap: () => setState(() => _featureType = t),
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.space16),
+        Container(height: 1, color: colors.rule),
+        const SizedBox(height: AppSpacing.space16),
+
         // ── Feature-level field ────────────────────────────────────────
         _FieldLabel(label: 'AREA'),
         const SizedBox(height: AppSpacing.space6),
@@ -293,6 +311,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
           projectId: _selectedProjectId!,
           area: area,
           isNonArchaeological: _isNonArchaeological,
+          featureType: _featureType,
         );
         ref.invalidate(featureDetailProvider(updated.id));
         ref.invalidate(featureListProvider);
@@ -303,6 +322,7 @@ class _FeatureFormScreenState extends ConsumerState<FeatureFormScreen> {
           projectId: _selectedProjectId!,
           area: area,
           isNonArchaeological: _isNonArchaeological,
+          featureType: _featureType,
         );
         ref.invalidate(featureListProvider);
         ref.invalidate(filteredFeatureListProvider);
@@ -355,6 +375,82 @@ class _FieldLabel extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _FeatureTypeOption extends StatelessWidget {
+  const _FeatureTypeOption({
+    required this.featureType,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final FeatureType featureType;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static String _description(FeatureType t) => switch (t) {
+        FeatureType.standard => 'Has cuts and fills',
+        FeatureType.spread => 'Fill-only — no cut required',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        margin: const EdgeInsets.only(bottom: AppSpacing.space6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space12,
+          vertical: AppSpacing.space8,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? colors.s2 : colors.s1,
+          borderRadius: AppRadius.smBorderRadius,
+          border: Border.all(
+            color: selected ? colors.primary : colors.rule,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    featureType.displayName,
+                    style: TextStyle(
+                      fontFamily: AppTypography.sansFontFamily,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: selected ? colors.t0 : colors.t1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _description(featureType),
+                    style: TextStyle(
+                      fontFamily: AppTypography.sansFontFamily,
+                      fontSize: 12,
+                      color: colors.t2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (selected)
+              Icon(
+                Icons.check_circle_rounded,
+                size: 18,
+                color: colors.primary,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

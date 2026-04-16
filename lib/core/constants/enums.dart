@@ -174,6 +174,16 @@ enum FillCompaction {
       };
 }
 
+enum FeatureType {
+  standard,
+  spread;
+
+  String get displayName => switch (this) {
+        FeatureType.standard => 'Standard',
+        FeatureType.spread => 'Spread',
+      };
+}
+
 enum HarrisRelationType {
   above,
   below,

@@ -155,7 +155,7 @@ return fill(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  cut,TResult Function( String id,  String featureId,  int contextNumber,  String parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  fill,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  cut,TResult Function( String id,  String featureId,  int contextNumber,  String? parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  fill,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CutModel() when cut != null:
 return cut(_that.id,_that.featureId,_that.contextNumber,_that.cutType,_that.customCutTypeText,_that.height,_that.width,_that.depth,_that.notes,_that.createdAt,_that.updatedAt);case FillModel() when fill != null:
@@ -177,7 +177,7 @@ return fill(_that.id,_that.featureId,_that.contextNumber,_that.parentCutId,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)  cut,required TResult Function( String id,  String featureId,  int contextNumber,  String parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)  fill,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)  cut,required TResult Function( String id,  String featureId,  int contextNumber,  String? parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)  fill,}) {final _that = this;
 switch (_that) {
 case CutModel():
 return cut(_that.id,_that.featureId,_that.contextNumber,_that.cutType,_that.customCutTypeText,_that.height,_that.width,_that.depth,_that.notes,_that.createdAt,_that.updatedAt);case FillModel():
@@ -195,7 +195,7 @@ return fill(_that.id,_that.featureId,_that.contextNumber,_that.parentCutId,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  cut,TResult? Function( String id,  String featureId,  int contextNumber,  String parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  fill,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String featureId,  int contextNumber,  CutType? cutType,  String? customCutTypeText,  double? height,  double? width,  double? depth,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  cut,TResult? Function( String id,  String featureId,  int contextNumber,  String? parentCutId,  FillComposition? composition,  String? color,  FillCompaction? compaction,  String? inclusions,  String? notes,  DateTime createdAt,  DateTime updatedAt)?  fill,}) {final _that = this;
 switch (_that) {
 case CutModel() when cut != null:
 return cut(_that.id,_that.featureId,_that.contextNumber,_that.cutType,_that.customCutTypeText,_that.height,_that.width,_that.depth,_that.notes,_that.createdAt,_that.updatedAt);case FillModel() when fill != null:
@@ -297,13 +297,14 @@ as DateTime,
 
 
 class FillModel implements ContextModel {
-  const FillModel({required this.id, required this.featureId, required this.contextNumber, required this.parentCutId, this.composition, this.color, this.compaction, this.inclusions, this.notes, required this.createdAt, required this.updatedAt});
+  const FillModel({required this.id, required this.featureId, required this.contextNumber, this.parentCutId, this.composition, this.color, this.compaction, this.inclusions, this.notes, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
 @override final  String featureId;
 @override final  int contextNumber;
- final  String parentCutId;
+/// Null for spread features where fills have no parent cut.
+ final  String? parentCutId;
  final  FillComposition? composition;
  final  String? color;
  final  FillCompaction? compaction;
@@ -342,7 +343,7 @@ abstract mixin class $FillModelCopyWith<$Res> implements $ContextModelCopyWith<$
   factory $FillModelCopyWith(FillModel value, $Res Function(FillModel) _then) = _$FillModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String featureId, int contextNumber, String parentCutId, FillComposition? composition, String? color, FillCompaction? compaction, String? inclusions, String? notes, DateTime createdAt, DateTime updatedAt
+ String id, String featureId, int contextNumber, String? parentCutId, FillComposition? composition, String? color, FillCompaction? compaction, String? inclusions, String? notes, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -359,13 +360,13 @@ class _$FillModelCopyWithImpl<$Res>
 
 /// Create a copy of ContextModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? contextNumber = null,Object? parentCutId = null,Object? composition = freezed,Object? color = freezed,Object? compaction = freezed,Object? inclusions = freezed,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureId = null,Object? contextNumber = null,Object? parentCutId = freezed,Object? composition = freezed,Object? color = freezed,Object? compaction = freezed,Object? inclusions = freezed,Object? notes = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(FillModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureId: null == featureId ? _self.featureId : featureId // ignore: cast_nullable_to_non_nullable
 as String,contextNumber: null == contextNumber ? _self.contextNumber : contextNumber // ignore: cast_nullable_to_non_nullable
-as int,parentCutId: null == parentCutId ? _self.parentCutId : parentCutId // ignore: cast_nullable_to_non_nullable
-as String,composition: freezed == composition ? _self.composition : composition // ignore: cast_nullable_to_non_nullable
+as int,parentCutId: freezed == parentCutId ? _self.parentCutId : parentCutId // ignore: cast_nullable_to_non_nullable
+as String?,composition: freezed == composition ? _self.composition : composition // ignore: cast_nullable_to_non_nullable
 as FillComposition?,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as String?,compaction: freezed == compaction ? _self.compaction : compaction // ignore: cast_nullable_to_non_nullable
 as FillCompaction?,inclusions: freezed == inclusions ? _self.inclusions : inclusions // ignore: cast_nullable_to_non_nullable

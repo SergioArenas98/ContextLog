@@ -12,9 +12,11 @@ import '../../../sample/presentation/widgets/sample_form_sheet.dart';
 import '../../../sample/presentation/providers/sample_providers.dart';
 import '../../../photo/presentation/widgets/photo_form_sheet.dart';
 import '../../../photo/presentation/providers/photo_providers.dart';
+import '../../../../core/constants/enums.dart';
 import '../../domain/models/context_model.dart';
 import '../providers/context_providers.dart';
 import '../widgets/context_form_sheet.dart';
+import '../../../feature/presentation/providers/feature_providers.dart';
 
 /// Context Detail Screen — full edit/detail view for a context.
 class ContextFocusScreen extends ConsumerWidget {
@@ -47,15 +49,23 @@ class ContextFocusScreen extends ConsumerWidget {
           );
         }
 
+        final featureType = ref
+                .read(featureDetailProvider(featureId))
+                .valueOrNull
+                ?.featureType ??
+            FeatureType.standard;
+
         return switch (ctx) {
           final CutModel cut => _CutFocusScaffold(
               cut: cut,
               featureId: featureId,
+              featureType: featureType,
               allContexts: contexts,
             ),
           final FillModel fill => _FillFocusScaffold(
               fill: fill,
               featureId: featureId,
+              featureType: featureType,
             ),
         };
       },
@@ -69,11 +79,13 @@ class _CutFocusScaffold extends StatelessWidget {
   const _CutFocusScaffold({
     required this.cut,
     required this.featureId,
+    required this.featureType,
     required this.allContexts,
   });
 
   final CutModel cut;
   final String featureId;
+  final FeatureType featureType;
   final List<ContextModel> allContexts;
 
   @override
@@ -96,6 +108,7 @@ class _CutFocusScaffold extends StatelessWidget {
               surfaceColor: colors.cutSurface,
               number: cut.contextNumber,
               featureId: featureId,
+              featureType: featureType,
               context_: cut,
             ),
           ),
@@ -227,10 +240,12 @@ class _FillFocusScaffold extends ConsumerWidget {
   const _FillFocusScaffold({
     required this.fill,
     required this.featureId,
+    required this.featureType,
   });
 
   final FillModel fill;
   final String featureId;
+  final FeatureType featureType;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -256,6 +271,7 @@ class _FillFocusScaffold extends ConsumerWidget {
                   surfaceColor: colors.fillSurface,
                   number: fill.contextNumber,
                   featureId: featureId,
+                  featureType: featureType,
                   context_: fill,
                 ),
               ),
@@ -515,6 +531,7 @@ class _ContextHeader extends ConsumerWidget {
     required this.surfaceColor,
     required this.number,
     required this.featureId,
+    required this.featureType,
     required this.context_,
   });
 
@@ -524,6 +541,7 @@ class _ContextHeader extends ConsumerWidget {
   final Color surfaceColor;
   final int number;
   final String featureId;
+  final FeatureType featureType;
   final ContextModel context_;
 
   @override
@@ -627,6 +645,7 @@ class _ContextHeader extends ConsumerWidget {
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
+        featureType: featureType,
         existingContext: context_,
         onSaved: () {
           ref.invalidate(contextsByFeatureProvider(featureId));

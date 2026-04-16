@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../feature/presentation/providers/feature_providers.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
@@ -86,12 +87,18 @@ class ContextListTab extends ConsumerWidget {
   }
 
   void _showAdd(BuildContext context, WidgetRef ref) {
+    final featureType = ref
+            .read(featureDetailProvider(featureId))
+            .valueOrNull
+            ?.featureType ??
+        FeatureType.standard;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
+        featureType: featureType,
         onSaved: () {
           ref.invalidate(contextsByFeatureProvider(featureId));
           ref.invalidate(cutsByFeatureProvider(featureId));
@@ -184,21 +191,29 @@ class _ContextTile extends StatelessWidget {
                         minWidth: 40,
                         minHeight: 40,
                       ),
-                      onPressed: () => showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        builder: (_) => ContextFormSheet(
-                          featureId: featureId,
-                          existingContext: context_,
-                          onSaved: () {
-                            ref.invalidate(
-                                contextsByFeatureProvider(featureId));
-                            ref.invalidate(cutsByFeatureProvider(featureId));
-                            ref.invalidate(fillsByFeatureProvider(featureId));
-                          },
-                        ),
-                      ),
+                      onPressed: () {
+                        final featureType = ref
+                                .read(featureDetailProvider(featureId))
+                                .valueOrNull
+                                ?.featureType ??
+                            FeatureType.standard;
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          builder: (_) => ContextFormSheet(
+                            featureId: featureId,
+                            featureType: featureType,
+                            existingContext: context_,
+                            onSaved: () {
+                              ref.invalidate(
+                                  contextsByFeatureProvider(featureId));
+                              ref.invalidate(cutsByFeatureProvider(featureId));
+                              ref.invalidate(fillsByFeatureProvider(featureId));
+                            },
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Icon(

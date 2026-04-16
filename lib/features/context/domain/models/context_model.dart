@@ -26,7 +26,8 @@ sealed class ContextModel with _$ContextModel {
     required String id,
     required String featureId,
     required int contextNumber,
-    required String parentCutId,
+    /// Null for spread features where fills have no parent cut.
+    String? parentCutId,
     FillComposition? composition,
     String? color,
     FillCompaction? compaction,

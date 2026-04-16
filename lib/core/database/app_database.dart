@@ -86,6 +86,12 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(
                 featuresTable, featuresTable.isNonArchaeological);
           }
+          if (from < 7) {
+            // v6→v7: Features: added featureType (TEXT DEFAULT 'standard').
+            // Existing rows default to 'standard' (cut+fill recording).
+            // 'spread' features allow fill-only recording without a parent cut.
+            await m.addColumn(featuresTable, featuresTable.featureType);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

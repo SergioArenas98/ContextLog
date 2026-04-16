@@ -111,7 +111,7 @@ class ContextRepository {
   Future<ContextModel> createFill({
     required String featureId,
     required int contextNumber,
-    required String parentCutId,
+    String? parentCutId,
     FillComposition? composition,
     String? color,
     FillCompaction? compaction,
@@ -168,7 +168,7 @@ class ContextRepository {
   Future<ContextModel> updateFill({
     required String id,
     required int contextNumber,
-    required String parentCutId,
+    String? parentCutId,
     FillComposition? composition,
     String? color,
     FillCompaction? compaction,
@@ -214,7 +214,7 @@ class ContextRepository {
           id: row.id,
           featureId: row.featureId,
           contextNumber: row.contextNumber,
-          parentCutId: row.parentCutId ?? '',
+          parentCutId: row.parentCutId,
           composition: row.composition,
           color: row.color,
           compaction: row.compaction,

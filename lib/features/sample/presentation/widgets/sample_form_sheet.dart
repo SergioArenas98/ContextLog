@@ -312,14 +312,15 @@ class _SampleFormSheetState extends ConsumerState<SampleFormSheet> {
           break;
       }
 
-      // Derive cutId from fill's parentCutId
+      // Derive cutId from fill's parentCutId.
+      // Spread fills have no parent cut; use '' as sentinel.
       final contextRepo = ref.read(contextRepositoryProvider);
       final fill = await contextRepo.getById(_fillId!);
       if (fill is! FillModel) {
         _showError('Selected fill is invalid');
         return;
       }
-      final cutId = fill.parentCutId;
+      final cutId = fill.parentCutId ?? '';
 
       final repo = ref.read(sampleRepositoryProvider);
       if (widget.sample != null) {

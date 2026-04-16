@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/enums.dart';
 import '../../../../core/design/app_colors.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/design/app_typography.dart';
@@ -731,12 +732,18 @@ class _ActionDock extends ConsumerWidget {
   }
 
   void _addContext(BuildContext context, WidgetRef ref) {
+    final featureType = ref
+            .read(featureDetailProvider(featureId))
+            .valueOrNull
+            ?.featureType ??
+        FeatureType.standard;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
+        featureType: featureType,
         onSaved: onContextAdded,
       ),
     );

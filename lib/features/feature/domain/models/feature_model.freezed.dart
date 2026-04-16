@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeatureModel {
 
- String get id; String get featureNumber; String? get projectId; String? get area; bool get isNonArchaeological; DateTime get date; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get featureNumber; String? get projectId; String? get area; bool get isNonArchaeological; FeatureType get featureType; DateTime get date; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FeatureModelCopyWith<FeatureModel> get copyWith => _$FeatureModelCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.projectId, projectId) || other.projectId == projectId)&&(identical(other.area, area) || other.area == area)&&(identical(other.isNonArchaeological, isNonArchaeological) || other.isNonArchaeological == isNonArchaeological)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.projectId, projectId) || other.projectId == projectId)&&(identical(other.area, area) || other.area == area)&&(identical(other.isNonArchaeological, isNonArchaeological) || other.isNonArchaeological == isNonArchaeological)&&(identical(other.featureType, featureType) || other.featureType == featureType)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureNumber,projectId,area,isNonArchaeological,date,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureNumber,projectId,area,isNonArchaeological,featureType,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FeatureModel(id: $id, featureNumber: $featureNumber, projectId: $projectId, area: $area, isNonArchaeological: $isNonArchaeological, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FeatureModel(id: $id, featureNumber: $featureNumber, projectId: $projectId, area: $area, isNonArchaeological: $isNonArchaeological, featureType: $featureType, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FeatureModelCopyWith<$Res>  {
   factory $FeatureModelCopyWith(FeatureModel value, $Res Function(FeatureModel) _then) = _$FeatureModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String featureNumber, String? projectId, String? area, bool isNonArchaeological, DateTime date, DateTime createdAt, DateTime updatedAt
+ String id, String featureNumber, String? projectId, String? area, bool isNonArchaeological, FeatureType featureType, DateTime date, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -62,14 +62,15 @@ class _$FeatureModelCopyWithImpl<$Res>
 
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureNumber = null,Object? projectId = freezed,Object? area = freezed,Object? isNonArchaeological = null,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? featureNumber = null,Object? projectId = freezed,Object? area = freezed,Object? isNonArchaeological = null,Object? featureType = null,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureNumber: null == featureNumber ? _self.featureNumber : featureNumber // ignore: cast_nullable_to_non_nullable
 as String,projectId: freezed == projectId ? _self.projectId : projectId // ignore: cast_nullable_to_non_nullable
 as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
 as String?,isNonArchaeological: null == isNonArchaeological ? _self.isNonArchaeological : isNonArchaeological // ignore: cast_nullable_to_non_nullable
-as bool,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as bool,featureType: null == featureType ? _self.featureType : featureType // ignore: cast_nullable_to_non_nullable
+as FeatureType,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  FeatureType featureType,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeatureModel() when $default != null:
-return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.date,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.featureType,_that.date,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.is
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  DateTime date,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  FeatureType featureType,  DateTime date,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FeatureModel():
-return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.date,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.featureType,_that.date,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.is
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String featureNumber,  String? projectId,  String? area,  bool isNonArchaeological,  FeatureType featureType,  DateTime date,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FeatureModel() when $default != null:
-return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.date,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.isNonArchaeological,_that.featureType,_that.date,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.id,_that.featureNumber,_that.projectId,_that.area,_that.is
 
 
 class _FeatureModel implements FeatureModel {
-  const _FeatureModel({required this.id, required this.featureNumber, this.projectId, this.area, this.isNonArchaeological = false, required this.date, required this.createdAt, required this.updatedAt});
+  const _FeatureModel({required this.id, required this.featureNumber, this.projectId, this.area, this.isNonArchaeological = false, this.featureType = FeatureType.standard, required this.date, required this.createdAt, required this.updatedAt});
   
 
 @override final  String id;
@@ -221,6 +222,7 @@ class _FeatureModel implements FeatureModel {
 @override final  String? projectId;
 @override final  String? area;
 @override@JsonKey() final  bool isNonArchaeological;
+@override@JsonKey() final  FeatureType featureType;
 @override final  DateTime date;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
@@ -235,16 +237,16 @@ _$FeatureModelCopyWith<_FeatureModel> get copyWith => __$FeatureModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.projectId, projectId) || other.projectId == projectId)&&(identical(other.area, area) || other.area == area)&&(identical(other.isNonArchaeological, isNonArchaeological) || other.isNonArchaeological == isNonArchaeological)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureModel&&(identical(other.id, id) || other.id == id)&&(identical(other.featureNumber, featureNumber) || other.featureNumber == featureNumber)&&(identical(other.projectId, projectId) || other.projectId == projectId)&&(identical(other.area, area) || other.area == area)&&(identical(other.isNonArchaeological, isNonArchaeological) || other.isNonArchaeological == isNonArchaeological)&&(identical(other.featureType, featureType) || other.featureType == featureType)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,featureNumber,projectId,area,isNonArchaeological,date,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,featureNumber,projectId,area,isNonArchaeological,featureType,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FeatureModel(id: $id, featureNumber: $featureNumber, projectId: $projectId, area: $area, isNonArchaeological: $isNonArchaeological, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FeatureModel(id: $id, featureNumber: $featureNumber, projectId: $projectId, area: $area, isNonArchaeological: $isNonArchaeological, featureType: $featureType, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$FeatureModelCopyWith<$Res> implements $FeatureModelCopyWi
   factory _$FeatureModelCopyWith(_FeatureModel value, $Res Function(_FeatureModel) _then) = __$FeatureModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String featureNumber, String? projectId, String? area, bool isNonArchaeological, DateTime date, DateTime createdAt, DateTime updatedAt
+ String id, String featureNumber, String? projectId, String? area, bool isNonArchaeological, FeatureType featureType, DateTime date, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -272,14 +274,15 @@ class __$FeatureModelCopyWithImpl<$Res>
 
 /// Create a copy of FeatureModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureNumber = null,Object? projectId = freezed,Object? area = freezed,Object? isNonArchaeological = null,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? featureNumber = null,Object? projectId = freezed,Object? area = freezed,Object? isNonArchaeological = null,Object? featureType = null,Object? date = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_FeatureModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,featureNumber: null == featureNumber ? _self.featureNumber : featureNumber // ignore: cast_nullable_to_non_nullable
 as String,projectId: freezed == projectId ? _self.projectId : projectId // ignore: cast_nullable_to_non_nullable
 as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
 as String?,isNonArchaeological: null == isNonArchaeological ? _self.isNonArchaeological : isNonArchaeological // ignore: cast_nullable_to_non_nullable
-as bool,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as bool,featureType: null == featureType ? _self.featureType : featureType // ignore: cast_nullable_to_non_nullable
+as FeatureType,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,

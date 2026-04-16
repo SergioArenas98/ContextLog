@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/design/app_colors.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/design/app_typography.dart';
+import '../../../../core/constants/enums.dart';
 import '../../../context/domain/models/context_model.dart';
 import '../../../context/presentation/providers/context_providers.dart';
 import '../../../context/presentation/widgets/context_form_sheet.dart';
+import '../providers/feature_providers.dart';
 import '../../../find/domain/models/find_model.dart';
 import '../../../find/presentation/providers/find_providers.dart';
 import '../../../find/presentation/widgets/find_form_sheet.dart';
@@ -53,10 +55,17 @@ class ContextStationPanel extends ConsumerWidget {
         final ctx = contexts.where((c) => c.id == contextId).firstOrNull;
         if (ctx == null) return _PanelError(message: 'Context not found');
 
+        final featureType = ref
+                .read(featureDetailProvider(featureId))
+                .valueOrNull
+                ?.featureType ??
+            FeatureType.standard;
+
         return switch (ctx) {
           final CutModel cut => _CutPanel(
               cut: cut,
               featureId: featureId,
+              featureType: featureType,
               allContexts: contexts,
               onNavigateToDetail: onNavigateToDetail,
               ref: ref,
@@ -64,6 +73,7 @@ class ContextStationPanel extends ConsumerWidget {
           final FillModel fill => _FillPanel(
               fill: fill,
               featureId: featureId,
+              featureType: featureType,
               onNavigateToDetail: onNavigateToDetail,
               ref: ref,
             ),
@@ -83,6 +93,7 @@ class _PanelShell extends StatelessWidget {
     required this.textColor,
     required this.surfaceColor,
     required this.featureId,
+    required this.featureType,
     required this.contextModel,
     required this.onNavigateToDetail,
     required this.ref,
@@ -96,6 +107,7 @@ class _PanelShell extends StatelessWidget {
   final Color textColor;
   final Color surfaceColor;
   final String featureId;
+  final FeatureType featureType;
   final ContextModel contextModel;
   final void Function(String, String) onNavigateToDetail;
   final WidgetRef ref;
@@ -251,6 +263,7 @@ class _PanelShell extends StatelessWidget {
       useSafeArea: true,
       builder: (_) => ContextFormSheet(
         featureId: featureId,
+        featureType: featureType,
         existingContext: contextModel,
         onSaved: () {
           ref.invalidate(contextsByFeatureProvider(featureId));
@@ -268,6 +281,7 @@ class _CutPanel extends StatelessWidget {
   const _CutPanel({
     required this.cut,
     required this.featureId,
+    required this.featureType,
     required this.allContexts,
     required this.onNavigateToDetail,
     required this.ref,
@@ -275,6 +289,7 @@ class _CutPanel extends StatelessWidget {
 
   final CutModel cut;
   final String featureId;
+  final FeatureType featureType;
   final List<ContextModel> allContexts;
   final void Function(String, String) onNavigateToDetail;
   final WidgetRef ref;
@@ -294,6 +309,7 @@ class _CutPanel extends StatelessWidget {
       textColor: colors.cutText,
       surfaceColor: colors.cutSurface,
       featureId: featureId,
+      featureType: featureType,
       contextModel: cut,
       onNavigateToDetail: onNavigateToDetail,
       ref: ref,
@@ -328,12 +344,14 @@ class _FillPanel extends ConsumerWidget {
   const _FillPanel({
     required this.fill,
     required this.featureId,
+    required this.featureType,
     required this.onNavigateToDetail,
     required this.ref,
   });
 
   final FillModel fill;
   final String featureId;
+  final FeatureType featureType;
   final void Function(String, String) onNavigateToDetail;
   final WidgetRef ref;
 
@@ -369,6 +387,7 @@ class _FillPanel extends ConsumerWidget {
       textColor: colors.fillText,
       surfaceColor: colors.fillSurface,
       featureId: featureId,
+      featureType: featureType,
       contextModel: fill,
       onNavigateToDetail: onNavigateToDetail,
       ref: ref,

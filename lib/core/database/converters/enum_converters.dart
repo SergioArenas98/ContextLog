@@ -144,6 +144,22 @@ class NullableFillCompactionConverter
   String? toSql(FillCompaction? value) => value?.name;
 }
 
+class FeatureTypeConverter extends TypeConverter<FeatureType, String> {
+  const FeatureTypeConverter();
+
+  @override
+  FeatureType fromSql(String fromDb) {
+    try {
+      return FeatureType.values.firstWhere((e) => e.name == fromDb);
+    } catch (_) {
+      return FeatureType.standard;
+    }
+  }
+
+  @override
+  String toSql(FeatureType value) => value.name;
+}
+
 class HarrisRelationTypeConverter
     extends TypeConverter<HarrisRelationType, String> {
   const HarrisRelationTypeConverter();

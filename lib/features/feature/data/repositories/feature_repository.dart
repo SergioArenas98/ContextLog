@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/enums.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/models/feature_model.dart';
 
@@ -69,6 +70,7 @@ class FeatureRepository {
     required String projectId,
     String? area,
     bool isNonArchaeological = false,
+    FeatureType featureType = FeatureType.standard,
   }) async {
     final now = DateTime.now();
     final id = _uuid.v4();
@@ -79,6 +81,7 @@ class FeatureRepository {
       projectId: Value(projectId),
       area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
       isNonArchaeological: Value(isNonArchaeological),
+      featureType: Value(featureType),
       date: now,
       createdAt: now,
       updatedAt: now,
@@ -93,6 +96,7 @@ class FeatureRepository {
     required String projectId,
     String? area,
     bool isNonArchaeological = false,
+    FeatureType featureType = FeatureType.standard,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id))).write(
@@ -100,6 +104,7 @@ class FeatureRepository {
         projectId: Value(projectId),
         area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
         isNonArchaeological: Value(isNonArchaeological),
+        featureType: Value(featureType),
         updatedAt: Value(now),
       ),
     );
@@ -117,6 +122,7 @@ class FeatureRepository {
         projectId: row.projectId,
         area: row.area,
         isNonArchaeological: row.isNonArchaeological,
+        featureType: row.featureType,
         date: row.date,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/design/app_colors.dart';
+import '../../../../core/design/app_typography.dart';
 import '../../../../core/design/app_tokens.dart';
 import '../../../../core/utils/validation_result.dart';
 import '../../../../core/widgets/app_sheet_header.dart';
@@ -14,12 +16,14 @@ class ContextFormSheet extends ConsumerStatefulWidget {
   const ContextFormSheet({
     super.key,
     required this.featureId,
+    required this.featureType,
     this.initialType,
     this.existingContext,
     required this.onSaved,
   });
 
   final String featureId;
+  final FeatureType featureType;
   final ContextType? initialType;
   final ContextModel? existingContext;
   final VoidCallback onSaved;
@@ -88,7 +92,10 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
           _inclusionsCtrl.text = inclusions ?? '';
       }
     } else {
-      _type = widget.initialType ?? ContextType.cut;
+      // Spread features are fill-only; ignore any initialType override.
+      _type = widget.featureType == FeatureType.spread
+          ? ContextType.fill
+          : (widget.initialType ?? ContextType.cut);
     }
   }
 
@@ -126,7 +133,8 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
               title: _isEditing ? 'Edit Context' : 'Add Context',
               onClose: () => Navigator.of(context).pop(),
             ),
-            if (!_isEditing)
+            // Spread features are fill-only — hide the type toggle.
+            if (!_isEditing && widget.featureType != FeatureType.spread)
               SegmentedButton<ContextType>(
                 segments: ContextType.values
                     .map(
@@ -139,6 +147,38 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
                 selected: {_type},
                 onSelectionChanged: (s) =>
                     setState(() => _type = s.first),
+              ),
+            // Spread feature label
+            if (!_isEditing && widget.featureType == FeatureType.spread)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space12,
+                  vertical: AppSpacing.space8,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: AppRadius.smBorderRadius,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.layers_outlined,
+                      size: 16,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    ),
+                    const SizedBox(width: AppSpacing.space8),
+                    Text(
+                      'Spread — fill only',
+                      style: TextStyle(
+                        fontFamily: AppTypography.monoFontFamily,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             const SizedBox(height: AppSpacing.space16),
             TextFormField(
@@ -244,54 +284,56 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
       ];
 
   List<Widget> _buildFillFields() {
-    final cutsAsync = ref.watch(cutsByFeatureProvider(widget.featureId));
+    final isSpread = widget.featureType == FeatureType.spread;
+    final cutsAsync = isSpread ? null : ref.watch(cutsByFeatureProvider(widget.featureId));
     return [
       SectionHeader(label: 'Fill Properties'),
       const SizedBox(height: AppSpacing.space8),
-      cutsAsync.when(
-        loading: () => const CircularProgressIndicator(),
-        error: (e, _) => Text('Error loading cuts: $e'),
-        data: (cuts) {
-          if (cuts.isEmpty) {
-            return Container(
-              padding: const EdgeInsets.all(AppSpacing.space12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.errorContainer,
-                borderRadius: AppRadius.smBorderRadius,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.warning_rounded,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(width: AppSpacing.space8),
-                  const Expanded(
-                    child: Text(
-                      'No cuts in this feature. Create a cut first, then add fills.',
+      if (!isSpread)
+        cutsAsync!.when(
+          loading: () => const CircularProgressIndicator(),
+          error: (e, _) => Text('Error loading cuts: $e'),
+          data: (cuts) {
+            if (cuts.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(AppSpacing.space12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: AppRadius.smBorderRadius,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_rounded,
+                      color: Theme.of(context).colorScheme.error,
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: AppSpacing.space8),
+                    const Expanded(
+                      child: Text(
+                        'No cuts in this feature. Create a cut first, then add fills.',
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return DropdownButtonFormField<String>(
+              value: _parentCutId,
+              decoration: const InputDecoration(labelText: 'Parent cut *'),
+              items: cuts
+                  .map(
+                    (c) => DropdownMenuItem(
+                      value: c.id,
+                      child: Text('C${c.contextNumber} — Cut'),
+                    ),
+                  )
+                  .toList(),
+              validator: (v) =>
+                  v == null || v.isEmpty ? 'A fill must have a parent cut' : null,
+              onChanged: (v) => setState(() => _parentCutId = v),
             );
-          }
-          return DropdownButtonFormField<String>(
-            value: _parentCutId,
-            decoration: const InputDecoration(labelText: 'Parent cut *'),
-            items: cuts
-                .map(
-                  (c) => DropdownMenuItem(
-                    value: c.id,
-                    child: Text('C${c.contextNumber} — Cut'),
-                  ),
-                )
-                .toList(),
-            validator: (v) =>
-                v == null || v.isEmpty ? 'A fill must have a parent cut' : null,
-            onChanged: (v) => setState(() => _parentCutId = v),
-          );
-        },
-      ),
+          },
+        ),
       const SizedBox(height: AppSpacing.space12),
       DropdownButtonFormField<FillComposition?>(
         value: _composition,
@@ -357,11 +399,12 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
       final validator = ref.read(contextValidatorProvider);
 
       final ValidationResult numResult;
-      if (_type == ContextType.fill && _parentCutId != null) {
+      if (_type == ContextType.fill) {
         numResult = await validator.validateFill(
           featureId: widget.featureId,
           contextNumber: contextNumber,
-          parentCutId: _parentCutId!,
+          // null for spread fills — parent cut check is skipped in validator
+          parentCutId: _parentCutId,
           excludeId: widget.existingContext?.id,
         );
       } else {
@@ -423,7 +466,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
           await repo.updateFill(
             id: widget.existingContext!.id,
             contextNumber: contextNumber,
-            parentCutId: _parentCutId!,
+            parentCutId: _parentCutId,
             composition: _composition,
             color: _colorCtrl.text.trim().isEmpty
                 ? null
@@ -440,7 +483,7 @@ class _ContextFormSheetState extends ConsumerState<ContextFormSheet> {
           await repo.createFill(
             featureId: widget.featureId,
             contextNumber: contextNumber,
-            parentCutId: _parentCutId!,
+            parentCutId: _parentCutId,
             composition: _composition,
             color: _colorCtrl.text.trim().isEmpty
                 ? null
