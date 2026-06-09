@@ -5,7 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemePreferences {
   static const _key = 'theme_mode';
 
-  /// Loads the persisted [ThemeMode]. Defaults to [ThemeMode.light].
+  /// Loads the persisted [ThemeMode]. Defaults to [ThemeMode.dark] when no
+  /// preference is stored — ContextLog is dark-first for outdoor field
+  /// readability (matches the startup fallback in `ContextLogApp`).
   static Future<ThemeMode> load() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString(_key);
@@ -28,6 +30,6 @@ class ThemePreferences {
         'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,
         'system' => ThemeMode.system,
-        _ => ThemeMode.light,
+        _ => ThemeMode.dark,
       };
 }
