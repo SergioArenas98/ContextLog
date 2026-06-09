@@ -6,7 +6,7 @@ abstract final class AppConstants {
   static const String databaseFileName = 'context_log.db';
 
   /// Current database schema version.
-  static const int databaseVersion = 7;
+  static const int databaseVersion = 8;
 
   /// Debounce delay for autosave in milliseconds.
   static const int autosaveDebounceMs = 2000;

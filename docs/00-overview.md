@@ -21,7 +21,7 @@ ContextLog is a Flutter Android app for recording archaeological excavation data
 | **Photo** | A photo record — stores the manual camera number and shooting stage (pre-ex, mid-ex, working shot, post-ex); may optionally have a reference phone image |
 | **Drawing** | A drawing record — stores drawing number, board number, type, facing direction, and an optional reference image |
 | **Find** | An archaeological object recovered from a fill (flint, ceramic, bone, etc.) |
-| **Sample** | A sediment sample taken from a fill (soil, charcoal, pollen, bulk) |
+| **Sample** | A sediment sample taken from a fill (soil, soil+charcoal, animal bone, human bone, other) |
 | **Harris Relation** | A directed stratigraphic relationship between two contexts (above, below, cuts, cutBy, equal to, contemporary with) |
 
 ## Main workflows

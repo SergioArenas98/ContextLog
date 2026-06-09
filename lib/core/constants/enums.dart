@@ -97,15 +97,15 @@ enum FindMaterialType {
 enum SampleType {
   soil,
   soilCharcoal,
-  bulk,
-  pollen,
+  animalBone,
+  humanBone,
   other;
 
   String get displayName => switch (this) {
         SampleType.soil => 'Soil',
         SampleType.soilCharcoal => 'Soil + charcoal',
-        SampleType.bulk => 'Bulk',
-        SampleType.pollen => 'Pollen',
+        SampleType.animalBone => 'Animal bone',
+        SampleType.humanBone => 'Human bone',
         SampleType.other => 'Other',
       };
 }

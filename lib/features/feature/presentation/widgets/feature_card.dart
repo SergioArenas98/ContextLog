@@ -37,6 +37,7 @@ class _FeatureRosterItemState extends ConsumerState<FeatureRosterItem> {
         ? ref.watch(projectDetailProvider(feature.projectId!)).valueOrNull
         : null;
 
+    final isNonArch = feature.isNonArchaeological;
     final firstCut = ref.watch(firstCutByFeatureProvider(feature.id)).valueOrNull;
     final cutLabel = firstCut != null
         ? firstCut.contextNumber.toString().padLeft(3, '0')
@@ -70,20 +71,41 @@ class _FeatureRosterItemState extends ConsumerState<FeatureRosterItem> {
         ),
         child: Row(
           children: [
-            // ── First cut number (mono, dominant) ─────────────────────────
+            // ── First cut number, or "Non Arch" marker (mono, dominant) ───
             SizedBox(
               width: 56,
-              child: Text(
-                cutLabel,
-                style: TextStyle(
-                  fontFamily: AppTypography.monoFontFamily,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 20,
-                  letterSpacing: -0.5,
-                  height: 1,
-                  color: firstCut != null ? colors.t0 : colors.t2,
-                ),
-              ),
+              child: isNonArch
+                  // Non-archaeological features show a compact marker that
+                  // scales down to fit the fixed-width slot without overflow.
+                  ? FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Non Arch',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: AppTypography.monoFontFamily,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          letterSpacing: -0.2,
+                          height: 1,
+                          color: colors.t1,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      cutLabel,
+                      style: TextStyle(
+                        fontFamily: AppTypography.monoFontFamily,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 20,
+                        letterSpacing: -0.5,
+                        height: 1,
+                        color: firstCut != null ? colors.t0 : colors.t2,
+                      ),
+                    ),
             ),
 
             // ── Site Information ───────────────────────────────────────

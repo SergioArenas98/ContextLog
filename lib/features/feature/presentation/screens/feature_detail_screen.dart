@@ -14,6 +14,7 @@ import '../../../harris_matrix/domain/models/harris_relation_model.dart';
 import '../../../harris_matrix/presentation/providers/harris_providers.dart';
 import '../../../harris_matrix/presentation/widgets/harris_interactive_matrix.dart';
 import '../../../harris_matrix/presentation/widgets/relation_form_sheet.dart';
+import '../../domain/models/feature_model.dart';
 import '../providers/feature_providers.dart';
 import 'context_station_panel.dart';
 
@@ -60,6 +61,8 @@ class _FeatureDetailScreenState extends ConsumerState<FeatureDetailScreen> {
                 featureId: widget.featureId,
                 projectId: feature.projectId,
               ),
+              Container(height: 1, color: colors.rule),
+              _ClassificationBar(feature: feature),
               Container(height: 1, color: colors.rule),
               Expanded(
                 child: _StationBody(
@@ -221,6 +224,266 @@ class _StationHeader extends ConsumerWidget {
                 onPressed: () => context.push('/features/$featureId/edit'),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Classification bar ─────────────────────────────────────────────────────────
+
+/// Inline controls for the two feature-classification fields, surfaced on the
+/// main workspace so they can be changed without opening the edit form:
+///   • feature type — STANDARD vs SPREAD
+///   • archaeological status — NON-ARCH toggle
+///
+/// Changes persist through [FeatureRepository.updateClassification] and
+/// invalidate the detail + list providers so the workbench and the home roster
+/// both reflect the change immediately.
+class _ClassificationBar extends ConsumerStatefulWidget {
+  const _ClassificationBar({required this.feature});
+
+  final FeatureModel feature;
+
+  @override
+  ConsumerState<_ClassificationBar> createState() => _ClassificationBarState();
+}
+
+class _ClassificationBarState extends ConsumerState<_ClassificationBar> {
+  bool _busy = false;
+
+  FeatureModel get _feature => widget.feature;
+
+  Future<void> _setType(FeatureType type) async {
+    if (type == _feature.featureType) return;
+    await _apply(
+      () => ref.read(featureRepositoryProvider).updateClassification(
+            id: _feature.id,
+            featureType: type,
+          ),
+      '${type.displayName} feature',
+    );
+  }
+
+  Future<void> _toggleNonArch() async {
+    final next = !_feature.isNonArchaeological;
+    await _apply(
+      () => ref.read(featureRepositoryProvider).updateClassification(
+            id: _feature.id,
+            isNonArchaeological: next,
+          ),
+      next ? 'Marked non-archaeological' : 'Marked archaeological',
+    );
+  }
+
+  Future<void> _apply(
+    Future<void> Function() op,
+    String successMessage,
+  ) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await op();
+      ref.invalidate(featureDetailProvider(_feature.id));
+      ref.invalidate(featureListProvider);
+      ref.invalidate(filteredFeatureListProvider);
+      if (mounted) _showSnack(successMessage);
+    } catch (_) {
+      if (mounted) _showSnack('Could not update feature', isError: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _showSnack(String message, {bool isError = false}) {
+    final colors = AppColors.of(context);
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(milliseconds: 1400),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isError ? colors.error : null,
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Container(
+      color: colors.s0,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space16,
+        AppSpacing.space8,
+        AppSpacing.space16,
+        AppSpacing.space8,
+      ),
+      child: Row(
+        children: [
+          _SegmentedTypeControl(
+            selected: _feature.featureType,
+            enabled: !_busy,
+            onSelect: _setType,
+          ),
+          const Spacer(),
+          _NonArchToggle(
+            active: _feature.isNonArchaeological,
+            enabled: !_busy,
+            onTap: _toggleNonArch,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SegmentedTypeControl extends StatelessWidget {
+  const _SegmentedTypeControl({
+    required this.selected,
+    required this.enabled,
+    required this.onSelect,
+  });
+
+  final FeatureType selected;
+  final bool enabled;
+  final ValueChanged<FeatureType> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: colors.s1,
+        borderRadius: AppRadius.smBorderRadius,
+        border: Border.all(color: colors.rule, width: 1),
+      ),
+      child: ClipRRect(
+        borderRadius: AppRadius.smBorderRadius,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final t in FeatureType.values)
+              _TypeSegment(
+                label: t.displayName.toUpperCase(),
+                selected: t == selected,
+                enabled: enabled,
+                onTap: () => onSelect(t),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TypeSegment extends StatelessWidget {
+  const _TypeSegment({
+    required this.label,
+    required this.selected,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Material(
+      color: selected ? colors.primary : Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 56),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: AppTypography.monoFontFamily,
+              fontWeight: FontWeight.w700,
+              fontSize: 10,
+              letterSpacing: 1.0,
+              color: selected ? colors.onPrimary : colors.t1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NonArchToggle extends StatelessWidget {
+  const _NonArchToggle({
+    required this.active,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final bool active;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    final accent = active ? colors.primary : colors.t1;
+    return Tooltip(
+      message: active
+          ? 'Non-archaeological — tap to mark archaeological'
+          : 'Tap to mark non-archaeological',
+      child: Material(
+        color: active ? colors.primaryContainer : colors.s1,
+        borderRadius: AppRadius.smBorderRadius,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: AppRadius.smBorderRadius,
+          child: Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.smBorderRadius,
+              border: Border.all(
+                color: active ? colors.primary : colors.rule,
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  active
+                      ? Icons.do_not_disturb_on_outlined
+                      : Icons.terrain_outlined,
+                  size: 14,
+                  color: accent,
+                ),
+                const SizedBox(width: AppSpacing.space6),
+                Text(
+                  'NON-ARCH',
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: AppTypography.monoFontFamily,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                    letterSpacing: 1.0,
+                    color: accent,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

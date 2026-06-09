@@ -65,8 +65,16 @@ class SampleTypeConverter extends TypeConverter<SampleType, String> {
   const SampleTypeConverter();
 
   @override
-  SampleType fromSql(String fromDb) =>
-      SampleType.values.firstWhere((e) => e.name == fromDb);
+  SampleType fromSql(String fromDb) {
+    // Defensive fallback: legacy databases may still hold removed values
+    // (e.g. 'bulk', 'pollen'). The v8 migration rewrites these to 'other',
+    // but if any slip through they must not crash model conversion.
+    try {
+      return SampleType.values.firstWhere((e) => e.name == fromDb);
+    } catch (_) {
+      return SampleType.other;
+    }
+  }
 
   @override
   String toSql(SampleType value) => value.name;

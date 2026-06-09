@@ -89,7 +89,7 @@ A **sample** is a sediment sample taken from a fill for scientific analysis (rad
 - Must be linked to a fill via `fillId`
 - `cutId` is denormalized (copied from `fill.parentCutId`) for convenience
 - `sampleNumber` is **globally unique across all features** — site sample registers are project-wide
-- `sampleType`: soil, soil+charcoal, bulk, pollen, other
+- `sampleType`: soil, soil+charcoal, animalBone, humanBone, other
 - `storageType`: bucket, bag, jar, other
 - `liters`: optional volume
 

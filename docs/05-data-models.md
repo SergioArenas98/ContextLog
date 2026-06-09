@@ -159,7 +159,7 @@ Provides `.contextType` and `.displayLabel` helpers on any `ContextModel`.
 | `fillId` | `String` | No | FK → `contexts.id` CASCADE |
 | `cutId` | `String` | No | Denormalized from `fill.parentCutId`; no DB FK |
 | `sampleNumber` | `int` | No | **Globally unique** across all features |
-| `sampleType` | `SampleType` | No | Enum: soil/soilCharcoal/bulk/pollen/other |
+| `sampleType` | `SampleType` | No | Enum: soil/soilCharcoal/animalBone/humanBone/other |
 | `customSampleTypeText` | `String?` | Yes | Required when `sampleType == other` |
 | `storageType` | `StorageType` | No | Enum: bucket/bag/jar/other |
 | `liters` | `double?` | Yes | Volume of sample |

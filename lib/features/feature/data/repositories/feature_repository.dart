@@ -90,21 +90,53 @@ class FeatureRepository {
     return (await getById(id))!;
   }
 
-  /// Updates optional metadata on an existing feature.
+  /// Updates project/area metadata on an existing feature.
+  ///
+  /// Classification fields ([isNonArchaeological], [featureType]) are only
+  /// written when explicitly provided; when left null they are preserved as
+  /// stored. They are edited from the feature detail page via
+  /// [updateClassification], so the project/area edit form must not clobber
+  /// them.
   Future<FeatureModel> update({
     required String id,
     required String projectId,
     String? area,
-    bool isNonArchaeological = false,
-    FeatureType featureType = FeatureType.standard,
+    bool? isNonArchaeological,
+    FeatureType? featureType,
   }) async {
     final now = DateTime.now();
     await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id))).write(
       FeaturesTableCompanion(
         projectId: Value(projectId),
         area: Value(area?.trim().isNotEmpty == true ? area!.trim() : null),
-        isNonArchaeological: Value(isNonArchaeological),
-        featureType: Value(featureType),
+        isNonArchaeological: isNonArchaeological == null
+            ? const Value.absent()
+            : Value(isNonArchaeological),
+        featureType:
+            featureType == null ? const Value.absent() : Value(featureType),
+        updatedAt: Value(now),
+      ),
+    );
+    return (await getById(id))!;
+  }
+
+  /// Updates only the feature classification fields (archaeological status and
+  /// standard/spread type), leaving project/area untouched. Used by the inline
+  /// controls on the feature detail page. Pass only the value being changed;
+  /// null values are left as stored.
+  Future<FeatureModel> updateClassification({
+    required String id,
+    bool? isNonArchaeological,
+    FeatureType? featureType,
+  }) async {
+    final now = DateTime.now();
+    await (_db.update(_db.featuresTable)..where((t) => t.id.equals(id))).write(
+      FeaturesTableCompanion(
+        isNonArchaeological: isNonArchaeological == null
+            ? const Value.absent()
+            : Value(isNonArchaeological),
+        featureType:
+            featureType == null ? const Value.absent() : Value(featureType),
         updatedAt: Value(now),
       ),
     );

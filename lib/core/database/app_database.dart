@@ -92,6 +92,31 @@ class AppDatabase extends _$AppDatabase {
             // 'spread' features allow fill-only recording without a parent cut.
             await m.addColumn(featuresTable, featuresTable.featureType);
           }
+          if (from < 8) {
+            // v7→v8: SampleType enum changed — 'bulk' and 'pollen' removed,
+            // 'animalBone' and 'humanBone' added. Existing samples stored the
+            // removed values as the strings 'bulk' / 'pollen'. Rewrite those
+            // rows to 'other' BEFORE the app reads them, preserving the old
+            // label in custom_sample_type_text when it is empty, so enum
+            // conversion never encounters an unknown value.
+            //
+            // Order matters: copy the label first (while sample_type still
+            // holds the old value), then rewrite sample_type to 'other'.
+            await customStatement(
+              "UPDATE samples SET custom_sample_type_text = 'Bulk' "
+              "WHERE sample_type = 'bulk' AND "
+              "(custom_sample_type_text IS NULL OR custom_sample_type_text = '')",
+            );
+            await customStatement(
+              "UPDATE samples SET custom_sample_type_text = 'Pollen' "
+              "WHERE sample_type = 'pollen' AND "
+              "(custom_sample_type_text IS NULL OR custom_sample_type_text = '')",
+            );
+            await customStatement(
+              "UPDATE samples SET sample_type = 'other' "
+              "WHERE sample_type IN ('bulk', 'pollen')",
+            );
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // Enable foreign keys enforcement

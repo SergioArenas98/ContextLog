@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:context_log/core/constants/enums.dart';
 import 'package:context_log/core/database/app_database.dart';
 import 'package:context_log/features/feature/data/repositories/feature_repository.dart';
 import 'package:context_log/features/project/data/repositories/project_repository.dart';
@@ -136,6 +137,71 @@ void main() {
       final project = await projectRepo.create(name: 'Site');
       final feature = await repo.create(projectId: project.id);
       expect(feature.projectId, isNotNull);
+    });
+
+    test('new features default to archaeological, standard type', () async {
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id);
+
+      expect(feature.isNonArchaeological, isFalse);
+      expect(feature.featureType, FeatureType.standard);
+    });
+
+    test('updateClassification updates only classification fields', () async {
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id, area: 'North');
+
+      final updated = await repo.updateClassification(
+        id: feature.id,
+        isNonArchaeological: true,
+        featureType: FeatureType.spread,
+      );
+
+      expect(updated.isNonArchaeological, isTrue);
+      expect(updated.featureType, FeatureType.spread);
+      // Project/area metadata is untouched.
+      expect(updated.area, 'North');
+      expect(updated.projectId, project.id);
+    });
+
+    test('updateClassification leaves omitted fields as stored', () async {
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id);
+      await repo.updateClassification(
+        id: feature.id,
+        isNonArchaeological: true,
+        featureType: FeatureType.spread,
+      );
+
+      // Toggle only the type back; non-archaeological flag must persist.
+      final updated = await repo.updateClassification(
+        id: feature.id,
+        featureType: FeatureType.standard,
+      );
+
+      expect(updated.featureType, FeatureType.standard);
+      expect(updated.isNonArchaeological, isTrue);
+    });
+
+    test('update preserves classification when not provided', () async {
+      final project = await projectRepo.create(name: 'Site');
+      final feature = await repo.create(projectId: project.id, area: 'A');
+      await repo.updateClassification(
+        id: feature.id,
+        isNonArchaeological: true,
+        featureType: FeatureType.spread,
+      );
+
+      // Editing project/area must not reset the classification fields.
+      final updated = await repo.update(
+        id: feature.id,
+        projectId: project.id,
+        area: 'B',
+      );
+
+      expect(updated.area, 'B');
+      expect(updated.isNonArchaeological, isTrue);
+      expect(updated.featureType, FeatureType.spread);
     });
   });
 }
